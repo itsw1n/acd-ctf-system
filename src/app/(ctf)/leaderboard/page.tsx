@@ -28,27 +28,27 @@ export default async function LeaderboardPage() {
           <TacticalPanel label="Team leaderboard" className="min-w-0 p-5 sm:p-7">
             <div className="overflow-x-auto pt-3">
               <div className="min-w-[560px] space-y-2">
-              <div className="grid grid-cols-[64px_1fr_90px] border border-border bg-background/75 px-3 py-3 font-mono text-[10px] uppercase tracking-[0.13em] text-muted">
-                <span>Rank</span>
-                <span>Team</span>
-                <span className="text-right">Points</span>
-              </div>
-              {boards.teamRanks.map((row, index) => (
-                <div
-                  key={row.teamId}
-                  className={cn(
-                    'grid grid-cols-[64px_1fr_90px] items-center border border-border px-3 py-4 font-mono text-sm',
-                    index === 0 && 'border-warning/65 bg-warning/5 text-warning'
-                  )}
-                >
-                  <span className="font-bold">{index + 1}</span>
-                  <span className="flex items-center gap-2 font-semibold">
-                    {index === 0 && <Crown size={16} aria-hidden />}
-                    {row.team}
-                  </span>
-                  <span className="text-right font-bold">{row.points}</span>
+                <div className="grid grid-cols-[64px_1fr_90px] border border-border bg-background/75 px-3 py-3 font-mono text-[10px] uppercase tracking-[0.13em] text-muted">
+                  <span>Rank</span>
+                  <span>Team</span>
+                  <span className="text-right">Points</span>
                 </div>
-              ))}
+                {boards.teamRanks.map((row, index) => (
+                  <div
+                    key={row.teamId}
+                    className={cn(
+                      'grid grid-cols-[64px_1fr_90px] items-center border border-border px-3 py-4 font-mono text-sm',
+                      index === 0 && 'border-warning/65 bg-warning/5 text-warning'
+                    )}
+                  >
+                    <span className="font-bold">{index + 1}</span>
+                    <span className="flex items-center gap-2 font-semibold">
+                      {index === 0 && <Crown size={16} aria-hidden />}
+                      {row.team}
+                    </span>
+                    <span className="text-right font-bold">{row.points}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </TacticalPanel>
@@ -56,27 +56,27 @@ export default async function LeaderboardPage() {
           <TacticalPanel label="Player leaderboard" className="min-w-0 p-5 sm:p-7">
             <div className="overflow-x-auto pt-3">
               <div className="min-w-[620px] space-y-2">
-              <div className="grid grid-cols-[55px_1fr_1fr_72px] border border-border bg-background/75 px-3 py-3 font-mono text-[10px] uppercase tracking-[0.13em] text-muted">
-                <span>Rank</span>
-                <span>Alias</span>
-                <span>Team</span>
-                <span className="text-right">PTS</span>
-              </div>
-              {boards.playerRanks.map((row, index) => (
-                <div
-                  key={row.playerId}
-                  className={cn(
-                    'grid grid-cols-[55px_1fr_1fr_72px] items-center border border-border px-3 py-4 font-mono text-xs sm:text-sm',
-                    row.playerId === player.id &&
-                      'border-danger bg-primary/12 text-danger-bright shadow-[inset_3px_0_0_var(--color-danger)]'
-                  )}
-                >
-                  <span>{index + 1}</span>
-                  <span className="truncate font-semibold">{row.alias}</span>
-                  <span className="truncate">{row.team}</span>
-                  <span className="text-right font-bold">{row.points}</span>
+                <div className="grid grid-cols-[55px_1fr_1fr_72px] border border-border bg-background/75 px-3 py-3 font-mono text-[10px] uppercase tracking-[0.13em] text-muted">
+                  <span>Rank</span>
+                  <span>Alias</span>
+                  <span>Team</span>
+                  <span className="text-right">PTS</span>
                 </div>
-              ))}
+                {boards.playerRanks.map((row, index) => (
+                  <div
+                    key={row.playerId}
+                    className={cn(
+                      'grid grid-cols-[55px_1fr_1fr_72px] items-center border border-border px-3 py-4 font-mono text-xs sm:text-sm',
+                      row.playerId === player.id &&
+                        'border-danger bg-primary/12 text-danger-bright shadow-[inset_3px_0_0_var(--color-danger)]'
+                    )}
+                  >
+                    <span>{index + 1}</span>
+                    <span className="truncate font-semibold">{row.alias}</span>
+                    <span className="truncate">{row.team}</span>
+                    <span className="text-right font-bold">{row.points}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </TacticalPanel>
