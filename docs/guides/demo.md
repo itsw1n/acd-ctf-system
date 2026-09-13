@@ -27,10 +27,9 @@ local resets — the Supabase CLI never applies it to hosted projects.
 | `rapz`   | Tech Pioneers | Welcome Flag  | `ACD-S9HL-N2VK-YQUQ` |
 
 Plus one teamless `ADMIN` for the admin area: `root` (no team, no
-pre-solved challenges). Its password and recovery code are random per
-generation, shown once when created, and stored only as hashes in
-`seed.sql` — deliberately **not** reproducible shared credentials. Sign in
-as `root` to exercise `/admin/*`; `root` cannot submit flags.
+pre-solved challenges). Password: `ctf-demo-1234` (shared with demo
+players). Recovery code: `ACD-ROOT-ADMIN-001`. Sign in as `root` to
+exercise `/admin/*`; `root` cannot submit flags.
 
 Submittable demo flags: `ACD{welcome_to_ctf}`, `ACD{hidden_header_demo}`.
 
