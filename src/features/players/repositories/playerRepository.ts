@@ -1,12 +1,18 @@
 import 'server-only'
 import { createAdminClient } from '@/lib/supabase/admin'
-import type { Player, Team } from '@/features/players/types'
+import type { Player, PlayerRole, Team } from '@/features/players/types'
 
 type PlayerRow = {
   id: string
   full_name: string
   alias: string
   team_id: string
+  role: PlayerRole
+}
+
+type PlayerCredentialsRow = {
+  id: string
+  password_hash: string | null
 }
 
 type TeamRow = {
@@ -52,7 +58,7 @@ export async function getPlayerById(playerId: string): Promise<Player | null> {
 
   const { data: player, error: playerError } = await supabase
     .from('players')
-    .select('id,full_name,alias,team_id')
+    .select('id,full_name,alias,team_id,role')
     .eq('id', playerId)
     .maybeSingle()
 
@@ -71,6 +77,7 @@ export async function getPlayerById(playerId: string): Promise<Player | null> {
     id: player.id,
     fullName: player.full_name,
     alias: player.alias,
+    role: (player as PlayerRow).role,
     team: team as TeamRow,
   }
 }
@@ -79,6 +86,7 @@ export async function createPlayer(input: {
   fullName: string
   alias: string
   teamId: string
+  passwordHash: string
   recoveryCodeHash: string
 }) {
   const supabase = createAdminClient()
@@ -88,6 +96,9 @@ export async function createPlayer(input: {
       full_name: input.fullName,
       alias: input.alias,
       team_id: input.teamId,
+      // Role is forced server-side. Never accept it from client input.
+      role: 'PLAYER',
+      password_hash: input.passwordHash,
       recovery_code_hash: input.recoveryCodeHash,
     })
     .select('id')
@@ -101,6 +112,31 @@ export async function createPlayer(input: {
   }
 
   return data.id as string
+}
+
+/** Returns id + password hash for signin. The hash must never reach the client. */
+export async function getPlayerCredentialsByAlias(
+  alias: string
+): Promise<PlayerCredentialsRow | null> {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('players')
+    .select('id,password_hash')
+    .ilike('alias', alias)
+    .maybeSingle()
+
+  if (error) throw new Error(`Unable to find player: ${error.message}`)
+  return (data as PlayerCredentialsRow | null) ?? null
+}
+
+export async function updatePlayerPassword(playerId: string, passwordHash: string) {
+  const supabase = createAdminClient()
+  const { error } = await supabase
+    .from('players')
+    .update({ password_hash: passwordHash })
+    .eq('id', playerId)
+
+  if (error) throw new Error(`Unable to update password: ${error.message}`)
 }
 
 export async function verifyRecoveryCode(playerId: string, recoveryCodeHash: string) {

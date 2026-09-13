@@ -7,10 +7,13 @@ export async function createSessionRecord(input: {
   expiresAt: string
 }) {
   const supabase = createAdminClient()
+  // last_seen_at is written once here at creation and never updated on reads,
+  // so session validation performs no per-request writes.
   const { error } = await supabase.from('player_sessions').insert({
     player_id: input.playerId,
     token_hash: input.tokenHash,
     expires_at: input.expiresAt,
+    last_seen_at: new Date().toISOString(),
   })
 
   if (error) throw new Error(`Unable to create session: ${error.message}`)
@@ -36,4 +39,12 @@ export async function deleteSessionByTokenHash(tokenHash: string) {
   const { error } = await supabase.from('player_sessions').delete().eq('token_hash', tokenHash)
 
   if (error) throw new Error(`Unable to remove session: ${error.message}`)
+}
+
+/** Revokes every session for a player (used after password reset). */
+export async function deleteAllSessionsForPlayer(playerId: string) {
+  const supabase = createAdminClient()
+  const { error } = await supabase.from('player_sessions').delete().eq('player_id', playerId)
+
+  if (error) throw new Error(`Unable to remove sessions: ${error.message}`)
 }
