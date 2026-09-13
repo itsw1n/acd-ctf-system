@@ -20,8 +20,9 @@ from README direction (user-approved onboarding).
 
 - Players (students): sign up with team name, full name, unique alias, and
   password; sign in with alias + password.
-- Admins (organizers): seed challenges/flags directly in SQL; remove demo rows
-  before the real event. No admin UI in v1.
+- Admins (organizers): manage challenges/teams and review players/solves via
+  `/admin/*` (guarded by `requireAdmin()`); accounts are promoted manually in
+  Supabase. No Docker/hosting controls.
 
 ## Core Workflows
 
@@ -47,13 +48,18 @@ from README direction (user-approved onboarding).
 - Wrong/duplicate submissions are rejected with safe errors.
 - Leaderboards and activity reflect solves.
 - Service-role key stays server-only (never NEXT*PUBLIC*\*).
+- Admin pages/mutations require ADMIN via `requireAdmin()`; signup never
+  accepts a role and always creates PLAYER.
+- Challenge flags are SHA-256 hashed server-side; plaintext is never stored
+  or returned; blank edit flag keeps the current hash.
 - `npm run lint && npm run typecheck && npm test && npm run build` pass.
 
 ## Out of Scope
 
-- Docker-hosted challenge instances (no per-challenge containers in v1).
+- Docker-hosted challenge instances (no per-challenge containers).
 - Supabase Auth.
-- Admin UI (SQL seeding + manual role promotion only).
+- Admin promotion/demotion UI, event start/stop, manual score adjustment,
+  solve deletion, unsafe team deletion.
 - Enforced rate limiting + CSRF hardening for cookie writes: required before any
   larger/public event (boundary hook exists, provider not yet integrated).
 
@@ -74,7 +80,10 @@ from README direction (user-approved onboarding).
   unique alias with HttpOnly session cookie + one-time recovery code; admins
   seed flags via SQL (`node scripts/hash-flag.mjs`, store SHA-256 digest only).
 - 2026-09-13 (user): leaderboards (team + player), personal activity, simple
-  profile are in scope; Docker challenges and admin UI are out.
+  profile are in scope; Docker challenges are out.
+- 2026-09-13 (user): admin area (`/admin/*`: overview, players, teams,
+  challenges, solves) is in scope; challenge management is the primary
+  feature with server-hashed flags and strict TEXT/FILE/EXTERNAL URL rules.
 
 ## Approved Deviations
 
@@ -85,6 +94,11 @@ from README direction (user-approved onboarding).
   `src/lib/security/*`, `src/app/{signin,signup,forgot-password}/**`.
   Recovery: passwords are Argon2id hashes (irreversible); rollback = restore
   pre-002 database backup, which drops password_hash/role/last_seen_at.
+- 2026-09-13 (approver: user/spec author): admin UI replaces SQL-only
+  challenge seeding. Rationale: organizers need operational challenge/team
+  management without production SQL. Files: `supabase/migrations/003_admin_challenges.sql`,
+  `src/features/admin/**`, `src/features/challenges/**`, `src/app/(ctf)/admin/**`.
+  Scope stays static flags only; no hosting/lifecycle controls.
 
 ## Notes
 

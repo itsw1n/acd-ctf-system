@@ -19,6 +19,9 @@
   PR + 1 approval + resolved conversations required, enforced for admins.
   Required status checks NOT yet set (repo has no Supabase secrets, so CI
   build cannot pass until hosted Supabase is wired).
+- 2026-09-14 (verified via API): approval gate no longer in effect — `main`
+  has no required reviews/checks, `dev` is unprotected, no rulesets exist.
+  Both PRs report MERGEABLE.
 - 2026-09-13: Project setup — upgraded npm 10.9.8 → 11.19.0 (project requires
   ≥11.19.0; old npm crashed with `edgesOut` error), `npm install` (476 pkgs),
   created `.env.local`, fixed `supabase/config.toml` (project_id, PG15, ports
@@ -30,7 +33,9 @@
 
 ## In Progress
 
-- CTF schema + join/session/flag/leaderboard implementation (starter still in place).
+- Admin area (`/admin/*`): overview, players, teams, challenges (CRUD + flag
+  hashing), solves; migration `003_admin_challenges.sql`; `requireAdmin()`
+  enforcement; tests for auth/flag/validation/secret-safety.
 
 ## Up Next
 
