@@ -11,7 +11,7 @@ export default async function ProfilePage() {
 
   const rows: Array<{ label: string; value: string; tone?: 'default' | 'success' }> = [
     { label: 'Full name', value: player.fullName },
-    { label: 'Team', value: player.team.name },
+    { label: 'Team', value: player.team?.name ?? '—' },
     { label: 'Role', value: player.role },
     // Rendered only with a valid session, so presence here means active.
     { label: 'Session', value: 'ACTIVE', tone: 'success' },
