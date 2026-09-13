@@ -46,14 +46,8 @@ jobs:
       - run: npm ci
       - run: npm audit --audit-level=high
 
-  codeql:
-    permissions:
-      contents: read
-      security-events: write
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - uses: github/codeql-action/init@5ba2889ada762081db2c4f32a729827dce632c7b # v3
-        with:
-          languages: javascript-typescript
-      - uses: github/codeql-action/analyze@5ba2889ada762081db2c4f32a729827dce632c7b # v3
+  # NOTE: no workflow codeql job here on purpose. GitHub's default code
+  # scanning already analyzes every PR (it caught the recovery-code modulo
+  # bias), while this workflow's upload-only job duplicated it and flaked on
+  # SARIF upload for PR events. Dependency-review, secret-scan, and npm-audit
+  # above remain the workflow's contribution.
