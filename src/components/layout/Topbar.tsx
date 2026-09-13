@@ -1,5 +1,5 @@
-import { ShieldAlert } from "lucide-react";
-import type { Player } from "@/features/players/types";
+import { ShieldAlert } from 'lucide-react'
+import type { Player } from '@/features/players/types'
 
 export function Topbar({ player, score }: { player: Player; score: number }) {
   return (
@@ -35,9 +35,11 @@ export function Topbar({ player, score }: { player: Player; score: number }) {
       </div>
 
       <div className="flex min-w-24 flex-col justify-center border-l border-border px-3 sm:min-w-36 sm:px-5">
-        <div className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted">Total score</div>
+        <div className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted">
+          Total score
+        </div>
         <div className="font-mono text-lg font-bold text-danger-bright sm:text-xl">{score} PTS</div>
       </div>
     </header>
-  );
+  )
 }

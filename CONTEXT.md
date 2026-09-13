@@ -1,6 +1,7 @@
 # CONTEXT.md
 
 ## Project
+
 **Name:** acd-ctf-system
 **Description:** ctf system for school competition
 **Stack:** nextjs-supabase
@@ -10,16 +11,19 @@
 **Product status:** active
 
 ## Product Goals
+
 School Capture The Flag competition platform: students join with a team, submit
 static flags, and compete on team and player leaderboards. Confirmed 2026-09-13
 from README direction (user-approved onboarding).
 
 ## Users
+
 - Players (students): join with team name, full name, unique alias; no passwords.
 - Admins (organizers): seed challenges/flags directly in SQL; remove demo rows
   before the real event. No admin UI in v1.
 
 ## Core Workflows
+
 1. Join: team + full name + unique alias → persistent opaque HttpOnly session
    cookie (SHA-256 token hash stored in PostgreSQL) + one-time recovery code
    (only its SHA-256 hash stored, shown once).
@@ -29,14 +33,16 @@ from README direction (user-approved onboarding).
 5. Personal activity page + simple profile page.
 
 ## Acceptance Criteria
+
 - Join/login/recover works without passwords or Supabase Auth.
 - Correct flag awards points exactly once per player per challenge.
 - Wrong/duplicate submissions are rejected with safe errors.
 - Leaderboards and activity reflect solves.
-- Service-role key stays server-only (never NEXT_PUBLIC_*).
+- Service-role key stays server-only (never NEXT*PUBLIC*\*).
 - `npm run lint && npm run typecheck && npm test && npm run build` pass.
 
 ## Out of Scope
+
 - Docker-hosted challenge instances (no per-challenge containers in v1).
 - Passwords / Supabase Auth.
 - Admin UI (SQL seeding only).
@@ -44,6 +50,7 @@ from README direction (user-approved onboarding).
   larger/public event (see README security notes).
 
 ## Generated Baseline
+
 <!-- These values were selected during generation. Deviations require explicit approval. -->
 
 - Architecture profile: medium
@@ -54,6 +61,7 @@ from README direction (user-approved onboarding).
 - Offline behavior: none
 
 ## Product Decisions
+
 - 2026-09-13 (user): v1 = static global flags only; auth = team + full name +
   unique alias with HttpOnly session cookie + one-time recovery code; admins
   seed flags via SQL (`node scripts/hash-flag.mjs`, store SHA-256 digest only).
@@ -61,10 +69,13 @@ from README direction (user-approved onboarding).
   profile are in scope; Docker challenges and admin UI are out.
 
 ## Approved Deviations
+
 <!-- Record date, approver, rationale, affected files, and recovery path. -->
+
 - (none)
 
 ## Notes
+
 - Starter baseline (`StarterStatus`, example migration) is not the product; keep
   reusable infra and replace starter behavior incrementally with tested CTF
   behavior (Starter Transition).
@@ -75,6 +86,7 @@ from README direction (user-approved onboarding).
 - `.env.local` points at the local stack; never commit real credentials.
 
 ## Expected Concerns (advisory)
+
 - validation
 - query
 - state
