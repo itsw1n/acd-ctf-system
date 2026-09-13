@@ -1,0 +1,93 @@
+name: Release
+
+# Cut a versioned release every time a PR lands on main. Direct pushes
+# cannot release (main only ever moves via PR), and no code or config
+# changes are involved — the job only tags and writes release notes.
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: write
+  checks: read
+
+concurrency:
+  group: release-main
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Wait for green CI on the merge commit
+        # A version pin must mean "merged AND tested green". Poll the
+        # commit's check runs (CI, Security, CodeQL scans) and fail this job
+        # if anything concludes non-green. Skipped/neutral results are OK.
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          sha="${{ github.event.pull_request.merge_commit_sha }}"
+          echo "Waiting on checks for $sha ..."
+          deadline=$(( $(date +%s) + 1500 ))
+          while true; do
+            report="$(gh api "repos/${{ github.repository }}/commits/$sha/check-runs" --paginate --jq '{
+              pending: ([.check_runs[] | select(.status != "completed")] | length),
+              failed: ([.check_runs[] | select(.status == "completed" and (.conclusion != "success" and .conclusion != "skipped" and .conclusion != "neutral")) | .name])
+            }')"
+            pending="$(echo "$report" | jq -r .pending)"
+            failed="$(echo "$report" | jq -c .failed)"
+            if [ "$pending" -eq 0 ]; then
+              if [ "$failed" = "[]" ]; then
+                echo 'All checks green. Releasing.'
+                break
+              fi
+              echo "Blocked: failing checks: $failed"
+              exit 1
+            fi
+            if [ "$(date +%s)" -ge "$deadline" ]; then
+              echo 'Timed out waiting for checks.'
+              exit 1
+            fi
+            echo "Still pending ($pending) — rechecking in 30s ..."
+            sleep 30
+          done
+
+      - name: Compute next version
+        id: version
+        run: |
+          last="$(git describe --tags --abbrev=0 --match 'v[0-9]*' 2>/dev/null || echo v0.0.0)"
+          echo "Previous tag: $last"
+          if [ "$last" = v0.0.0 ]; then
+            subjects="$(git log --pretty=%s)"
+          else
+            subjects="$(git log "$last"..HEAD --pretty=%s)"
+          fi
+          major="$(echo "$last" | cut -d. -f1 | tr -dc '0-9')"
+          minor="$(echo "$last" | cut -d. -f2)"
+          patch="$(echo "$last" | cut -d. -f3)"
+          if echo "$subjects" | grep -qiE 'breaking change'; then
+            major=$((major + 1)); minor=0; patch=0
+          elif echo "$subjects" | grep -qiE '^feat(\(|:)'; then
+            minor=$((minor + 1)); patch=0
+          else
+            patch=$((patch + 1))
+          fi
+          next="$major.$minor.$patch"
+          echo "Next version: v$next"
+          echo "next=$next" >> "$GITHUB_OUTPUT"
+
+      - name: Tag and publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git tag "v${{ steps.version.outputs.next }}"
+          git push origin "v${{ steps.version.outputs.next }}"
+          gh release create "v${{ steps.version.outputs.next }}" \
+            --title "v${{ steps.version.outputs.next }}" \
+            --generate-notes
