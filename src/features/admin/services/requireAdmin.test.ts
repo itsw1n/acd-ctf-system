@@ -15,15 +15,16 @@ vi.mock('next/navigation', () => ({
 
 import { getCurrentPlayer } from '@/features/sessions/services/sessionService'
 import { requireAdmin } from '@/features/admin/services/requireAdmin'
+import type { Player } from '@/features/players/types'
 
-function adminPlayer() {
+function adminPlayer(): Player {
   return {
     id: 'admin-id',
     fullName: 'Admin User',
     alias: 'admin',
     role: 'ADMIN',
     team: { id: 'team-id', name: 'Ops', slug: 'ops' },
-  } as never
+  }
 }
 
 function regularPlayer() {
@@ -50,5 +51,10 @@ describe('requireAdmin', () => {
   it('allows admins', async () => {
     vi.mocked(getCurrentPlayer).mockResolvedValueOnce(adminPlayer())
     await expect(requireAdmin()).resolves.toMatchObject({ role: 'ADMIN' })
+  })
+
+  it('allows teamless ADMIN accounts', async () => {
+    vi.mocked(getCurrentPlayer).mockResolvedValueOnce({ ...adminPlayer(), team: null } as never)
+    await expect(requireAdmin()).resolves.toMatchObject({ role: 'ADMIN', team: null })
   })
 })

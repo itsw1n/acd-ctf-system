@@ -20,8 +20,7 @@ function tableChain(result: { data: unknown; error: null }) {
 }
 
 describe('public signup cannot self-assign ADMIN', () => {
-  it('strips role from signup input', () => {
-    const parsed = signUpSchema.safeParse({
+  it('strips role from signup input', () => {    const parsed = signUpSchema.safeParse({
       teamId: '4b2873c8-01b9-4c22-9482-858276b94c43',
       fullName: 'Test Player',
       alias: 'testplayer',
@@ -34,6 +33,16 @@ describe('public signup cannot self-assign ADMIN', () => {
     if (parsed.success) {
       expect(parsed.data).not.toHaveProperty('role')
     }
+  })
+
+  it('still requires a team for public signup', () => {
+    const withoutTeam = {
+      fullName: 'Test Player',
+      alias: 'testplayer',
+      password: '0123456789',
+      confirmPassword: '0123456789',
+    }
+    expect(signUpSchema.safeParse(withoutTeam).success).toBe(false)
   })
 })
 
