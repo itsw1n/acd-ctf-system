@@ -46,7 +46,7 @@ export async function getCurrentPlayer() {
 
 export async function requireCurrentPlayer() {
   const player = await getCurrentPlayer()
-  if (!player) redirect('/')
+  if (!player) redirect('/signin')
   return player
 }
 
