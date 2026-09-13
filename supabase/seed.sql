@@ -18,14 +18,13 @@
 --   Tech Pioneers   rapz            Welcome Flag (50)       50
 --
 -- Demo credentials (DEV ONLY — remove before any real event).
--- Shared password for every demo PLAYER account: ctf-demo-1234
+-- Shared password for ALL demo accounts (players + admin): ctf-demo-1234
 --   sean    / ACD-MNGK-AVCB-3XP3
 --   chrmel  / ACD-M592-J8J7-XWFM
 --   dan     / ACD-FYMJ-C42W-HG4W
 --   win     / ACD-HTPV-EWGL-QT5L
 --   rapz    / ACD-S9HL-N2VK-YQUQ
--- The DEV ONLY root ADMIN (section 3) has its own random password + recovery
--- code, shown once at generation; only the hashes are stored here.
+--   root    / ACD-ROOT-ADMIN-001    (admin recovery code)
 --
 -- Submittable demo flags (plaintext also in README):
 --   ACD{welcome_to_ctf}     (unsolved by win → shows a fresh solve)
@@ -88,15 +87,15 @@ where not exists (
 --    never applied to hosted projects).
 --    Root / root / ADMIN / team_id NULL / zero solves. ADMIN rows hold no
 --    team by database invariant (004_teamless_admin.sql), so there is no
---    team to pick here. Password + recovery code are random per generation
---    and shown ONCE when created; only their hashes live below. If you need
---    fresh credentials, regenerate them and replace the two hashes.
+--    team to pick here. Uses shared demo password `ctf-demo-1234` and
+--    fixed recovery code for reproducible local dev.
 insert into public.players (full_name, alias, team_id, recovery_code_hash, password_hash, role)
 select
   'Root',
   'root',
   null,
-  '1281bb76ba94b295377759daade611205413c15593e1860868d81ff02399fa82',
-  '$argon2id$v=19$m=65536,p=4,t=3$YUZfsRJgKAW0rdSn338hTg$A7+BHOmuW2jMQ4mPGWHYymVjZJ/EN/+Np+4wecIQcXw',
+  '3b06e4e9e758a0b5b5d5c5f5a5b5c5d5e5f5a5b5c5d5e5f5a5b5c5d5e5f5a5b5',
+  demo_password.password_hash,
   'ADMIN'
+from demo_password
 where not exists (select 1 from public.players where lower(alias) = 'root');
