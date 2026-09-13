@@ -30,7 +30,9 @@
 
 ## In Progress
 
-- CTF schema + join/session/flag/leaderboard implementation (starter still in place).
+- Admin area (`/admin/*`): overview, players, teams, challenges (CRUD + flag
+  hashing), solves; migration `003_admin_challenges.sql`; `requireAdmin()`
+  enforcement; tests for auth/flag/validation/secret-safety.
 
 ## Up Next
 
