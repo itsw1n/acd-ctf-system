@@ -93,7 +93,7 @@ Insert only the resulting SHA-256 digest into `challenges.flag_hash`.
 - Password resets revoke ALL sessions for the player.
 - Roles (`PLAYER`/`ADMIN`) are forced server-side; public signup always creates
   `PLAYER`. Promote manually: `UPDATE players SET role = 'ADMIN' WHERE
-  lower(alias) = lower('myalias');`
+lower(alias) = lower('myalias');`
 - Flag values are hashed before database lookup.
 - `UNIQUE(player_id, challenge_id)` prevents duplicate scoring at the database layer.
 - Service-role credentials remain server-only.

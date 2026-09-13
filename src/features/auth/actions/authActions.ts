@@ -1,7 +1,11 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { signInSchema, signUpSchema, resetPasswordSchema } from '@/features/auth/schemas/authSchemas'
+import {
+  signInSchema,
+  signUpSchema,
+  resetPasswordSchema,
+} from '@/features/auth/schemas/authSchemas'
 import { signIn } from '@/features/auth/services/signIn'
 import { continueAfterSignup, signUp } from '@/features/auth/services/signUp'
 import { resetPassword } from '@/features/auth/services/resetPassword'
@@ -58,7 +62,12 @@ export async function continueSignupAction(_previous: ContinueSignupState, formD
   const playerId = formData.get('playerId')
   const recoveryCode = formData.get('recoveryCode')
 
-  if (typeof playerId !== 'string' || typeof recoveryCode !== 'string' || !playerId || !recoveryCode) {
+  if (
+    typeof playerId !== 'string' ||
+    typeof recoveryCode !== 'string' ||
+    !playerId ||
+    !recoveryCode
+  ) {
     return { error: 'Verification failed. Please sign in.' }
   }
 

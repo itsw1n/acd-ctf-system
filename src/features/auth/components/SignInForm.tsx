@@ -37,11 +37,7 @@ export function SignInForm({ resetSuccess }: { resetSuccess: boolean }) {
               size={17}
               aria-hidden
             />
-            <Input
-              className="pl-11"
-              placeholder="Enter your alias"
-              autoComplete="username"
-            />
+            <Input className="pl-11" placeholder="Enter your alias" autoComplete="username" />
           </div>
         </TextField>
 

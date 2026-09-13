@@ -3,10 +3,7 @@
 import { useActionState, useState } from 'react'
 import { Label, TextField } from 'react-aria-components'
 import { KeyRound, RotateCcw, Terminal } from 'lucide-react'
-import {
-  resetPasswordAction,
-  type ResetPasswordState,
-} from '@/features/auth/actions/authActions'
+import { resetPasswordAction, type ResetPasswordState } from '@/features/auth/actions/authActions'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
@@ -32,11 +29,7 @@ export function ResetPasswordForm() {
               size={17}
               aria-hidden
             />
-            <Input
-              className="pl-11"
-              placeholder="Enter your alias"
-              autoComplete="username"
-            />
+            <Input className="pl-11" placeholder="Enter your alias" autoComplete="username" />
           </div>
         </TextField>
 
@@ -107,8 +100,8 @@ export function ResetPasswordForm() {
         )}
 
         <p className="border-t border-border pt-4 font-mono text-xs leading-5 text-muted">
-          Use the alias and recovery code issued when you created your account. Resetting signs
-          you out everywhere.
+          Use the alias and recovery code issued when you created your account. Resetting signs you
+          out everywhere.
         </p>
       </form>
     </TacticalPanel>

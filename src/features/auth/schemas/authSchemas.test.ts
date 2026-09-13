@@ -19,7 +19,11 @@ describe('signup schema', () => {
   })
 
   it('rejects passwords shorter than 10 characters', () => {
-    const result = signUpSchema.safeParse({ ...validSignup, password: 'short1', confirmPassword: 'short1' })
+    const result = signUpSchema.safeParse({
+      ...validSignup,
+      password: 'short1',
+      confirmPassword: 'short1',
+    })
     expect(result.success).toBe(false)
   })
 
@@ -46,9 +50,7 @@ describe('signup schema', () => {
 
 describe('signin schema', () => {
   it('accepts alias and password', () => {
-    expect(signInSchema.safeParse({ alias: 'testplayer', password: 'whatever' }).success).toBe(
-      true
-    )
+    expect(signInSchema.safeParse({ alias: 'testplayer', password: 'whatever' }).success).toBe(true)
   })
 })
 

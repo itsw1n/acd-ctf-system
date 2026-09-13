@@ -29,9 +29,7 @@ test('root and dashboard redirect logged-out visitors to signin', async ({ page 
   await expect(page.getByRole('heading', { name: 'Enter the CTF' })).toBeVisible()
 })
 
-test('signup shows the recovery code once, then continues to the dashboard', async ({
-  page,
-}) => {
+test('signup shows the recovery code once, then continues to the dashboard', async ({ page }) => {
   const alias = uniqueAlias('e2ecode')
   await signUp(page, alias)
 
@@ -96,10 +94,7 @@ test('signin rejects wrong passwords with a generic error', async ({ page }) => 
   await expect(page).toHaveURL('/dashboard')
 })
 
-test('forgot-password resets the password and revokes old sessions', async ({
-  page,
-  context,
-}) => {
+test('forgot-password resets the password and revokes old sessions', async ({ page, context }) => {
   const alias = uniqueAlias('e2ereset')
   await signUp(page, alias)
   const code = await page.getByText(/ACD-[A-Z2-9]{4}-[A-Z2-9]{4}-[A-Z2-9]{4}/).textContent()

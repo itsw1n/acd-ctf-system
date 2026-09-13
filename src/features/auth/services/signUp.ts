@@ -42,10 +42,7 @@ export async function continueAfterSignup(input: {
   playerId: string
   recoveryCode: string
 }): Promise<void> {
-  const valid = await verifyRecoveryCode(
-    input.playerId,
-    sha256(input.recoveryCode.toUpperCase())
-  )
+  const valid = await verifyRecoveryCode(input.playerId, sha256(input.recoveryCode.toUpperCase()))
   if (!valid) throw new Error('INVALID_RECOVERY')
 
   await issuePlayerSession(input.playerId)

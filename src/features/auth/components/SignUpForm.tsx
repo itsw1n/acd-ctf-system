@@ -41,8 +41,7 @@ export function SignUpForm({ teams }: { teams: Team[] }) {
             </h2>
             <p className="mt-3 max-w-xl font-mono text-sm leading-6 text-muted">
               This code will only be shown once. You will need it
-              <span className="text-foreground"> {state.alias}</span> if you forget your
-              password.
+              <span className="text-foreground"> {state.alias}</span> if you forget your password.
             </p>
           </div>
 
@@ -158,11 +157,7 @@ export function SignUpForm({ teams }: { teams: Team[] }) {
               size={17}
               aria-hidden
             />
-            <Input
-              className="pl-11"
-              placeholder="Choose your hacker tag"
-              autoComplete="username"
-            />
+            <Input className="pl-11" placeholder="Choose your hacker tag" autoComplete="username" />
           </div>
         </TextField>
 
