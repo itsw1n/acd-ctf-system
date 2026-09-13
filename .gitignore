@@ -1,0 +1,45 @@
+# Environment
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Dependencies
+node_modules/
+
+# Build outputs
+.next/
+out/
+*.tsbuildinfo
+src/generated/prisma/
+
+# Vercel
+.vercel/
+
+# IDE (personal files stay local; shared workspace settings are committed)
+.idea/
+.vscode/*
+!.vscode/settings.json
+*.iml
+*.suo
+*.user
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+
+# Testing
+coverage/
+playwright-report/
+test-results/
+
+# Docker volumes
+postgres-data/
+
+# Supabase
+.supabase/
