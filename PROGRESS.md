@@ -1,11 +1,22 @@
 # PROGRESS.md
 
 ## Status
-🟢 Baseline running — CTF build not started
+🟢 CTF implementation merged to main — live on dev server
 
 ---
 
 ## Completed
+- 2026-09-13: Copied real CTF implementation from `../acd-ctf` (join, sessions,
+  flags, leaderboards, activity, profile, schema 001) onto this project's
+  baseline; added missing `server-only` dep + vitest stub; replaced stale
+  starter tests/e2e; removed example migration.
+- 2026-09-13: Merged via PR relay on branch `feature/ctf-implementation`
+  (13 commits) → `dev` (PR #1) → `main` (PR #2). Remote:
+  `github.com/itsw1n/acd-ctf-system`.
+- 2026-09-13: `main` branch protection on — direct pushes rejected (GH006),
+  PR + 1 approval + resolved conversations required, enforced for admins.
+  Required status checks NOT yet set (repo has no Supabase secrets, so CI
+  build cannot pass until hosted Supabase is wired).
 - 2026-09-13: Project setup — upgraded npm 10.9.8 → 11.19.0 (project requires
   ≥11.19.0; old npm crashed with `edgesOut` error), `npm install` (476 pkgs),
   created `.env.local`, fixed `supabase/config.toml` (project_id, PG15, ports
