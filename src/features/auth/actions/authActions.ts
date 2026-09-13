@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation'
 import { signInSchema, signUpSchema, resetPasswordSchema } from '@/features/auth/schemas/authSchemas'
 import { signIn } from '@/features/auth/services/signIn'
-import { signUp } from '@/features/auth/services/signUp'
+import { continueAfterSignup, signUp } from '@/features/auth/services/signUp'
 import { resetPassword } from '@/features/auth/services/resetPassword'
 import { clearCurrentSession } from '@/features/sessions/services/sessionService'
 import { checkAuthRateLimit } from '@/lib/security/rateLimit'
@@ -12,6 +12,7 @@ export type SignUpState = {
   error?: string
   recoveryCode?: string
   alias?: string
+  playerId?: string
 }
 
 export async function signUpAction(
@@ -43,6 +44,33 @@ export async function signUpAction(
     }
     return { error: 'Registration failed. Please try again.' }
   }
+}
+
+export type ContinueSignupState = {
+  error?: string
+}
+
+/**
+ * Issues the first session after signup. The caller must prove knowledge of
+ * the just-issued recovery code; a bare playerId grants nothing.
+ */
+export async function continueSignupAction(_previous: ContinueSignupState, formData: FormData) {
+  const playerId = formData.get('playerId')
+  const recoveryCode = formData.get('recoveryCode')
+
+  if (typeof playerId !== 'string' || typeof recoveryCode !== 'string' || !playerId || !recoveryCode) {
+    return { error: 'Verification failed. Please sign in.' }
+  }
+
+  await checkAuthRateLimit(`continue:${playerId}`)
+
+  try {
+    await continueAfterSignup({ playerId, recoveryCode })
+  } catch {
+    return { error: 'Verification failed. Please sign in.' }
+  }
+
+  redirect('/dashboard')
 }
 
 export type SignInState = {

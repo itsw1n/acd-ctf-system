@@ -1,9 +1,13 @@
 import 'server-only'
 import { createRecoveryCode, hashPassword, sha256 } from '@/lib/security/hash'
-import { createPlayer, getTeamById } from '@/features/players/repositories/playerRepository'
+import {
+  createPlayer,
+  getTeamById,
+  verifyRecoveryCode,
+} from '@/features/players/repositories/playerRepository'
 import { issuePlayerSession } from '@/features/sessions/services/sessionService'
 
-export type SignUpResult = { recoveryCode: string; alias: string }
+export type SignUpResult = { recoveryCode: string; alias: string; playerId: string }
 
 export async function signUp(input: {
   teamId: string
@@ -23,7 +27,26 @@ export async function signUp(input: {
     recoveryCodeHash: sha256(recoveryCode.toUpperCase()),
   })
 
-  await issuePlayerSession(playerId)
+  // No session here on purpose: issuing the session cookie inside this action
+  // makes Next.js reload the route and drops the one-time recovery-code state.
+  // The session is issued by continueAfterSignup once the user saves the code.
+  return { recoveryCode, alias: input.alias, playerId }
+}
 
-  return { recoveryCode, alias: input.alias }
+/**
+ * Second half of signup. Proves knowledge of the just-issued recovery code
+ * (verified against its stored hash) before creating the first session, so a
+ * bare playerId can never be exchanged for access.
+ */
+export async function continueAfterSignup(input: {
+  playerId: string
+  recoveryCode: string
+}): Promise<void> {
+  const valid = await verifyRecoveryCode(
+    input.playerId,
+    sha256(input.recoveryCode.toUpperCase())
+  )
+  if (!valid) throw new Error('INVALID_RECOVERY')
+
+  await issuePlayerSession(input.playerId)
 }

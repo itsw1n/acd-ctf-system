@@ -1,19 +1,14 @@
 'use client'
 
 import { useActionState, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import {
-  Button as AriaButton,
-  Label,
-  ListBox,
-  ListBoxItem,
-  Popover,
-  Select,
-  SelectValue,
-  TextField,
-} from 'react-aria-components'
+import { Label, TextField } from 'react-aria-components'
 import { Check, ChevronDown, Copy, LogIn, Terminal, UserRound, Users } from 'lucide-react'
-import { signUpAction, type SignUpState } from '@/features/auth/actions/authActions'
+import {
+  continueSignupAction,
+  signUpAction,
+  type ContinueSignupState,
+  type SignUpState,
+} from '@/features/auth/actions/authActions'
 import type { Team } from '@/features/players/types'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
@@ -24,7 +19,10 @@ const initialState: SignUpState = {}
 export function SignUpForm({ teams }: { teams: Team[] }) {
   const [state, action, pending] = useActionState(signUpAction, initialState)
   const [copied, setCopied] = useState(false)
-  const router = useRouter()
+  const [continueState, continueAction, continuePending] = useActionState(
+    continueSignupAction,
+    {} as ContinueSignupState
+  )
 
   if (state.recoveryCode) {
     return (
@@ -73,16 +71,26 @@ export function SignUpForm({ teams }: { teams: Team[] }) {
             </Button>
           </div>
 
-          <Button
-            type="button"
-            size="lg"
-            className="w-full sm:w-auto"
-            onPress={() => {
-              router.push('/dashboard')
-            }}
-          >
-            <LogIn size={18} aria-hidden />I saved my code — continue
-          </Button>
+          <form action={continueAction}>
+            <input type="hidden" name="playerId" value={state.playerId ?? ''} />
+            <input type="hidden" name="recoveryCode" value={state.recoveryCode ?? ''} />
+            {continueState.error && (
+              <p
+                role="alert"
+                className="mb-4 border-l-2 border-danger pl-3 font-mono text-xs text-danger-bright"
+              >
+                {continueState.error}
+              </p>
+            )}
+            <Button
+              type="submit"
+              size="lg"
+              isPending={continuePending}
+              className="w-full sm:w-auto"
+            >
+              <LogIn size={18} aria-hidden />I saved my code — continue
+            </Button>
+          </form>
         </div>
       </TacticalPanel>
     )
@@ -91,29 +99,40 @@ export function SignUpForm({ teams }: { teams: Team[] }) {
   return (
     <TacticalPanel label="Create account" index="01" className="mx-auto max-w-2xl p-5 sm:p-7">
       <form action={action} className="space-y-5">
-        <Select name="teamId" isRequired>
-          <Label className="mb-2 block font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+        {/* Native select: bulletproof without JS, keyboard-accessible by
+            default, and trivially drivable in tests. A 4-team picker gains
+            nothing from a custom listbox. */}
+        <div>
+          <Label
+            htmlFor="teamId"
+            className="mb-2 block font-mono text-[11px] uppercase tracking-[0.14em] text-muted"
+          >
             Team
           </Label>
-          <AriaButton className="clip-input flex h-12 w-full items-center justify-between border border-border-strong bg-background/90 px-4 text-left font-mono text-sm text-foreground outline-none transition focus:border-danger">
-            <SelectValue className="truncate" />
-            <ChevronDown size={17} className="text-danger" aria-hidden />
-          </AriaButton>
-          <Popover className="w-[--trigger-width] border border-border-strong bg-surface shadow-2xl outline-none">
-            <ListBox className="outline-none">
+          <div className="relative">
+            <select
+              id="teamId"
+              name="teamId"
+              required
+              defaultValue=""
+              className="clip-input h-12 w-full appearance-none border border-border-strong bg-background/90 pl-4 pr-11 font-mono text-sm text-foreground outline-none transition focus:border-danger"
+            >
+              <option value="" disabled>
+                Select a team
+              </option>
               {teams.map((team) => (
-                <ListBoxItem
-                  id={team.id}
-                  key={team.id}
-                  textValue={team.name}
-                  className="cursor-default px-4 py-3 font-mono text-sm text-foreground outline-none data-[focused]:bg-primary/25 data-[selected]:text-danger-bright"
-                >
+                <option key={team.id} value={team.id}>
                   {team.name}
-                </ListBoxItem>
+                </option>
               ))}
-            </ListBox>
-          </Popover>
-        </Select>
+            </select>
+            <ChevronDown
+              size={17}
+              className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-danger"
+              aria-hidden
+            />
+          </div>
+        </div>
 
         <TextField name="fullName" isRequired>
           <Label className="mb-2 block font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
