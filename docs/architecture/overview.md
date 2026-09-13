@@ -7,7 +7,7 @@
 - Platform: web
 - Architecture profile: medium
 - Styling mode: tailwind
-- Authentication: undecided
+- Authentication: custom password accounts (alias + Argon2id, sessions, recovery codes) — see `auth-flow.md`
 
 ## Generated source map
 
@@ -18,45 +18,37 @@ specific stack and architecture profile. Tooling, deployment, and guidance files
 acd-ctf-system/
 ├── src/
 │   ├── app/
-│   │   ├── api/health/
-│   │   │   └── route.ts
-│   │   ├── globals.css
-│   │   ├── layout.tsx
-│   │   ├── page.test.tsx
-│   │   └── page.tsx
+│   │   ├── (ctf)/            protected: dashboard, leaderboard, activity, profile
+│   │   ├── signin/ signup/ forgot-password/
+│   │   ├── globals.css       Tailwind import, @theme tokens, base rules
+│   │   ├── layout.tsx        Oxanium + JetBrains Mono via next/font
+│   │   └── page.tsx          redirects by session (→ /dashboard or /signin)
 │   ├── components/
-│   │   ├── common/
-│   │   │   ├── Button.test.tsx
-│   │   │   └── Button.tsx
-│   │   └── layout/
-│   │       ├── Container.tsx
-│   │       └── Section.tsx
-│   ├── features/status/
-│   │   ├── components/
-│   │   │   └── StarterStatus.tsx
-│   │   ├── services/
-│   │   │   └── getStarterStatus.ts
-│   │   └── types.ts
-│   ├── lib/
-│   │   ├── supabase/
-│   │   │   ├── client.ts
-│   │   │   └── server.ts
-│   │   └── cn.ts
-│   └── test/
-│       └── setup.ts
+│   │   ├── common/           Button, Input, TacticalPanel (shared primitives)
+│   │   └── layout/           AppShell, Sidebar, Topbar, Container, Section
+│   ├── features/
+│   │   ├── auth/             schemas, services, actions, forms
+│   │   ├── players/          team/player repositories, types
+│   │   ├── sessions/         session repository + service
+│   │   ├── flags/            submission schema, service, repository, form
+│   │   ├── leaderboard/      ranking queries
+│   │   └── activity/         solve-history queries
+│   ├── config/               server-only env validation
+│   ├── lib/                  cn(), security (hash, rate-limit boundary),
+│   │                         supabase admin client
+│   └── test/                 vitest setup
+├── e2e/                      Playwright auth + access flows
+├── scripts/                  hash-flag.mjs
 └── supabase/
-    ├── migrations/
-    │   └── 00000000000000_create_examples.sql
-    ├── tests/
-    │   └── examples_rls.test.sql
+    ├── migrations/           001 schema + RLS, 002 password auth
+    ├── seed.sql              local-only demo data
     └── config.toml
 ```
 
-This is the exact generated source tree, not the complete reference architecture. The application
-is intentionally a small vertical slice; absent reference folders are not missing requirements.
-Add domain features only after recording product goals and boundaries in `CONTEXT.md`. Keep entry
-points thin, validate at trust boundaries, and enforce authorization beside protected data or side
-effects.
+The map above reflects the current tree; the original generated map is
+superseded. Entry points stay thin (routing + composition), validation happens
+at trust boundaries (zod schemas in server actions), and authorization is
+enforced beside protected data (`requireCurrentPlayer`) and side effects.
 
 ## Detailed structure rules
 
