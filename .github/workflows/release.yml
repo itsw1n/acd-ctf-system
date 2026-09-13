@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: write
+  checks: read
 
 concurrency:
   group: release-main
@@ -23,6 +24,39 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Wait for green CI on the merge commit
+        # A version pin must mean "merged AND tested green". Poll the
+        # commit's check runs (CI, Security, CodeQL scans) and fail this job
+        # if anything concludes non-green. Skipped/neutral results are OK.
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          sha="${{ github.event.pull_request.merge_commit_sha }}"
+          echo "Waiting on checks for $sha ..."
+          deadline=$(( $(date +%s) + 1500 ))
+          while true; do
+            report="$(gh api "repos/${{ github.repository }}/commits/$sha/check-runs" --paginate --jq '{
+              pending: ([.check_runs[] | select(.status != "completed")] | length),
+              failed: ([.check_runs[] | select(.status == "completed" and (.conclusion != "success" and .conclusion != "skipped" and .conclusion != "neutral")) | .name])
+            }')"
+            pending="$(echo "$report" | jq -r .pending)"
+            failed="$(echo "$report" | jq -c .failed)"
+            if [ "$pending" -eq 0 ]; then
+              if [ "$failed" = "[]" ]; then
+                echo 'All checks green. Releasing.'
+                break
+              fi
+              echo "Blocked: failing checks: $failed"
+              exit 1
+            fi
+            if [ "$(date +%s)" -ge "$deadline" ]; then
+              echo 'Timed out waiting for checks.'
+              exit 1
+            fi
+            echo "Still pending ($pending) — rechecking in 30s ..."
+            sleep 30
+          done
 
       - name: Compute next version
         id: version
