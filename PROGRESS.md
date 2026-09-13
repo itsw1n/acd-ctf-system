@@ -1,11 +1,13 @@
 # PROGRESS.md
 
 ## Status
+
 🟢 CTF implementation merged to main — live on dev server
 
 ---
 
 ## Completed
+
 - 2026-09-13: Copied real CTF implementation from `../acd-ctf` (join, sessions,
   flags, leaderboards, activity, profile, schema 001) onto this project's
   baseline; added missing `server-only` dep + vitest stub; replaced stale
@@ -27,9 +29,11 @@
   SQL seeding, leaderboards/activity/profile in scope); CONTEXT.md → active.
 
 ## In Progress
+
 - CTF schema + join/session/flag/leaderboard implementation (starter still in place).
 
 ## Up Next
+
 1. Design CTF tables (teams, players, sessions, challenges, solves) + RLS/service-role access.
 2. Join + session + recovery-code flow with tests.
 3. Flag submission with hash lookup + duplicate protection + tests.
@@ -37,8 +41,10 @@
 5. Replace starter tests/E2E with CTF behavior tests.
 
 ## Blocked
+
 - (none)
 
 ## Decisions Made
+
 - 2026-09-13: Local Supabase on ports 55421/55422/55423 + PG15 (sibling stack
   conflict + CLI limitation); dev server on :3000.

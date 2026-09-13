@@ -1,16 +1,16 @@
-import { redirect } from "next/navigation";
-import { ShieldAlert, Skull } from "lucide-react";
-import { getCurrentPlayer } from "@/features/sessions/services/sessionService";
-import { listTeams } from "@/features/players/repositories/playerRepository";
-import { JoinAccess } from "@/features/players/components/JoinAccess";
-import { Container } from "@/components/layout/Container";
-import { Section } from "@/components/layout/Section";
+import { redirect } from 'next/navigation'
+import { ShieldAlert, Skull } from 'lucide-react'
+import { getCurrentPlayer } from '@/features/sessions/services/sessionService'
+import { listTeams } from '@/features/players/repositories/playerRepository'
+import { JoinAccess } from '@/features/players/components/JoinAccess'
+import { Container } from '@/components/layout/Container'
+import { Section } from '@/components/layout/Section'
 
 export default async function AccessPage() {
-  const currentPlayer = await getCurrentPlayer();
-  if (currentPlayer) redirect("/dashboard");
+  const currentPlayer = await getCurrentPlayer()
+  if (currentPlayer) redirect('/dashboard')
 
-  const teams = await listTeams();
+  const teams = await listTeams()
 
   return (
     <main className="min-h-screen bg-background px-4 py-6 text-foreground tactical-grid scanlines sm:px-6 lg:px-10">
@@ -31,29 +31,29 @@ export default async function AccessPage() {
 
       <Section className="py-10 sm:py-16" data-ui="access">
         <Container className="max-w-[1280px]">
-        <div className="mb-8 grid gap-5 md:grid-cols-[1fr_auto] md:items-end">
-          <div>
-            <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
-              {"// Access"}
-            </p>
-            <h1 className="mt-3 font-display text-5xl font-black uppercase leading-none tracking-tight text-foreground sm:text-7xl">
-              Enter the <span className="text-danger-bright">CTF</span>
-            </h1>
-            <p className="mt-4 max-w-2xl font-mono text-xs uppercase tracking-[0.14em] text-muted sm:text-sm">
-              Solve problems. Build skills. Join a brighter tomorrow.
-            </p>
-          </div>
-          <div className="hidden items-center gap-3 border-l border-border pl-5 md:flex">
-            <Skull className="text-border-strong" size={54} aria-hidden />
-            <div className="font-mono text-[10px] uppercase leading-5 tracking-[0.13em] text-muted">
-              More than a competition
-              <br />
-              Students. Skills. Opportunity.
+          <div className="mb-8 grid gap-5 md:grid-cols-[1fr_auto] md:items-end">
+            <div>
+              <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
+                {'// Access'}
+              </p>
+              <h1 className="mt-3 font-display text-5xl font-black uppercase leading-none tracking-tight text-foreground sm:text-7xl">
+                Enter the <span className="text-danger-bright">CTF</span>
+              </h1>
+              <p className="mt-4 max-w-2xl font-mono text-xs uppercase tracking-[0.14em] text-muted sm:text-sm">
+                Solve problems. Build skills. Join a brighter tomorrow.
+              </p>
+            </div>
+            <div className="hidden items-center gap-3 border-l border-border pl-5 md:flex">
+              <Skull className="text-border-strong" size={54} aria-hidden />
+              <div className="font-mono text-[10px] uppercase leading-5 tracking-[0.13em] text-muted">
+                More than a competition
+                <br />
+                Students. Skills. Opportunity.
+              </div>
             </div>
           </div>
-        </div>
 
-        <JoinAccess teams={teams} />
+          <JoinAccess teams={teams} />
         </Container>
       </Section>
 
@@ -61,5 +61,5 @@ export default async function AccessPage() {
         “Curiosity breaches. Practice secures.”
       </footer>
     </main>
-  );
+  )
 }

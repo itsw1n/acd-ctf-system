@@ -1,17 +1,17 @@
-"use client";
+'use client'
 
-import { useActionState } from "react";
-import { Label, TextField } from "react-aria-components";
-import { AlertTriangle, CheckCircle2, ChevronRight, Flag, RotateCcw } from "lucide-react";
-import { submitFlagAction, type FlagState } from "@/features/flags/actions/flagActions";
-import { Button } from "@/components/common/Button";
-import { Input } from "@/components/common/Input";
-import { cn } from "@/lib/cn";
+import { useActionState } from 'react'
+import { Label, TextField } from 'react-aria-components'
+import { AlertTriangle, CheckCircle2, ChevronRight, Flag, RotateCcw } from 'lucide-react'
+import { submitFlagAction, type FlagState } from '@/features/flags/actions/flagActions'
+import { Button } from '@/components/common/Button'
+import { Input } from '@/components/common/Input'
+import { cn } from '@/lib/cn'
 
-const initialState: FlagState = {};
+const initialState: FlagState = {}
 
 export function FlagSubmissionForm() {
-  const [state, action, pending] = useActionState(submitFlagAction, initialState);
+  const [state, action, pending] = useActionState(submitFlagAction, initialState)
 
   return (
     <form action={action} className="mt-8">
@@ -31,7 +31,7 @@ export function FlagSubmissionForm() {
 
         <Button type="submit" size="lg" isPending={pending} className="h-16 self-end">
           <ChevronRight size={20} aria-hidden />
-          {pending ? "Validating..." : "Submit flag"}
+          {pending ? 'Validating...' : 'Submit flag'}
         </Button>
       </div>
 
@@ -39,18 +39,16 @@ export function FlagSubmissionForm() {
         <div
           role="status"
           className={cn(
-            "mx-auto mt-6 flex max-w-2xl items-center justify-center gap-2 border px-4 py-3 text-center font-mono text-xs uppercase tracking-[0.09em]",
-            state.status === "correct" &&
-              "border-success/70 bg-success/5 text-success",
-            state.status === "duplicate" &&
-              "border-warning/60 bg-warning/5 text-warning",
-            (state.status === "incorrect" || state.status === "error") &&
-              "border-danger/60 bg-primary/10 text-danger-bright",
+            'mx-auto mt-6 flex max-w-2xl items-center justify-center gap-2 border px-4 py-3 text-center font-mono text-xs uppercase tracking-[0.09em]',
+            state.status === 'correct' && 'border-success/70 bg-success/5 text-success',
+            state.status === 'duplicate' && 'border-warning/60 bg-warning/5 text-warning',
+            (state.status === 'incorrect' || state.status === 'error') &&
+              'border-danger/60 bg-primary/10 text-danger-bright'
           )}
         >
-          {state.status === "correct" ? (
+          {state.status === 'correct' ? (
             <CheckCircle2 size={16} aria-hidden />
-          ) : state.status === "duplicate" ? (
+          ) : state.status === 'duplicate' ? (
             <RotateCcw size={16} aria-hidden />
           ) : (
             <AlertTriangle size={16} aria-hidden />
@@ -59,5 +57,5 @@ export function FlagSubmissionForm() {
         </div>
       )}
     </form>
-  );
+  )
 }
