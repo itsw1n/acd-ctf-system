@@ -5,7 +5,7 @@ import { Label, TextField } from 'react-aria-components'
 import { ChevronDown, Save } from 'lucide-react'
 
 import type { ChallengeActionState } from '@/features/challenges/actions/challengeActions'
-import type { ChallengeEditRow } from '@/features/challenges/repositories/challengeRepository'
+import type { ChallengeEditRow } from '@/features/challenges/types'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
 import { TacticalPanel } from '@/components/common/TacticalPanel'

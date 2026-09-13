@@ -2,6 +2,7 @@ import 'server-only'
 
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { ChallengeType } from '@/features/challenges/schemas/challengeSchemas'
+import type { ChallengeEditRow } from '@/features/challenges/types'
 
 export type AdminChallengeRow = {
   id: string
@@ -13,17 +14,7 @@ export type AdminChallengeRow = {
   createdAt: string
 }
 
-export type ChallengeEditRow = {
-  id: string
-  title: string
-  category: string
-  description: string
-  type: ChallengeType
-  points: number
-  externalUrl: string | null
-  fileUrl: string | null
-  active: boolean
-}
+export type { ChallengeEditRow } from '@/features/challenges/types'
 
 export type InsertChallengeRow = {
   title: string
