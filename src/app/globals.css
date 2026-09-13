@@ -1,17 +1,141 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #f8fafc;
-  --color-foreground: #0f172a;
-  --color-surface: #ffffff;
-  --color-muted: #e2e8f0;
-  --color-primary: #2563eb;
-  --color-primary-foreground: #ffffff;
-  --radius-control: 0.5rem;
+  --color-background: #080706;
+  --color-surface: #100d0c;
+  --color-primary: #8f1111;
+  --color-danger: #e32636;
+  --color-danger-bright: #ff3447;
+  --color-warning: #ff9f1c;
+  --color-success: #76c893;
+  --color-foreground: #e8e1d9;
+  --color-muted: #8a817a;
+  --color-border: #37201d;
+  --color-border-strong: #65302b;
+
+  --font-display: Impact, "Arial Narrow", "Roboto Condensed", sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+
+  --shadow-danger: 0 0 18px rgb(227 38 54 / 0.13);
+  --ease-tactical: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
-@layer base {
-  * { box-sizing: border-box; }
-  body { margin: 0; min-height: 100vh; background: var(--color-background); color: var(--color-foreground); font-family: Arial, Helvetica, sans-serif; }
-  a { color: inherit; }
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--color-background);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-mono);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-danger) 38%, transparent);
+  color: white;
+}
+
+@utility tactical-grid {
+  background-image:
+    linear-gradient(rgb(143 17 17 / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(143 17 17 / 0.035) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+@utility scanlines {
+  position: relative;
+}
+
+.scanlines::before {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  content: "";
+  opacity: 0.12;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 3px,
+    rgb(255 255 255 / 0.018) 4px
+  );
+}
+
+@utility clip-panel {
+  clip-path: polygon(
+    0 12px,
+    12px 0,
+    calc(100% - 20px) 0,
+    100% 20px,
+    100% calc(100% - 12px),
+    calc(100% - 12px) 100%,
+    18px 100%,
+    0 calc(100% - 18px)
+  );
+}
+
+@utility clip-button {
+  clip-path: polygon(
+    0 9px,
+    9px 0,
+    calc(100% - 13px) 0,
+    100% 13px,
+    100% calc(100% - 9px),
+    calc(100% - 9px) 100%,
+    8px 100%,
+    0 calc(100% - 8px)
+  );
+}
+
+@utility clip-input {
+  clip-path: polygon(
+    0 7px,
+    7px 0,
+    calc(100% - 7px) 0,
+    100% 7px,
+    100% 100%,
+    0 100%
+  );
+}
+
+.corner-bracket {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  pointer-events: none;
+}
+
+.corner-bracket-tl {
+  top: 8px;
+  left: 8px;
+  border-top: 2px solid var(--color-danger);
+  border-left: 2px solid var(--color-danger);
+}
+
+.corner-bracket-br {
+  right: 8px;
+  bottom: 8px;
+  border-right: 2px solid var(--color-danger);
+  border-bottom: 2px solid var(--color-danger);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
