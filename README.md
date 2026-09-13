@@ -4,16 +4,18 @@ Basic school Capture The Flag platform built with Next.js App Router, Tailwind C
 
 ## Current scope
 
-- Join with team, full name, and unique alias
-- One-time recovery code
+- Signup with team, full name, unique alias, and password (10–128 chars)
+- Signin with alias + password (generic failures, no account enumeration)
+- One-time recovery code (`ACD-XXXX-XXXX-XXXX`) for forgotten passwords only
+- Forgot-password flow revokes all sessions and requires a fresh login
 - Persistent HttpOnly browser session
 - Global flag submission
 - Duplicate-solve protection
 - Team leaderboard
 - Player leaderboard
 - Personal activity page
-- Simple profile page
-- No passwords / no Supabase Auth
+- Simple profile page with role display
+- No Supabase Auth (custom password accounts on PostgreSQL only)
 - No Docker-hosted challenges yet
 
 ## 1. Install
@@ -83,11 +85,22 @@ Insert only the resulting SHA-256 digest into `challenges.flag_hash`.
 
 - Player identity is represented by an opaque random HttpOnly cookie.
 - Only a SHA-256 session-token hash is stored in PostgreSQL.
+- Passwords are hashed with Argon2id (never SHA-256, never plaintext) and
+  verified server-side only; unknown aliases run a dummy verification so
+  signin timing reveals nothing.
 - Recovery codes are shown once; only their SHA-256 hashes are stored.
+  Codes reset forgotten passwords only — they never restore sessions directly.
+- Password resets revoke ALL sessions for the player.
+- Roles (`PLAYER`/`ADMIN`) are forced server-side; public signup always creates
+  `PLAYER`. Promote manually: `UPDATE players SET role = 'ADMIN' WHERE
+  lower(alias) = lower('myalias');`
 - Flag values are hashed before database lookup.
 - `UNIQUE(player_id, challenge_id)` prevents duplicate scoring at the database layer.
 - Service-role credentials remain server-only.
-- For a larger/public event, add trusted rate limiting and CSRF hardening for cookie-authenticated writes before launch.
+- Auth actions call a rate-limit boundary (`checkAuthRateLimit`) that is
+  currently a documented no-op. Before any larger/public event, integrate a
+  production-compatible provider (e.g. Upstash Redis on Vercel) plus CSRF
+  hardening for cookie-authenticated writes.
 
 ## Production checklist
 

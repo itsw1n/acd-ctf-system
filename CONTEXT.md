@@ -18,23 +18,31 @@ from README direction (user-approved onboarding).
 
 ## Users
 
-- Players (students): join with team name, full name, unique alias; no passwords.
+- Players (students): sign up with team name, full name, unique alias, and
+  password; sign in with alias + password.
 - Admins (organizers): seed challenges/flags directly in SQL; remove demo rows
   before the real event. No admin UI in v1.
 
 ## Core Workflows
 
-1. Join: team + full name + unique alias → persistent opaque HttpOnly session
-   cookie (SHA-256 token hash stored in PostgreSQL) + one-time recovery code
-   (only its SHA-256 hash stored, shown once).
-2. Flag submission: global static flags, hashed (SHA-256) before DB lookup.
-3. Duplicate-solve protection at DB layer: UNIQUE(player_id, challenge_id).
-4. Leaderboards: team leaderboard, player leaderboard.
-5. Personal activity page + simple profile page.
+1. Signup: team + full name + unique alias + password (10–128 chars) →
+   Argon2id hash stored; recovery code (`ACD-XXXX-XXXX-XXXX`, hash stored)
+   shown ONCE behind an explicit continue gate; first session issued only
+   after the gate.
+2. Signin: alias + password → generic failures, persistent opaque HttpOnly
+   session cookie (SHA-256 token hash stored in PostgreSQL).
+3. Forgot password: alias + recovery code re-verified statelessly →
+   new Argon2id hash, ALL sessions revoked, fresh login required.
+4. Flag submission: global static flags, hashed (SHA-256) before DB lookup.
+5. Duplicate-solve protection at DB layer: UNIQUE(player_id, challenge_id).
+6. Leaderboards: team leaderboard, player leaderboard.
+7. Personal activity page + simple profile page (shows role + session status).
 
 ## Acceptance Criteria
 
-- Join/login/recover works without passwords or Supabase Auth.
+- Signup/signin/forgot-password work with alias + Argon2id password; no
+  Supabase Auth (PostgreSQL only).
+- Recovery codes are shown once and reset passwords only.
 - Correct flag awards points exactly once per player per challenge.
 - Wrong/duplicate submissions are rejected with safe errors.
 - Leaderboards and activity reflect solves.
@@ -44,10 +52,10 @@ from README direction (user-approved onboarding).
 ## Out of Scope
 
 - Docker-hosted challenge instances (no per-challenge containers in v1).
-- Passwords / Supabase Auth.
-- Admin UI (SQL seeding only).
-- Trusted rate limiting + CSRF hardening for cookie writes: required before any
-  larger/public event (see README security notes).
+- Supabase Auth.
+- Admin UI (SQL seeding + manual role promotion only).
+- Enforced rate limiting + CSRF hardening for cookie writes: required before any
+  larger/public event (boundary hook exists, provider not yet integrated).
 
 ## Generated Baseline
 
@@ -55,7 +63,7 @@ from README direction (user-approved onboarding).
 
 - Architecture profile: medium
 - Production baseline: generated default; deviations require approval.
-- Authentication: not-yet
+- Authentication: custom password accounts (deviation approved 2026-09-13; was not-yet)
 - Uploads: none
 - Background jobs: none
 - Offline behavior: none
@@ -70,9 +78,13 @@ from README direction (user-approved onboarding).
 
 ## Approved Deviations
 
-<!-- Record date, approver, rationale, affected files, and recovery path. -->
-
-- (none)
+- 2026-09-13 (approver: user/spec author): password accounts replace the
+  passwordless join model. Rationale: usable signin without keeping recovery
+  codes at hand; codes remain for password reset only. Files:
+  `supabase/migrations/002_account_auth.sql`, `src/features/auth/**`,
+  `src/lib/security/*`, `src/app/{signin,signup,forgot-password}/**`.
+  Recovery: passwords are Argon2id hashes (irreversible); rollback = restore
+  pre-002 database backup, which drops password_hash/role/last_seen_at.
 
 ## Notes
 
