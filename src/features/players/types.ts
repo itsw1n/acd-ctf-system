@@ -11,5 +11,6 @@ export type Player = {
   fullName: string
   alias: string
   role: PlayerRole
-  team: Team
+  // ADMIN accounts have no competition team (see 004_teamless_admin.sql).
+  team: Team | null
 }
