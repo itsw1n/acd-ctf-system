@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --color-background: #080706;
@@ -13,8 +13,8 @@
   --color-border: #37201d;
   --color-border-strong: #65302b;
 
-  --font-display: Impact, "Arial Narrow", "Roboto Condensed", sans-serif;
-  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --font-display: Impact, 'Arial Narrow', 'Roboto Condensed', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
 
   --shadow-danger: 0 0 18px rgb(227 38 54 / 0.13);
   --ease-tactical: cubic-bezier(0.2, 0.7, 0.2, 1);
@@ -61,7 +61,7 @@ body {
   inset: 0;
   z-index: 100;
   pointer-events: none;
-  content: "";
+  content: '';
   opacity: 0.12;
   background: repeating-linear-gradient(
     to bottom,
@@ -98,14 +98,7 @@ body {
 }
 
 @utility clip-input {
-  clip-path: polygon(
-    0 7px,
-    7px 0,
-    calc(100% - 7px) 0,
-    100% 7px,
-    100% 100%,
-    0 100%
-  );
+  clip-path: polygon(0 7px, 7px 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%);
 }
 
 .corner-bracket {

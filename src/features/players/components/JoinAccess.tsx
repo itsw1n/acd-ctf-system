@@ -1,8 +1,8 @@
-"use client";
+'use client'
 
-import { useActionState, useEffect } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useActionState, useEffect } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
   Button as AriaButton,
   Label,
@@ -12,46 +12,55 @@ import {
   Select,
   SelectValue,
   TextField,
-} from "react-aria-components";
-import { ChevronDown, Copy, KeyRound, LogIn, Terminal, UserRound } from "lucide-react";
-import { joinPlayer, recoverPlayer, type JoinState, type RecoverState } from "@/features/players/actions/playerActions";
-import type { Team } from "@/features/players/types";
-import { Button } from "@/components/common/Button";
-import { Input } from "@/components/common/Input";
-import { TacticalPanel } from "@/components/common/TacticalPanel";
+} from 'react-aria-components'
+import { ChevronDown, Copy, KeyRound, LogIn, Terminal, UserRound } from 'lucide-react'
+import {
+  joinPlayer,
+  recoverPlayer,
+  type JoinState,
+  type RecoverState,
+} from '@/features/players/actions/playerActions'
+import type { Team } from '@/features/players/types'
+import { Button } from '@/components/common/Button'
+import { Input } from '@/components/common/Input'
+import { TacticalPanel } from '@/components/common/TacticalPanel'
 
-const initialJoin: JoinState = {};
-const initialRecover: RecoverState = {};
-
+const initialJoin: JoinState = {}
+const initialRecover: RecoverState = {}
 
 export function JoinAccess({ teams }: { teams: Team[] }) {
-  const [joinState, joinAction, joinPending] = useActionState(joinPlayer, initialJoin);
+  const [joinState, joinAction, joinPending] = useActionState(joinPlayer, initialJoin)
   const [recoverState, recoverAction, recoverPending] = useActionState(
     recoverPlayer,
-    initialRecover,
-  );
-  const router = useRouter();
+    initialRecover
+  )
+  const router = useRouter()
 
   useEffect(() => {
     if (recoverState.recovered) {
-      router.push("/dashboard");
+      router.push('/dashboard')
     }
-  }, [recoverState.recovered, router]);
+  }, [recoverState.recovered, router])
 
   if (joinState.recoveryCode) {
     return (
-      <TacticalPanel label="Recovery key issued" index="01" className="mx-auto max-w-2xl p-6 sm:p-9">
+      <TacticalPanel
+        label="Recovery key issued"
+        index="01"
+        className="mx-auto max-w-2xl p-6 sm:p-9"
+      >
         <div className="space-y-6">
           <div>
             <p className="font-mono text-xs uppercase tracking-[0.18em] text-success">
-              {"// Registration complete"}
+              {'// Registration complete'}
             </p>
             <h2 className="mt-2 font-display text-4xl font-black uppercase text-foreground">
               Access <span className="text-danger-bright">Granted</span>
             </h2>
             <p className="mt-3 max-w-xl font-mono text-sm leading-6 text-muted">
               Save this recovery code now. It is the only recovery credential for
-              <span className="text-foreground"> {joinState.alias}</span> if the browser session is lost.
+              <span className="text-foreground"> {joinState.alias}</span> if the browser session is
+              lost.
             </p>
           </div>
 
@@ -68,7 +77,8 @@ export function JoinAccess({ teams }: { teams: Team[] }) {
           </div>
 
           <p className="font-mono text-xs leading-5 text-muted">
-            Take a screenshot or copy it somewhere safe. The platform stores only a hash and cannot display this exact code again.
+            Take a screenshot or copy it somewhere safe. The platform stores only a hash and cannot
+            display this exact code again.
           </p>
 
           <Link
@@ -80,7 +90,7 @@ export function JoinAccess({ teams }: { teams: Team[] }) {
           </Link>
         </div>
       </TacticalPanel>
-    );
+    )
   }
 
   if (recoverState.recovered) {
@@ -90,7 +100,7 @@ export function JoinAccess({ teams }: { teams: Team[] }) {
           Recovery accepted. Redirecting to your dashboard…
         </p>
       </TacticalPanel>
-    );
+    )
   }
 
   return (
@@ -130,7 +140,11 @@ export function JoinAccess({ teams }: { teams: Team[] }) {
               Full name
             </Label>
             <div className="relative">
-              <UserRound className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={17} aria-hidden />
+              <UserRound
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-muted"
+                size={17}
+                aria-hidden
+              />
               <Input className="pl-11" placeholder="Enter your full name" />
             </div>
           </TextField>
@@ -140,20 +154,27 @@ export function JoinAccess({ teams }: { teams: Team[] }) {
               Alias / Hacker tag
             </Label>
             <div className="relative">
-              <Terminal className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={17} aria-hidden />
+              <Terminal
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-muted"
+                size={17}
+                aria-hidden
+              />
               <Input className="pl-11" placeholder="Choose your hacker tag" />
             </div>
           </TextField>
 
           {joinState.error && (
-            <p role="alert" className="border-l-2 border-danger pl-3 font-mono text-xs text-danger-bright">
+            <p
+              role="alert"
+              className="border-l-2 border-danger pl-3 font-mono text-xs text-danger-bright"
+            >
               {joinState.error}
             </p>
           )}
 
           <Button type="submit" size="lg" isPending={joinPending} className="w-full sm:w-auto">
             <LogIn size={18} aria-hidden />
-            {joinPending ? "Entering..." : "Enter CTF"}
+            {joinPending ? 'Entering...' : 'Enter CTF'}
           </Button>
         </form>
       </TacticalPanel>
@@ -169,7 +190,11 @@ export function JoinAccess({ teams }: { teams: Team[] }) {
               Alias / Hacker tag
             </Label>
             <div className="relative">
-              <Terminal className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={17} aria-hidden />
+              <Terminal
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-muted"
+                size={17}
+                aria-hidden
+              />
               <Input className="pl-11" placeholder="Enter your alias" />
             </div>
           </TextField>
@@ -179,13 +204,20 @@ export function JoinAccess({ teams }: { teams: Team[] }) {
               Recovery code
             </Label>
             <div className="relative">
-              <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={17} aria-hidden />
+              <KeyRound
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-muted"
+                size={17}
+                aria-hidden
+              />
               <Input className="pl-11 uppercase" placeholder="XXXX-XXXX-XXXX" />
             </div>
           </TextField>
 
           {recoverState.error && (
-            <p role="alert" className="border-l-2 border-danger pl-3 font-mono text-xs text-danger-bright">
+            <p
+              role="alert"
+              className="border-l-2 border-danger pl-3 font-mono text-xs text-danger-bright"
+            >
               {recoverState.error}
             </p>
           )}
@@ -198,7 +230,7 @@ export function JoinAccess({ teams }: { teams: Team[] }) {
             className="w-full"
           >
             <KeyRound size={18} aria-hidden />
-            {recoverPending ? "Recovering..." : "Recover session"}
+            {recoverPending ? 'Recovering...' : 'Recover session'}
           </Button>
 
           <p className="border-t border-border pt-4 font-mono text-xs leading-5 text-muted">
@@ -207,5 +239,5 @@ export function JoinAccess({ teams }: { teams: Team[] }) {
         </form>
       </TacticalPanel>
     </div>
-  );
+  )
 }

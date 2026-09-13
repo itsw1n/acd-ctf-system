@@ -1,0 +1,6 @@
+# Generated files — never hand-edit, never format.
+next-env.d.ts
+.next/
+out/
+build/
+coverage/
