@@ -14,7 +14,7 @@ export function FlagSubmissionForm() {
   const [state, action, pending] = useActionState(submitFlagAction, initialState)
 
   return (
-    <form action={action} className="mt-8">
+    <form action={action} className="mt-1">
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_330px]">
         <TextField name="flag" isRequired>
           <Label className="mb-2 inline-flex items-center gap-2 bg-background px-2 font-mono text-[10px] uppercase tracking-[0.18em] text-muted">

@@ -8,7 +8,7 @@ export function Topbar({ player, score }: { player: Player; score: number }) {
       data-ui="topbar"
     >
       <div className="flex min-w-0 flex-1 items-center gap-4 px-4 sm:px-7">
-        <div className="font-display text-2xl font-black uppercase tracking-tight text-foreground sm:text-4xl">
+        <div className="font-display text-2xl font-extrabold uppercase tracking-tight text-foreground sm:text-4xl">
           ACD <span className="text-danger-bright">CTF</span>
         </div>
         <div className="hidden h-10 w-px bg-border md:block" />
