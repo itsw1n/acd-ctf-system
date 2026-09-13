@@ -31,6 +31,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: supabase/setup-cli@v1
+        with:
+          # Must support new-format API keys in `status -o env`
+          # (PUBLISHABLE_KEY / SECRET_KEY); setup-cli default is older.
+          version: 2.116.0
       - run: supabase start
       - run: supabase db reset
       - name: Export local Supabase env
