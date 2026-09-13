@@ -12,7 +12,9 @@ function parseActiveFlag(value: unknown): boolean {
   if (value === null || value === undefined) return false
   if (typeof value === 'number') return value === 1
   const normalized = String(value).trim().toLowerCase()
-  return normalized === 'true' || normalized === 'on' || normalized === '1' || normalized === 'checked'
+  return (
+    normalized === 'true' || normalized === 'on' || normalized === '1' || normalized === 'checked'
+  )
 }
 
 export const activeInput = z.preprocess(parseActiveFlag, z.boolean())
@@ -34,19 +36,20 @@ function isHttpUrl(value: string) {
 
 const optionalHttpUrl = z.preprocess(
   emptyToUndefined,
-  z.string().trim().max(2048, 'URL must be at most 2048 characters.').refine(isHttpUrl, {
-    message: 'Must be a valid http(s) URL.',
-  }).optional()
+  z
+    .string()
+    .trim()
+    .max(2048, 'URL must be at most 2048 characters.')
+    .refine(isHttpUrl, {
+      message: 'Must be a valid http(s) URL.',
+    })
+    .optional()
 )
 
 const baseChallengeFields = z.object({
   title: z.string().trim().min(3, 'Title must be at least 3 characters.').max(120),
   category: z.string().trim().min(2, 'Category is required.').max(40),
-  description: z
-    .string()
-    .trim()
-    .min(10, 'Description must be at least 10 characters.')
-    .max(4000),
+  description: z.string().trim().min(10, 'Description must be at least 10 characters.').max(4000),
   type: challengeTypeEnum,
   points: z.coerce.number().int().min(1).max(1000),
   externalUrl: optionalHttpUrl,
@@ -59,7 +62,11 @@ function checkUrlRules(
   ctx: z.RefinementCtx
 ) {
   if (value.type === 'FILE' && !value.fileUrl) {
-    ctx.addIssue({ code: 'custom', path: ['fileUrl'], message: 'FILE challenges require a file URL.' })
+    ctx.addIssue({
+      code: 'custom',
+      path: ['fileUrl'],
+      message: 'FILE challenges require a file URL.',
+    })
   }
   if (value.type === 'EXTERNAL' && !value.externalUrl) {
     ctx.addIssue({

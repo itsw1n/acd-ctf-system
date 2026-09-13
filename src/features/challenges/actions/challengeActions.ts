@@ -9,10 +9,7 @@ import {
   toggleChallengeActiveSchema,
   updateChallengeSchema,
 } from '@/features/challenges/schemas/challengeSchemas'
-import {
-  createChallenge,
-  updateChallenge,
-} from '@/features/challenges/services/challengeService'
+import { createChallenge, updateChallenge } from '@/features/challenges/services/challengeService'
 import { setChallengeActive } from '@/features/challenges/repositories/challengeRepository'
 
 export type ChallengeActionState = {

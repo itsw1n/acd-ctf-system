@@ -11,8 +11,7 @@ import { Input } from '@/components/common/Input'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 
 const inputWrap = 'relative'
-const labelClass =
-  'mb-2 block font-mono text-[11px] uppercase tracking-[0.14em] text-muted'
+const labelClass = 'mb-2 block font-mono text-[11px] uppercase tracking-[0.14em] text-muted'
 const textareaClass =
   'clip-input min-h-28 w-full border border-border-strong bg-background/90 px-4 py-3 font-mono text-sm text-foreground outline-none transition placeholder:text-muted/60 focus:border-danger'
 const selectClass =

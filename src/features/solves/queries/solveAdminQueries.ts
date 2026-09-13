@@ -72,7 +72,9 @@ export async function listSolvesForAdmin(input?: {
     const allowedPlayerIds = new Set(
       (players ?? []).filter((player) => player.team_id === teamId).map((player) => player.id)
     )
-    const solvePlayerByAlias = new Map(rows.map((row, index) => [solves[index]?.player_id ?? row.id, row]))
+    const solvePlayerByAlias = new Map(
+      rows.map((row, index) => [solves[index]?.player_id ?? row.id, row])
+    )
     rows = [...solvePlayerByAlias.entries()]
       .filter(([playerId]) => allowedPlayerIds.has(playerId))
       .map(([, row]) => row)

@@ -48,10 +48,7 @@ describe('admin team actions authorization', () => {
   it('denies PLAYER rename without touching the mutation', async () => {
     vi.mocked(requireAdmin).mockRejectedValueOnce(new Error('FORBIDDEN'))
     await expect(
-      renameTeamAction(
-        {},
-        formData({ id: '4b2873c8-01b9-4c22-9482-858276b94c43', name: 'Sneaky' })
-      )
+      renameTeamAction({}, formData({ id: '4b2873c8-01b9-4c22-9482-858276b94c43', name: 'Sneaky' }))
     ).rejects.toThrow('FORBIDDEN')
     expect(vi.mocked(renameTeam)).not.toHaveBeenCalled()
   })

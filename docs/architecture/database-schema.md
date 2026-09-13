@@ -47,20 +47,20 @@ conflict while display casing is preserved.
 
 ### challenges
 
-| Column      | Type        | Notes                                            |
-| ----------- | ----------- | ------------------------------------------------ |
-| id          | uuid PK     | `gen_random_uuid()`                              |
-| title       | text        | display name                                     |
-| category    | text        | e.g. Misc, Web                                   |
-| description | text        | player-facing briefing (`003`, backfilled)       |
-| type        | text        | `TEXT` / `FILE` / `EXTERNAL` (`003`)             |
-| points      | integer     | `> 0`                                            |
-| flag_hash   | char(64)    | SHA-256 of the flag, unique                      |
-| external_url| text null   | required for `EXTERNAL`, else null (`003`)       |
-| file_url    | text null   | required for `FILE`, else null (`003`)           |
-| active      | boolean     | default `true`                                   |
-| created_at  | timestamptz | default `now()`                                  |
-| updated_at  | timestamptz | default `now()`, touched on admin writes (`003`) |
+| Column       | Type        | Notes                                            |
+| ------------ | ----------- | ------------------------------------------------ |
+| id           | uuid PK     | `gen_random_uuid()`                              |
+| title        | text        | display name                                     |
+| category     | text        | e.g. Misc, Web                                   |
+| description  | text        | player-facing briefing (`003`, backfilled)       |
+| type         | text        | `TEXT` / `FILE` / `EXTERNAL` (`003`)             |
+| points       | integer     | `> 0`                                            |
+| flag_hash    | char(64)    | SHA-256 of the flag, unique                      |
+| external_url | text null   | required for `EXTERNAL`, else null (`003`)       |
+| file_url     | text null   | required for `FILE`, else null (`003`)           |
+| active       | boolean     | default `true`                                   |
+| created_at   | timestamptz | default `now()`                                  |
+| updated_at   | timestamptz | default `now()`, touched on admin writes (`003`) |
 
 `challenges_url_rules_check` (`003`): `TEXT` has no URLs; `FILE` requires a
 non-empty `file_url`; `EXTERNAL` requires a non-empty `external_url`. URL
