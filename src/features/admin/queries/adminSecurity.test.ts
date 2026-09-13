@@ -20,7 +20,8 @@ function tableChain(result: { data: unknown; error: null }) {
 }
 
 describe('public signup cannot self-assign ADMIN', () => {
-  it('strips role from signup input', () => {    const parsed = signUpSchema.safeParse({
+  it('strips role from signup input', () => {
+    const parsed = signUpSchema.safeParse({
       teamId: '4b2873c8-01b9-4c22-9482-858276b94c43',
       fullName: 'Test Player',
       alias: 'testplayer',
