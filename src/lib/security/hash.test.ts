@@ -8,6 +8,6 @@ describe('security hashing', () => {
   })
 
   it('creates a grouped recovery code', () => {
-    expect(createRecoveryCode()).toMatch(/^[A-Z2-9]{4}-[A-Z2-9]{4}-[A-Z2-9]{4}$/)
+    expect(createRecoveryCode()).toMatch(/^ACD-[A-Z2-9]{4}-[A-Z2-9]{4}-[A-Z2-9]{4}$/)
   })
 })
