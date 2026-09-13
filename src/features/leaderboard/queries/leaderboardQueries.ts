@@ -23,7 +23,9 @@ export async function getLeaderboards() {
     { data: solves, error: solvesError },
   ] = await Promise.all([
     supabase.from('teams').select('id,name'),
-    supabase.from('players').select('id,alias,team_id'),
+    // Competitors only: teamless ADMIN accounts must not appear on the
+    // player board nor leak points into team totals.
+    supabase.from('players').select('id,alias,team_id,role').eq('role', 'PLAYER'),
     supabase.from('solves').select('player_id,points_awarded'),
   ])
 
@@ -55,6 +57,8 @@ export async function getLeaderboards() {
   for (const rank of playerRanks) {
     const player = playerById.get(rank.playerId)
     if (!player) continue
+    // Defensive: a teamless row must never create a null-bucket entry.
+    if (!player.team_id) continue
     teamPoints.set(player.team_id, (teamPoints.get(player.team_id) ?? 0) + rank.points)
   }
 
