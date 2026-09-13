@@ -1,4 +1,4 @@
-import { AlertTriangle, Skull } from 'lucide-react'
+import { AlertTriangle } from 'lucide-react'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
@@ -8,31 +8,26 @@ export default function DashboardPage() {
   return (
     <Section data-ui="dashboard">
       <Container>
-        <TacticalPanel label="Flag input" index="01" className="min-h-[620px] p-5 sm:p-8 lg:p-12">
-          <div className="flex items-start justify-between gap-6">
-            <div>
-              <h1 className="font-display text-4xl font-extrabold uppercase leading-none tracking-tight sm:text-6xl">
-                Submit <span className="text-danger-bright">Flag</span>
-              </h1>
-              <p className="mt-3 font-mono text-xs uppercase tracking-[0.14em] text-muted sm:text-sm">
-                Enter a valid flag to earn points for your team
-              </p>
-            </div>
-            <div className="hidden items-center gap-4 xl:flex">
-              <div className="border-l border-border px-5 font-mono text-[10px] uppercase leading-5 tracking-[0.13em] text-muted">
-                {'// Global input'}
-                <br />
-                Parse &gt; Validate &gt; Score
-              </div>
-              <Skull className="text-border-strong" size={62} aria-hidden />
-            </div>
+        <div className="mb-6">
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
+            {'// Flag submission'}
+          </p>
+          <h1 className="mt-2 font-display text-4xl font-extrabold uppercase leading-none tracking-tight sm:text-6xl">
+            Submit <span className="text-danger-bright">Flag</span>
+          </h1>
+          <p className="mt-3 font-mono text-xs uppercase tracking-[0.14em] text-muted sm:text-sm">
+            Enter a valid flag to earn points for your team
+          </p>
+        </div>
+
+        <TacticalPanel label="Flag submission // Global" className="p-5 sm:p-7">
+          <div className="border border-danger/25 bg-primary/[0.07] p-4 sm:p-6">
+            <FlagSubmissionForm />
           </div>
 
-          <FlagSubmissionForm />
-
-          <div className="mt-16 border-t border-border pt-8 sm:mt-20">
+          <div className="mt-6 border-t border-border pt-6">
             <div className="flex max-w-2xl gap-4">
-              <AlertTriangle className="mt-0.5 shrink-0 text-danger" size={34} aria-hidden />
+              <AlertTriangle className="mt-0.5 shrink-0 text-danger" size={30} aria-hidden />
               <div>
                 <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-danger-bright">
                   {'// Operational security'}
