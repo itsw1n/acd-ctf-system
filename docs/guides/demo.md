@@ -26,6 +26,12 @@ local resets — the Supabase CLI never applies it to hosted projects.
 | `dan`    | IT Innovators | Welcome Flag  | `ACD-FYMJ-C42W-HG4W` |
 | `rapz`   | Tech Pioneers | Welcome Flag  | `ACD-S9HL-N2VK-YQUQ` |
 
+Plus one teamless `ADMIN` for the admin area: `root` (no team, no
+pre-solved challenges). Its password and recovery code are random per
+generation, shown once when created, and stored only as hashes in
+`seed.sql` — deliberately **not** reproducible shared credentials. Sign in
+as `root` to exercise `/admin/*`; `root` cannot submit flags.
+
 Submittable demo flags: `ACD{welcome_to_ctf}`, `ACD{hidden_header_demo}`.
 
 ## Suggested walkthrough
@@ -41,6 +47,7 @@ Submittable demo flags: `ACD{welcome_to_ctf}`, `ACD{hidden_header_demo}`.
 
 - Delete demo players, demo solves, and demo challenges (or start from a
   clean hosted project and run migrations only — seed never applies there).
+  This includes the seeded `root` admin.
 - Add real challenges with `node scripts/hash-flag.mjs` (store digests only).
 - Promote organizers: `UPDATE players SET role = 'ADMIN' WHERE
 lower(alias) = lower('myalias');`

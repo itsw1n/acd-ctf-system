@@ -60,7 +60,7 @@ export async function listSolvesForAdmin(input?: {
       id: solve.id,
       playerAlias: player?.alias ?? 'Unknown',
       fullName: player?.full_name ?? 'Unknown',
-      team: (player?.team_id ? teamById.get(player.team_id) : undefined) ?? 'Unknown',
+      team: (player?.team_id ? teamById.get(player.team_id) : undefined) ?? '—',
       challenge: challenge?.title ?? 'Unknown challenge',
       category: challenge?.category ?? 'Unknown',
       pointsAwarded: solve.points_awarded,

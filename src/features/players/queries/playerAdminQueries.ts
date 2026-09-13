@@ -7,7 +7,7 @@ export type AdminPlayerRow = {
   id: string
   fullName: string
   alias: string
-  teamId: string
+  teamId: string | null
   team: string
   role: PlayerRole
   createdAt: string
@@ -47,7 +47,8 @@ export async function listPlayersForAdmin(input?: {
     fullName: player.full_name,
     alias: player.alias,
     teamId: player.team_id,
-    team: teamById.get(player.team_id) ?? 'Unknown',
+    // Teamless ADMINs have no team; '—' marks the absence explicitly.
+    team: player.team_id ? (teamById.get(player.team_id) ?? 'Unknown') : '—',
     role: player.role as PlayerRole,
     createdAt: player.created_at,
   }))

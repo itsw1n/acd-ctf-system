@@ -29,7 +29,7 @@ export function Topbar({ player, score }: { player: Player; score: number }) {
             {player.alias}
           </div>
           <div className="hidden truncate font-mono text-[9px] uppercase tracking-[0.1em] text-muted sm:block">
-            Team: {player.team.name}
+            Team: {player.team?.name ?? '—'}
           </div>
         </div>
       </div>

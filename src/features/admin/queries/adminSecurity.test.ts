@@ -35,6 +35,16 @@ describe('public signup cannot self-assign ADMIN', () => {
       expect(parsed.data).not.toHaveProperty('role')
     }
   })
+
+  it('still requires a team for public signup', () => {
+    const withoutTeam = {
+      fullName: 'Test Player',
+      alias: 'testplayer',
+      password: '0123456789',
+      confirmPassword: '0123456789',
+    }
+    expect(signUpSchema.safeParse(withoutTeam).success).toBe(false)
+  })
 })
 
 describe('admin reads do not expose authentication secrets', () => {
