@@ -11,7 +11,7 @@ export default function DashboardPage() {
         <TacticalPanel label="Flag input" index="01" className="min-h-[620px] p-5 sm:p-8 lg:p-12">
           <div className="flex items-start justify-between gap-6">
             <div>
-              <h1 className="font-display text-5xl font-black uppercase leading-none tracking-tight sm:text-7xl">
+              <h1 className="font-display text-4xl font-extrabold uppercase leading-none tracking-tight sm:text-6xl">
                 Submit <span className="text-danger-bright">Flag</span>
               </h1>
               <p className="mt-3 font-mono text-xs uppercase tracking-[0.14em] text-muted sm:text-sm">

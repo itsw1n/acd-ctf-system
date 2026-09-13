@@ -19,7 +19,7 @@ export default async function ProfilePage() {
       <Container>
         <div className="mb-8">
           <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">{'// Profile'}</p>
-          <h1 className="mt-2 font-display text-5xl font-black uppercase leading-none sm:text-7xl">
+          <h1 className="mt-2 font-display text-4xl font-extrabold uppercase leading-none sm:text-6xl">
             Profile
           </h1>
           <p className="mt-3 font-mono text-xs uppercase tracking-[0.14em] text-muted sm:text-sm">

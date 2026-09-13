@@ -54,7 +54,7 @@ export function JoinAccess({ teams }: { teams: Team[] }) {
             <p className="font-mono text-xs uppercase tracking-[0.18em] text-success">
               {'// Registration complete'}
             </p>
-            <h2 className="mt-2 font-display text-4xl font-black uppercase text-foreground">
+            <h2 className="mt-2 font-display text-4xl font-extrabold uppercase text-foreground">
               Access <span className="text-danger-bright">Granted</span>
             </h2>
             <p className="mt-3 max-w-xl font-mono text-sm leading-6 text-muted">
