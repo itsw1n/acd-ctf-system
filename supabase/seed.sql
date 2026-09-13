@@ -89,6 +89,9 @@ where not exists (
 --    team by database invariant (004_teamless_admin.sql), so there is no
 --    team to pick here. Uses shared demo password `ctf-demo-1234` and
 --    fixed recovery code for reproducible local dev.
+with demo_password(password_hash) as (
+  values ('$argon2id$v=19$m=65536,p=4,t=3$ZG/3AP+XHiTspdIrDuoYvA$017WlpijjvjqxOhG+qf13Gu7h9Q1537na/TycjthOfQ')
+)
 insert into public.players (full_name, alias, team_id, recovery_code_hash, password_hash, role)
 select
   'Root',
