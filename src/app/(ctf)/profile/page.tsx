@@ -18,7 +18,7 @@ export default async function ProfilePage() {
     <Section data-ui="profile">
       <Container>
       <div className="mb-8">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">// Profile</p>
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">{"// Profile"}</p>
         <h1 className="mt-2 font-display text-5xl font-black uppercase leading-none sm:text-7xl">
           Profile
         </h1>
@@ -41,7 +41,7 @@ export default async function ProfilePage() {
               >
                 <span className="font-mono text-xs uppercase tracking-[0.11em] text-muted">{label}</span>
                 <span className="font-mono text-base text-foreground sm:text-lg">
-                  <span className="mr-4 hidden text-danger sm:inline">//</span>
+                  <span className="mr-4 hidden text-danger sm:inline">{"//"}</span>
                   {value}
                 </span>
               </div>

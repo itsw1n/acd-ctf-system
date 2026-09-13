@@ -20,7 +20,7 @@ export default function DashboardPage() {
           </div>
           <div className="hidden items-center gap-4 xl:flex">
             <div className="border-l border-border px-5 font-mono text-[10px] uppercase leading-5 tracking-[0.13em] text-muted">
-              // Global input
+              {"// Global input"}
               <br />
               Parse &gt; Validate &gt; Score
             </div>
@@ -35,7 +35,7 @@ export default function DashboardPage() {
             <AlertTriangle className="mt-0.5 shrink-0 text-danger" size={34} aria-hidden />
             <div>
               <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-danger-bright">
-                // Operational security
+                {"// Operational security"}
               </h2>
               <p className="mt-2 font-mono text-[11px] uppercase leading-5 tracking-[0.09em] text-muted">
                 Submit only challenge flags through this field. Duplicate solves never award points twice.

@@ -16,7 +16,7 @@ export default async function LeaderboardPage() {
     <Section data-ui="leaderboard">
       <Container>
       <div className="mb-8">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">// Leaderboard</p>
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">{"// Leaderboard"}</p>
         <h1 className="mt-2 font-display text-5xl font-black uppercase leading-none sm:text-7xl">
           Leader<span className="text-danger-bright">board</span>
         </h1>

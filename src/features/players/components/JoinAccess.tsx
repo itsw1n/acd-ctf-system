@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Button as AriaButton,
   Label,
@@ -29,6 +30,13 @@ export function JoinAccess({ teams }: { teams: Team[] }) {
     recoverPlayer,
     initialRecover,
   );
+  const router = useRouter();
+
+  useEffect(() => {
+    if (recoverState.recovered) {
+      router.push("/dashboard");
+    }
+  }, [recoverState.recovered, router]);
 
   if (joinState.recoveryCode) {
     return (
@@ -36,7 +44,7 @@ export function JoinAccess({ teams }: { teams: Team[] }) {
         <div className="space-y-6">
           <div>
             <p className="font-mono text-xs uppercase tracking-[0.18em] text-success">
-              // Registration complete
+              {"// Registration complete"}
             </p>
             <h2 className="mt-2 font-display text-4xl font-black uppercase text-foreground">
               Access <span className="text-danger-bright">Granted</span>
@@ -74,12 +82,6 @@ export function JoinAccess({ teams }: { teams: Team[] }) {
       </TacticalPanel>
     );
   }
-
-  useEffect(() => {
-    if (recoverState.recovered) {
-      window.location.assign("/dashboard");
-    }
-  }, [recoverState.recovered]);
 
   if (recoverState.recovered) {
     return (

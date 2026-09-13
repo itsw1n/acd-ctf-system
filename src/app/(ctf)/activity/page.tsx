@@ -14,7 +14,7 @@ export default async function ActivityPage() {
     <Section data-ui="activity">
       <Container>
       <div className="mb-8">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">// Activity</p>
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">{"// Activity"}</p>
         <h1 className="mt-2 font-display text-5xl font-black uppercase leading-none sm:text-7xl">
           My <span className="text-danger-bright">Activity</span>
         </h1>

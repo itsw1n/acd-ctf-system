@@ -34,7 +34,7 @@ export default async function AccessPage() {
         <div className="mb-8 grid gap-5 md:grid-cols-[1fr_auto] md:items-end">
           <div>
             <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
-              // Access
+              {"// Access"}
             </p>
             <h1 className="mt-3 font-display text-5xl font-black uppercase leading-none tracking-tight text-foreground sm:text-7xl">
               Enter the <span className="text-danger-bright">CTF</span>

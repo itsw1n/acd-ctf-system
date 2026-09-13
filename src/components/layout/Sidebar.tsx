@@ -20,7 +20,7 @@ export function Sidebar() {
       <aside className="hidden border-r border-border bg-background/92 lg:block" data-ui="sidebar">
         <nav aria-label="CTF navigation" className="sticky top-[85px] flex h-[calc(100vh-85px)] w-60 flex-col">
           <div className="border-b border-border px-5 py-4 font-mono text-[10px] uppercase tracking-[0.2em] text-muted">
-            // Navigation
+            {"// Navigation"}
           </div>
           <div className="py-2">
             {items.map(({ href, label, icon: Icon }) => {

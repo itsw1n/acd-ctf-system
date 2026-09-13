@@ -24,7 +24,7 @@ export function TacticalPanel({
     >
       {(label || index) && (
         <div className="absolute left-4 top-0 z-10 flex -translate-y-1/2 items-center gap-3 bg-background px-3 font-mono text-xs uppercase tracking-[0.16em] text-muted">
-          <span className="text-danger">//</span>
+          <span className="text-danger">{"//"}</span>
           {label && <span>{label}</span>}
           {index && <span className="text-muted/60">{index}</span>}
         </div>
