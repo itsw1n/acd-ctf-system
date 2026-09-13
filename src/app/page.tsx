@@ -16,7 +16,7 @@ export default async function AccessPage() {
     <main className="min-h-screen bg-background px-4 py-6 text-foreground tactical-grid scanlines sm:px-6 lg:px-10">
       <header className="mx-auto flex max-w-[1480px] items-center justify-between border-b border-border pb-5">
         <div className="flex items-center gap-4">
-          <div className="font-display text-3xl font-black uppercase sm:text-5xl">
+          <div className="font-display text-2xl font-extrabold uppercase sm:text-4xl">
             ACD <span className="text-danger-bright">CTF</span>
           </div>
           <div className="hidden h-10 w-px bg-border sm:block" />
@@ -36,7 +36,7 @@ export default async function AccessPage() {
               <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
                 {'// Access'}
               </p>
-              <h1 className="mt-3 font-display text-5xl font-black uppercase leading-none tracking-tight text-foreground sm:text-7xl">
+              <h1 className="mt-3 font-display text-4xl font-extrabold uppercase leading-none tracking-tight text-foreground sm:text-6xl">
                 Enter the <span className="text-danger-bright">CTF</span>
               </h1>
               <p className="mt-4 max-w-2xl font-mono text-xs uppercase tracking-[0.14em] text-muted sm:text-sm">

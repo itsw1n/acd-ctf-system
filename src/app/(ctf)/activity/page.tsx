@@ -17,7 +17,7 @@ export default async function ActivityPage() {
           <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
             {'// Activity'}
           </p>
-          <h1 className="mt-2 font-display text-5xl font-black uppercase leading-none sm:text-7xl">
+          <h1 className="mt-2 font-display text-4xl font-extrabold uppercase leading-none sm:text-6xl">
             My <span className="text-danger-bright">Activity</span>
           </h1>
           <p className="mt-3 font-mono text-xs uppercase tracking-[0.14em] text-muted sm:text-sm">

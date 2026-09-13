@@ -9,6 +9,12 @@ on:
 permissions:
   contents: read
 
+# One run per ref: a new push cancels the stale duplicate (push + PR runs
+# would otherwise boot two Supabase stacks and waste minutes).
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   static:
     name: Format, Lint, Types, Unit
@@ -36,7 +42,21 @@ jobs:
           # (PUBLISHABLE_KEY / SECRET_KEY); setup-cli default is older.
           version: 2.116.0
       - run: supabase start
-      - run: supabase db reset
+      - name: Reset local database
+        # `db reset` recreates containers and can hit a Docker port-bind
+        # race; retry instead of failing the run on a flake.
+        run: |
+          for attempt in 1 2 3; do
+            echo "db reset attempt $attempt..."
+            if supabase db reset; then
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo 'db reset failed after 3 attempts'
+              exit 1
+            fi
+            sleep 15
+          done
       - name: Export local Supabase env
         run: supabase status -o env >> "$GITHUB_ENV"
       - uses: actions/setup-node@v4
