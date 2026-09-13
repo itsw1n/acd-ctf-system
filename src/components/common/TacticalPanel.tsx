@@ -9,7 +9,7 @@ type TacticalPanelProps = HTMLAttributes<HTMLDivElement> & {
 
 export function TacticalPanel({ label, index, children, className, ...props }: TacticalPanelProps) {
   return (
-    <div className="relative pt-3">
+    <div className="relative min-w-0 pt-3">
       {(label || index) && (
         <div className="absolute left-6 top-0 z-20 flex items-center gap-3 bg-background px-3 font-mono text-xs uppercase tracking-[0.16em] text-muted">
           <span className="text-danger" aria-hidden>
