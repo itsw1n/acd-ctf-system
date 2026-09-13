@@ -4,9 +4,12 @@ export type Team = {
   slug: string
 }
 
+export type PlayerRole = 'PLAYER' | 'ADMIN'
+
 export type Player = {
   id: string
   fullName: string
   alias: string
+  role: PlayerRole
   team: Team
 }

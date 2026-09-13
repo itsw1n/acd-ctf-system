@@ -4,7 +4,7 @@ import { TacticalPanel } from '@/components/common/TacticalPanel'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
 import { requireCurrentPlayer } from '@/features/sessions/services/sessionService'
-import { logoutPlayer } from '@/features/players/actions/playerActions'
+import { logoutAction } from '@/features/auth/actions/authActions'
 
 export default async function ProfilePage() {
   const player = await requireCurrentPlayer()
@@ -12,6 +12,7 @@ export default async function ProfilePage() {
   const rows: Array<{ label: string; value: string; tone?: 'default' | 'success' }> = [
     { label: 'Full name', value: player.fullName },
     { label: 'Team', value: player.team.name },
+    { label: 'Role', value: player.role },
     // Rendered only with a valid session, so presence here means active.
     { label: 'Session', value: 'ACTIVE', tone: 'success' },
   ]
@@ -75,7 +76,7 @@ export default async function ProfilePage() {
                 <p className="font-mono text-[10px] leading-5 text-muted">
                   Recovery is handled through your secure browser session and recovery code.
                 </p>
-                <form action={logoutPlayer}>
+                <form action={logoutAction}>
                   <Button type="submit" className="w-full sm:w-auto">
                     End session
                   </Button>
