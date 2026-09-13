@@ -1,0 +1,59 @@
+name: Release
+
+# Cut a versioned release every time a PR lands on main. Direct pushes
+# cannot release (main only ever moves via PR), and no code or config
+# changes are involved — the job only tags and writes release notes.
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-main
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute next version
+        id: version
+        run: |
+          last="$(git describe --tags --abbrev=0 --match 'v[0-9]*' 2>/dev/null || echo v0.0.0)"
+          echo "Previous tag: $last"
+          if [ "$last" = v0.0.0 ]; then
+            subjects="$(git log --pretty=%s)"
+          else
+            subjects="$(git log "$last"..HEAD --pretty=%s)"
+          fi
+          major="$(echo "$last" | cut -d. -f1 | tr -dc '0-9')"
+          minor="$(echo "$last" | cut -d. -f2)"
+          patch="$(echo "$last" | cut -d. -f3)"
+          if echo "$subjects" | grep -qiE 'breaking change'; then
+            major=$((major + 1)); minor=0; patch=0
+          elif echo "$subjects" | grep -qiE '^feat(\(|:)'; then
+            minor=$((minor + 1)); patch=0
+          else
+            patch=$((patch + 1))
+          fi
+          next="$major.$minor.$patch"
+          echo "Next version: v$next"
+          echo "next=$next" >> "$GITHUB_OUTPUT"
+
+      - name: Tag and publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git tag "v${{ steps.version.outputs.next }}"
+          git push origin "v${{ steps.version.outputs.next }}"
+          gh release create "v${{ steps.version.outputs.next }}" \
+            --title "v${{ steps.version.outputs.next }}" \
+            --generate-notes
