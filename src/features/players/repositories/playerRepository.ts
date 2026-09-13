@@ -12,6 +12,7 @@ type PlayerRow = {
 
 type PlayerCredentialsRow = {
   id: string
+  alias: string
   password_hash: string | null
 }
 
@@ -121,7 +122,7 @@ export async function getPlayerCredentialsByAlias(
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('players')
-    .select('id,password_hash')
+    .select('id,alias,password_hash')
     .ilike('alias', alias)
     .maybeSingle()
 
