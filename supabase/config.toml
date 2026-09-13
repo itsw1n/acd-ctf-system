@@ -1,0 +1,15 @@
+project_id = "acd-ctf-system"
+
+[api]
+enabled = true
+port = 55421
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+
+[db]
+port = 55422
+major_version = 15
+
+[studio]
+enabled = true
+port = 55423
