@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('@/features/admin/services/requireAdmin', () => ({
   requireAdmin: vi.fn(),
@@ -24,8 +24,13 @@ vi.mock('next/navigation', () => ({
 }))
 
 import { requireAdmin } from '@/features/admin/services/requireAdmin'
-import { createChallenge } from '@/features/challenges/services/challengeService'
-import { createChallengeAction } from '@/features/challenges/actions/challengeActions'
+import { createChallenge, updateChallenge } from '@/features/challenges/services/challengeService'
+import { setChallengeActive } from '@/features/challenges/repositories/challengeRepository'
+import {
+  createChallengeAction,
+  toggleChallengeActiveAction,
+  updateChallengeAction,
+} from '@/features/challenges/actions/challengeActions'
 
 function formData(entries: Record<string, string>) {
   const form = new FormData()
@@ -45,6 +50,8 @@ const validForm = () =>
   })
 
 describe('admin challenge actions authorization', () => {
+  beforeEach(() => vi.clearAllMocks())
+
   it('denies unauthenticated callers', async () => {
     vi.mocked(requireAdmin).mockRejectedValueOnce(new Error('REDIRECT:/signin'))
     await expect(createChallengeAction({}, validForm())).rejects.toThrow('REDIRECT:/signin')
@@ -64,5 +71,20 @@ describe('admin challenge actions authorization', () => {
       'REDIRECT:/admin/challenges'
     )
     expect(vi.mocked(createChallenge)).toHaveBeenCalledTimes(1)
+  })
+
+  it('denies PLAYER update without touching the mutation', async () => {
+    vi.mocked(requireAdmin).mockRejectedValueOnce(new Error('FORBIDDEN'))
+    const form = validForm()
+    form.set('id', '4b2873c8-01b9-4c22-9482-858276b94c43')
+    await expect(updateChallengeAction({}, form)).rejects.toThrow('FORBIDDEN')
+    expect(vi.mocked(updateChallenge)).not.toHaveBeenCalled()
+  })
+
+  it('denies PLAYER toggle without touching the mutation', async () => {
+    vi.mocked(requireAdmin).mockRejectedValueOnce(new Error('FORBIDDEN'))
+    const form = formData({ id: '4b2873c8-01b9-4c22-9482-858276b94c43', active: 'false' })
+    await expect(toggleChallengeActiveAction(form)).rejects.toThrow('FORBIDDEN')
+    expect(vi.mocked(setChallengeActive)).not.toHaveBeenCalled()
   })
 })
