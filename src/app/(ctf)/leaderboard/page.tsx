@@ -24,9 +24,10 @@ export default async function LeaderboardPage() {
           </p>
         </div>
 
-        <div className="grid gap-5 xl:grid-cols-2">
-          <TacticalPanel label="Team leaderboard" className="p-5 sm:p-7">
-            <div className="space-y-2 pt-3">
+        <div className="grid gap-5 min-[1500px]:grid-cols-2">
+          <TacticalPanel label="Team leaderboard" className="min-w-0 p-5 sm:p-7">
+            <div className="overflow-x-auto pt-3">
+              <div className="min-w-[560px] space-y-2">
               <div className="grid grid-cols-[64px_1fr_90px] border border-border bg-background/75 px-3 py-3 font-mono text-[10px] uppercase tracking-[0.13em] text-muted">
                 <span>Rank</span>
                 <span>Team</span>
@@ -48,11 +49,13 @@ export default async function LeaderboardPage() {
                   <span className="text-right font-bold">{row.points}</span>
                 </div>
               ))}
+              </div>
             </div>
           </TacticalPanel>
 
-          <TacticalPanel label="Player leaderboard" className="p-5 sm:p-7">
-            <div className="space-y-2 pt-3">
+          <TacticalPanel label="Player leaderboard" className="min-w-0 p-5 sm:p-7">
+            <div className="overflow-x-auto pt-3">
+              <div className="min-w-[620px] space-y-2">
               <div className="grid grid-cols-[55px_1fr_1fr_72px] border border-border bg-background/75 px-3 py-3 font-mono text-[10px] uppercase tracking-[0.13em] text-muted">
                 <span>Rank</span>
                 <span>Alias</span>
@@ -74,6 +77,7 @@ export default async function LeaderboardPage() {
                   <span className="text-right font-bold">{row.points}</span>
                 </div>
               ))}
+              </div>
             </div>
           </TacticalPanel>
         </div>
