@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { signUpSchema } from '@/features/auth/schemas/authSchemas'
 
@@ -6,7 +6,12 @@ vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: vi.fn(),
 }))
 
+vi.mock('@/features/admin/services/requireAdmin', () => ({
+  requireAdmin: vi.fn(),
+}))
+
 import { createAdminClient } from '@/lib/supabase/admin'
+import { requireAdmin } from '@/features/admin/services/requireAdmin'
 import { listPlayersForAdmin } from '@/features/players/queries/playerAdminQueries'
 
 function tableChain(result: { data: unknown; error: null }) {
@@ -48,6 +53,28 @@ describe('public signup cannot self-assign ADMIN', () => {
 })
 
 describe('admin reads do not expose authentication secrets', () => {
+  beforeEach(() => {
+    vi.mocked(requireAdmin).mockResolvedValue({ role: 'ADMIN' } as never)
+  })
+
+  it('player admin query enforces the admin guard before reading', async () => {
+    const playersChain = tableChain({ data: [], error: null })
+    const teamsChain = tableChain({ data: [], error: null })
+    vi.mocked(createAdminClient).mockReturnValue({
+      from: ((table: string) => (table === 'players' ? playersChain : teamsChain)) as never,
+    } as never)
+
+    await listPlayersForAdmin({})
+
+    expect(vi.mocked(requireAdmin)).toHaveBeenCalledTimes(1)
+  })
+
+  it('player admin query fails closed when the guard denies', async () => {
+    vi.mocked(requireAdmin).mockRejectedValueOnce(new Error('FORBIDDEN'))
+
+    await expect(listPlayersForAdmin({})).rejects.toThrow('FORBIDDEN')
+  })
+
   it('player admin query selects display fields only', async () => {
     const selects: string[] = []
     const playersResult = {
