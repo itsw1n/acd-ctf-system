@@ -54,12 +54,15 @@ export function RenameTeamForm({
   const [state, formAction, pending] = useActionState(action, {} as TeamActionState)
 
   return (
-    <form action={formAction} className="flex items-center gap-2">
+    <form action={formAction} className="space-y-5">
       <input type="hidden" name="id" value={teamId} />
-      <TextField name="name" aria-label={`Rename ${defaultName}`} className="min-w-0 flex-1">
-        <Input defaultValue={defaultName} maxLength={60} aria-label={`Rename ${defaultName}`} />
+      <TextField name="name" className="block">
+        <Label className="mb-2 block font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+          Team name
+        </Label>
+        <Input defaultValue={defaultName} maxLength={60} aria-label="Team name" />
       </TextField>
-      <Button type="submit" variant="secondary" size="sm" isPending={pending}>
+      <Button type="submit" size="lg" isPending={pending} className="w-full">
         <Pencil size={15} aria-hidden />
         {pending ? 'Saving...' : 'Save'}
       </Button>
