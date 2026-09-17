@@ -77,12 +77,12 @@ Schema: [`docs/architecture/database-schema.md`](docs/architecture/database-sche
 
 ## Environment
 
-| Variable                               | Visibility      | Purpose                                       |
-| -------------------------------------- | --------------- | --------------------------------------------- |
-| `NEXT_PUBLIC_SUPABASE_URL`             | client / public | Supabase project URL                          |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | client / public | Public key; RLS protects data                 |
-| `SUPABASE_SERVICE_ROLE_KEY`            | server only     | Trusted server access — never `NEXT_PUBLIC_*` |
-| `SESSION_COOKIE_NAME`                  | server only     | Session cookie name (`acd_ctf_session`)       |
+| Variable                               | Visibility      | Purpose                                                                                |
+| -------------------------------------- | --------------- | -------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`             | client / public | Supabase project URL                                                                   |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | client / public | Public key; direct client DB access is disabled (no RLS policies — server-only access) |
+| `SUPABASE_SERVICE_ROLE_KEY`            | server only     | Trusted server access — never `NEXT_PUBLIC_*`                                          |
+| `SESSION_COOKIE_NAME`                  | server only     | Session cookie name (`acd_ctf_session`)                                                |
 
 Details: [`docs/guides/env-variables.md`](docs/guides/env-variables.md).
 
