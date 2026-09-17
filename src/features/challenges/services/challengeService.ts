@@ -29,6 +29,7 @@ export async function createChallenge(input: CreateChallengeInput) {
     type: input.type,
     points: input.points,
     flagHash,
+    flag: normalizeFlag(input.flag),
     externalUrl: input.externalUrl,
     fileUrl: input.fileUrl,
     active: input.active,
@@ -49,7 +50,8 @@ export async function updateChallenge(input: UpdateChallengeInput) {
     externalUrl: input.externalUrl,
     fileUrl: input.fileUrl,
     active: input.active,
-    // Blank means keep the current flag_hash.
+    // Blank means keep the current flag and hash.
+    ...(trimmedFlag ? { flag: trimmedFlag } : {}),
     ...(trimmedFlag ? { flagHash: hashFlag(trimmedFlag) } : {}),
   })
 }

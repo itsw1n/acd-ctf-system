@@ -92,12 +92,18 @@ export function ChallengeForm({
             />
           </TextField>
 
-          <TextField name="flag" type="password">
-            <Label className={labelClass}>
-              Flag{mode === 'edit' ? ' (blank keeps current)' : ''}
-            </Label>
+          {mode === 'edit' && (
+            <div className="border border-border bg-background/75 px-4 py-3 font-mono text-xs">
+              <p className={labelClass}>Current flag</p>
+              <p className="break-all text-foreground">{initial?.flag ?? 'Not available'}</p>
+            </div>
+          )}
+
+          <TextField name="flag">
+            <Label className={labelClass}>{mode === 'edit' ? 'Replacement flag' : 'Flag'}</Label>
             <Input
-              placeholder={mode === 'edit' ? 'Leave blank to keep current flag' : 'ACD{...}'}
+              defaultValue={initial?.flag ?? ''}
+              placeholder="ACD{...}"
               autoComplete="off"
               spellCheck={false}
             />

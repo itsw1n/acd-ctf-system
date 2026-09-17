@@ -23,6 +23,7 @@ export type InsertChallengeRow = {
   type: ChallengeType
   points: number
   flagHash: string
+  flag: string
   externalUrl?: string
   fileUrl?: string
   active: boolean
@@ -52,7 +53,7 @@ export async function getChallengeForEdit(challengeId: string): Promise<Challeng
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('challenges')
-    .select('id,title,category,description,type,points,external_url,file_url,active')
+    .select('id,title,category,description,type,points,flag,external_url,file_url,active')
     .eq('id', challengeId)
     .maybeSingle()
 
@@ -66,6 +67,7 @@ export async function getChallengeForEdit(challengeId: string): Promise<Challeng
     description: data.description,
     type: data.type as ChallengeType,
     points: data.points,
+    flag: data.flag,
     externalUrl: data.external_url,
     fileUrl: data.file_url,
     active: data.active,
@@ -95,6 +97,7 @@ export async function insertChallenge(input: InsertChallengeRow) {
       type: input.type,
       points: input.points,
       flag_hash: input.flagHash,
+      flag: input.flag,
       external_url: input.externalUrl ?? null,
       file_url: input.fileUrl ?? null,
       active: input.active,
@@ -118,6 +121,7 @@ export async function updateChallengeRow(
     description: string
     type: ChallengeType
     points: number
+    flag?: string
     externalUrl?: string
     fileUrl?: string
     active: boolean
@@ -137,6 +141,7 @@ export async function updateChallengeRow(
     updated_at: new Date().toISOString(),
   }
   if (input.flagHash) patch.flag_hash = input.flagHash
+  if (input.flag) patch.flag = input.flag
 
   const { error } = await supabase.from('challenges').update(patch).eq('id', challengeId)
 
