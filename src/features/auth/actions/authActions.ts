@@ -7,6 +7,7 @@ import {
   resetPasswordSchema,
 } from '@/features/auth/schemas/authSchemas'
 import { signIn } from '@/features/auth/services/signIn'
+import type { PlayerRole } from '@/features/players/types'
 import { continueAfterSignup, signUp } from '@/features/auth/services/signUp'
 import { resetPassword } from '@/features/auth/services/resetPassword'
 import { clearCurrentSession } from '@/features/sessions/services/sessionService'
@@ -101,14 +102,15 @@ export async function signInAction(
 
   await checkAuthRateLimit(`signin:${parsed.data.alias.toLowerCase()}`)
 
+  let role: PlayerRole
   try {
-    await signIn(parsed.data)
+    role = await signIn(parsed.data)
   } catch {
     // Generic failure for unknown alias AND wrong password alike.
     return { error: 'Invalid alias or password.' }
   }
 
-  redirect('/dashboard')
+  redirect(role === 'ADMIN' ? '/admin' : '/dashboard')
 }
 
 export type ResetPasswordState = {
