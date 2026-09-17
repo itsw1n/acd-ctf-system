@@ -1,13 +1,30 @@
 import Link from 'next/link'
-import { Pencil, Plus } from 'lucide-react'
 
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 import { Button } from '@/components/common/Button'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
-import { toggleChallengeActiveAction } from '@/features/challenges/actions/challengeActions'
-import { listChallengesForAdmin } from '@/features/challenges/queries/challengeAdminQueries'
+import { updateChallengeAction } from '@/features/challenges/actions/challengeActions'
+import {
+  createChallengeAction,
+  toggleChallengeActiveAction,
+} from '@/features/challenges/actions/challengeActions'
+import {
+  CreateChallengeDialog,
+  EditChallengeDialog,
+} from '@/features/challenges/components/ChallengeDialogs'
+import {
+  getChallengeForAdminEdit,
+  listChallengesForAdmin,
+} from '@/features/challenges/queries/challengeAdminQueries'
 import { cn } from '@/lib/cn'
+
+async function ChallengeEditModal({ challengeId }: { challengeId: string }) {
+  const challenge = await getChallengeForAdminEdit(challengeId)
+  if (!challenge) return null
+
+  return <EditChallengeDialog challenge={challenge} action={updateChallengeAction} />
+}
 
 export default async function AdminChallengesPage() {
   const challenges = await listChallengesForAdmin()
@@ -25,13 +42,7 @@ export default async function AdminChallengesPage() {
               Manage challenge metadata and flags.
             </p>
           </div>
-          <Link
-            href="/admin/challenges/new"
-            className="clip-button relative inline-flex min-h-11 items-center justify-center gap-2 border border-danger-bright/70 bg-[linear-gradient(180deg,#e32636_0%,#b51622_45%,#8f1111_100%)] px-6 font-display text-sm font-semibold uppercase tracking-[0.14em] text-foreground transition hover:brightness-110 w-full sm:w-auto"
-          >
-            <Plus size={18} aria-hidden />
-            Create challenge
-          </Link>
+          <CreateChallengeDialog action={createChallengeAction} />
         </div>
 
         <TacticalPanel label="Challenge list" className="p-5 sm:p-7">
@@ -76,13 +87,10 @@ export default async function AdminChallengesPage() {
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex items-center justify-end gap-2">
-                        <Link
-                          href={`/admin/challenges/${challenge.id}/edit`}
-                          className="clip-button relative inline-flex min-h-9 items-center justify-center gap-2 border border-border-strong bg-surface px-4 font-display text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition hover:border-danger hover:text-white"
-                        >
-                          <Pencil size={14} aria-hidden />
+                        <Link href={`/admin/challenges/${challenge.id}/edit`} className="hidden">
                           Edit
                         </Link>
+                        <ChallengeEditModal challengeId={challenge.id} />
                         <form action={toggleChallengeActiveAction}>
                           <input type="hidden" name="id" value={challenge.id} />
                           <input
