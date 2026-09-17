@@ -1,11 +1,9 @@
-import { ChevronDown, Search } from 'lucide-react'
-
 import { TacticalPanel } from '@/components/common/TacticalPanel'
-import { Input } from '@/components/common/Input'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
 import { listPlayersForAdmin } from '@/features/players/queries/playerAdminQueries'
 import { listTeamsAdmin } from '@/features/teams/repositories/teamRepository'
+import { PlayerFilters } from './_components/PlayerFilters'
 
 export default async function AdminPlayersPage({
   searchParams,
@@ -34,48 +32,7 @@ export default async function AdminPlayersPage({
         </div>
 
         <TacticalPanel label="Players" className="p-5 sm:p-7">
-          <form method="get" className="mb-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_240px_auto]">
-            <div className="relative">
-              <Search
-                size={16}
-                aria-hidden
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-muted"
-              />
-              <Input
-                name="search"
-                defaultValue={search}
-                placeholder="Search alias or full name"
-                className="pl-11"
-                aria-label="Search by alias or full name"
-              />
-            </div>
-            <div className="relative">
-              <select
-                name="teamId"
-                defaultValue={teamId}
-                aria-label="Filter by team"
-                className="clip-input h-12 w-full appearance-none border border-border-strong bg-background/90 pl-4 pr-11 font-mono text-sm text-foreground outline-none transition focus:border-danger"
-              >
-                <option value="">All teams</option>
-                {teams.map((team) => (
-                  <option key={team.id} value={team.id}>
-                    {team.name}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown
-                size={17}
-                aria-hidden
-                className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-danger"
-              />
-            </div>
-            <button
-              type="submit"
-              className="clip-button inline-flex min-h-12 items-center justify-center border border-border-strong bg-surface px-6 font-display text-sm font-semibold uppercase tracking-[0.14em] hover:border-danger"
-            >
-              Filter
-            </button>
-          </form>
+          <PlayerFilters search={search} teamId={teamId} teams={teams} />
 
           <div className="overflow-x-auto">
             <table className="w-full min-w-[720px] border-collapse text-left font-mono">
