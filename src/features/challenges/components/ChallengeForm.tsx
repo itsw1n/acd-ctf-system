@@ -2,20 +2,19 @@
 
 import { useActionState } from 'react'
 import { Label, TextField } from 'react-aria-components'
-import { ChevronDown, Save } from 'lucide-react'
+import { Save } from 'lucide-react'
 
 import type { ChallengeActionState } from '@/features/challenges/actions/challengeActions'
 import type { ChallengeEditRow } from '@/features/challenges/types'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
+import { Select } from '@/components/ui/select/Select'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 
 const inputWrap = 'relative'
 const labelClass = 'mb-2 block font-mono text-[11px] uppercase tracking-[0.14em] text-muted'
 const textareaClass =
   'clip-input min-h-28 w-full border border-border-strong bg-background/90 px-4 py-3 font-mono text-sm text-foreground outline-none transition placeholder:text-muted/60 focus:border-danger'
-const selectClass =
-  'clip-input h-12 w-full appearance-none border border-border-strong bg-background/90 pl-4 pr-11 font-mono text-sm text-foreground outline-none transition focus:border-danger'
 
 export function ChallengeForm({
   mode,
@@ -50,29 +49,18 @@ export function ChallengeForm({
             <Input placeholder="Misc" defaultValue={initial?.category ?? ''} />
           </TextField>
 
-          <div>
-            <Label htmlFor="type" className={labelClass}>
-              Type
-            </Label>
-            <div className={inputWrap}>
-              <select
-                id="type"
-                name="type"
-                required
-                defaultValue={initial?.type ?? 'TEXT'}
-                className={selectClass}
-              >
-                <option value="TEXT">TEXT</option>
-                <option value="FILE">FILE</option>
-                <option value="EXTERNAL">EXTERNAL</option>
-              </select>
-              <ChevronDown
-                size={17}
-                className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-danger"
-                aria-hidden
-              />
-            </div>
-          </div>
+          <Select
+            id="type"
+            name="type"
+            label="Type"
+            required
+            defaultValue={initial?.type ?? 'TEXT'}
+            options={[
+              { id: 'TEXT', label: 'TEXT' },
+              { id: 'FILE', label: 'FILE' },
+              { id: 'EXTERNAL', label: 'EXTERNAL' },
+            ]}
+          />
         </div>
 
         <div>

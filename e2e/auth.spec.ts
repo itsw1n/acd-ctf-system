@@ -7,8 +7,10 @@ function uniqueAlias(prefix: string) {
 }
 
 async function selectFirstTeam(page: Page) {
-  const select = page.locator('select[name="teamId"]')
-  await select.selectOption({ index: 1 })
+  // Team picker is the shared RAC Select (button trigger + listbox popover),
+  // so drive it the way a user does instead of using a native select driver.
+  await page.getByRole('button', { name: /select a team/i }).click()
+  await page.getByRole('listbox').getByRole('option').first().click()
 }
 
 async function signUp(page: Page, alias: string, password: string = PASSWORD) {

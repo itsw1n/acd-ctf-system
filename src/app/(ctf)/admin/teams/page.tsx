@@ -2,7 +2,8 @@ import { TacticalPanel } from '@/components/common/TacticalPanel'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
 import { createTeamAction, renameTeamAction } from '@/features/teams/actions/teamActions'
-import { CreateTeamForm, RenameTeamForm } from '@/features/teams/components/TeamForms'
+import { CreateTeamForm } from '@/features/teams/components/TeamForms'
+import { RenameTeamDialog } from '@/features/teams/components/TeamDialogs'
 import { listTeamsWithStats } from '@/features/teams/queries/teamAdminQueries'
 
 export default async function AdminTeamsPage() {
@@ -24,29 +25,33 @@ export default async function AdminTeamsPage() {
         <div className="grid gap-5">
           <CreateTeamForm action={createTeamAction} />
 
-          <TacticalPanel label="Teams" className="p-5 sm:p-7">
+          <TacticalPanel label="Manage teams" className="p-5 sm:p-7">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[720px] border-collapse text-left font-mono">
                 <thead>
                   <tr className="border-y border-border bg-background/70 text-[10px] uppercase tracking-[0.12em] text-muted">
+                    <th className="w-12 px-4 py-3 font-normal">#</th>
                     <th className="px-4 py-3 font-normal">Team name</th>
                     <th className="px-4 py-3 font-normal">Members</th>
                     <th className="px-4 py-3 text-right font-normal">Score</th>
+                    <th className="px-4 py-3 text-right font-normal">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {teams.map((team) => (
+                  {teams.map((team, index) => (
                     <tr key={team.id} className="border-b border-border/70 text-xs">
-                      <td className="min-w-[280px] px-4 py-4">
-                        <RenameTeamForm
-                          teamId={team.id}
-                          defaultName={team.name}
-                          action={renameTeamAction}
-                        />
-                      </td>
+                      <td className="px-4 py-4 text-muted">{index + 1}</td>
+                      <td className="px-4 py-4 font-semibold">{team.name}</td>
                       <td className="px-4 py-4">{team.memberCount}</td>
                       <td className="px-4 py-4 text-right font-bold text-danger-bright">
                         {team.score}
+                      </td>
+                      <td className="px-4 py-4 text-right">
+                        <RenameTeamDialog
+                          teamId={team.id}
+                          teamName={team.name}
+                          action={renameTeamAction}
+                        />
                       </td>
                     </tr>
                   ))}

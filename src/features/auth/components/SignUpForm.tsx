@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from 'react'
 import { Label, TextField } from 'react-aria-components'
-import { Check, ChevronDown, Copy, LogIn, Terminal, UserRound, Users } from 'lucide-react'
+import { Check, Copy, LogIn, Terminal, UserRound, Users } from 'lucide-react'
 import {
   continueSignupAction,
   signUpAction,
@@ -12,6 +12,7 @@ import {
 import type { Team } from '@/features/players/types'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
+import { Select } from '@/components/ui/select/Select'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 
 const initialState: SignUpState = {}
@@ -98,40 +99,15 @@ export function SignUpForm({ teams }: { teams: Team[] }) {
   return (
     <TacticalPanel label="Create account" index="01" className="mx-auto max-w-2xl p-5 sm:p-7">
       <form action={action} className="space-y-5">
-        {/* Native select: bulletproof without JS, keyboard-accessible by
-            default, and trivially drivable in tests. A 4-team picker gains
-            nothing from a custom listbox. */}
-        <div>
-          <Label
-            htmlFor="teamId"
-            className="mb-2 block font-mono text-[11px] uppercase tracking-[0.14em] text-muted"
-          >
-            Team
-          </Label>
-          <div className="relative">
-            <select
-              id="teamId"
-              name="teamId"
-              required
-              defaultValue=""
-              className="clip-input h-12 w-full appearance-none border border-border-strong bg-background/90 pl-4 pr-11 font-mono text-sm text-foreground outline-none transition focus:border-danger"
-            >
-              <option value="" disabled>
-                Select a team
-              </option>
-              {teams.map((team) => (
-                <option key={team.id} value={team.id}>
-                  {team.name}
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              size={17}
-              className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-danger"
-              aria-hidden
-            />
-          </div>
-        </div>
+        <Select
+          id="teamId"
+          name="teamId"
+          label="Team"
+          required
+          defaultValue=""
+          placeholder="Select a team"
+          options={teams.map((team) => ({ id: team.id, label: team.name }))}
+        />
 
         <TextField name="fullName" isRequired>
           <Label className="mb-2 block font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
