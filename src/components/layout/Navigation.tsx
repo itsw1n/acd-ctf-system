@@ -2,7 +2,18 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Activity, Gauge, LogOut, Shield, Trophy, UserRound } from 'lucide-react'
+import {
+  Activity,
+  Crosshair,
+  Gauge,
+  LayoutDashboard,
+  LogOut,
+  ScrollText,
+  Trophy,
+  UserRound,
+  Users,
+  UsersRound,
+} from 'lucide-react'
 import { Button } from '@/components/common/Button'
 import { cn } from '@/lib/cn'
 
@@ -14,11 +25,11 @@ const items = [
 ]
 
 const adminItems = [
-  { href: '/admin', label: 'Dashboard', icon: Shield },
-  { href: '/admin/players', label: 'Players', icon: Shield },
-  { href: '/admin/teams', label: 'Teams', icon: Shield },
-  { href: '/admin/challenges', label: 'Challenges', icon: Shield },
-  { href: '/admin/solves', label: 'Solves', icon: Shield },
+  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/admin/players', label: 'Players', icon: Users },
+  { href: '/admin/teams', label: 'Teams', icon: UsersRound },
+  { href: '/admin/challenges', label: 'Challenges', icon: Crosshair },
+  { href: '/admin/solves', label: 'Solves', icon: ScrollText },
 ]
 
 function linkClass(active: boolean) {
@@ -45,9 +56,6 @@ export function Navigation({
           aria-label="CTF navigation"
           className="sticky top-[85px] flex h-[calc(100vh-85px)] w-60 flex-col"
         >
-          <div className="border-b border-border px-5 py-4 font-mono text-[10px] uppercase tracking-[0.2em] text-muted">
-            {'// Navigation'}
-          </div>
           {!isAdmin && (
             <div className="py-2">
               {items.map(({ href, label, icon: Icon }) => {
@@ -68,10 +76,6 @@ export function Navigation({
           )}
           {isAdmin && (
             <div className="py-2">
-              <div className="flex items-center gap-2 px-6 py-3 font-mono text-[10px] uppercase tracking-[0.2em] text-muted">
-                <Shield size={13} aria-hidden className="text-danger" />
-                {'// Admin'}
-              </div>
               {adminItems.map(({ href, label, icon: Icon }) => {
                 const active = pathname === href
                 return (
