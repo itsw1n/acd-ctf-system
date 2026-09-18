@@ -62,8 +62,10 @@ from README direction (user-approved onboarding).
 - Supabase Auth.
 - Admin promotion/demotion UI, event start/stop, manual score adjustment,
   solve deletion, unsafe team deletion.
-- Enforced rate limiting + CSRF hardening for cookie writes: required before any
-  larger/public event (boundary hook exists, provider not yet integrated).
+- Enforced rate limiting for auth/flag actions is in-memory single-instance
+  (`src/lib/security/rateLimit.ts`): correct for a classroom on one server.
+  A shared provider (e.g. Redis) is still required before any
+  multi-instance/public event, as is CSRF hardening for cookie writes.
 
 ## Generated Baseline
 
