@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useActionState, useState } from 'react'
 import { Label, TextField } from 'react-aria-components'
 import { Check, Copy, LogIn, Terminal, UserRound, Users } from 'lucide-react'
@@ -174,6 +175,12 @@ export function SignUpForm({ teams }: { teams: Team[] }) {
           <Users size={18} aria-hidden />
           {pending ? 'Creating...' : 'Create account'}
         </Button>
+
+        <p className="flex flex-wrap gap-x-6 gap-y-2 border-t border-border pt-4 font-mono text-xs text-muted">
+          <Link href="/signin" className="underline-offset-4 hover:text-foreground hover:underline">
+            Already have an account? Sign in
+          </Link>
+        </p>
       </form>
     </TacticalPanel>
   )
