@@ -91,50 +91,54 @@ export function Select({
       aria-label={label ? undefined : ariaLabel}
       className="group relative"
     >
-      {label && (
-        <Label className="mb-2 block font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
-          {label}
-        </Label>
-      )}
-      <Button
-        className={cn(
-          'clip-input flex h-12 w-full items-center justify-between border border-border-strong bg-background/90 px-4 text-left font-mono text-sm text-foreground outline-none transition hover:border-danger/70 focus-visible:border-danger focus-visible:shadow-[inset_0_0_18px_rgba(227,38,54,.05),0_0_10px_rgba(227,38,54,.08)] disabled:cursor-not-allowed disabled:opacity-50',
-          className
-        )}
-      >
-        <SelectValue>
-          {({ selectedItem }) =>
-            (selectedItem as { textValue?: string } | null)?.textValue ?? placeholder ?? ''
-          }
-        </SelectValue>
-        <ChevronDown size={17} aria-hidden className="text-danger transition-transform" />
-      </Button>
-      <Popover
-        offset={4}
-        className="w-[--trigger-width] overflow-hidden border border-danger/70 bg-surface shadow-[0_0_28px_rgba(0,0,0,.55),0_0_18px_rgba(227,38,54,.12)] entering:animate-in entering:fade-in exiting:animate-out exiting:fade-out"
-      >
-        <ListBox
-          items={options}
-          className="max-h-64 overflow-y-auto p-1 outline-none"
-          renderEmptyState={() => null}
-        >
-          {(option) => (
-            <ListBoxItem
-              id={option.id as Key}
-              textValue={option.label}
-              isDisabled={option.isDisabled}
-              className="group flex cursor-pointer items-center justify-between px-3 py-3 font-mono text-sm text-foreground outline-none transition hover:bg-danger/15 focus:bg-danger/20 focus:text-white data-[selected]:bg-danger/25"
-            >
-              {option.label}
-              <Check
-                size={15}
-                aria-hidden
-                className="text-danger opacity-0 group-data-[selected]:opacity-100"
-              />
-            </ListBoxItem>
+      {({ isOpen }) => (
+        <>
+          {label && (
+            <Label className="mb-2 block font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+              {label}
+            </Label>
           )}
-        </ListBox>
-      </Popover>
+          <Button
+            className={cn(
+              'clip-input flex h-12 w-full items-center justify-between border border-border-strong bg-background/90 px-4 text-left font-mono text-sm text-foreground outline-none transition hover:border-danger/70 focus-visible:border-danger focus-visible:shadow-[inset_0_0_18px_rgba(227,38,54,.05),0_0_10px_rgba(227,38,54,.08)] disabled:cursor-not-allowed disabled:opacity-50',
+              className
+            )}
+          >
+            <SelectValue>{({ selectedText }) => selectedText || placeholder || ''}</SelectValue>
+            <ChevronDown
+              size={17}
+              aria-hidden
+              className={cn('text-danger transition-transform', isOpen && 'rotate-180')}
+            />
+          </Button>
+          <Popover
+            offset={4}
+            className="w-[var(--trigger-width)] overflow-hidden border border-danger/70 bg-surface shadow-[0_0_28px_rgba(0,0,0,.55),0_0_18px_rgba(227,38,54,.12)] entering:animate-in entering:fade-in exiting:animate-out exiting:fade-out"
+          >
+            <ListBox
+              items={options}
+              className="max-h-64 overflow-y-auto p-1 outline-none"
+              renderEmptyState={() => null}
+            >
+              {(option) => (
+                <ListBoxItem
+                  id={option.id as Key}
+                  textValue={option.label}
+                  isDisabled={option.isDisabled}
+                  className="group flex cursor-pointer items-center justify-between px-3 py-3 font-mono text-sm text-foreground outline-none transition hover:bg-danger/15 focus:bg-danger/20 focus:text-white data-[selected]:bg-danger/25"
+                >
+                  {option.label}
+                  <Check
+                    size={15}
+                    aria-hidden
+                    className="text-danger opacity-0 group-data-[selected]:opacity-100"
+                  />
+                </ListBoxItem>
+              )}
+            </ListBox>
+          </Popover>
+        </>
+      )}
     </AriaSelect>
   )
 }
