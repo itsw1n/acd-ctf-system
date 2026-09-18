@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Plus } from 'lucide-react'
 
 import { Button } from '@/components/common/Button'
-import { Modal } from '@/components/layout/modal/Modal'
+import { Modal } from '@/components/common/Modal'
 import type { ChallengeActionState } from '@/features/challenges/actions/challengeActions'
 import type { ChallengeEditRow } from '@/features/challenges/types'
 import { ChallengeForm } from '@/features/challenges/components/ChallengeForm'

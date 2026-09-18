@@ -12,7 +12,7 @@ import {
 import type { Team } from '@/features/players/types'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
-import { Select } from '@/components/ui/select/Select'
+import { Select } from '@/components/common/Select'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 
 const initialState: SignUpState = {}

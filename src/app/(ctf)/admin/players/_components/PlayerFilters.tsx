@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from 'next/navigation'
 
 import { SearchBar } from '@/components/common/SearchBar'
-import { Select } from '@/components/ui/select/Select'
+import { Select } from '@/components/common/Select'
 
 type PlayerFiltersProps = {
   search: string

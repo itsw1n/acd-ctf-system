@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 import { Button } from '@/components/common/Button'
-import { Modal } from '@/components/layout/modal/Modal'
+import { Modal } from '@/components/common/Modal'
 import type { TeamActionState } from '@/features/teams/actions/teamActions'
 import { RenameTeamForm } from '@/features/teams/components/TeamForms'
 
