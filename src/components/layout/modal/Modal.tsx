@@ -1,7 +1,7 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { Dialog, Modal as AriaModal, ModalOverlay } from 'react-aria-components'
+import { Dialog, Heading, Modal as AriaModal, ModalOverlay } from 'react-aria-components'
 import { X } from 'lucide-react'
 
 import { Button } from '@/components/common/Button'
@@ -47,20 +47,23 @@ export function Modal({
           className
         )}
       >
-        <Dialog
-          aria-label={title}
-          className="max-h-[min(90vh,760px)] overflow-y-auto p-5 outline-none sm:p-7"
-        >
+        <Dialog className="flex max-h-[min(90vh,760px)] flex-col overflow-hidden p-5 outline-none sm:p-7">
           {({ close }) => (
             <>
-              <div className="mb-5 flex items-start justify-between gap-4 border-b border-border pb-4">
+              <div className="mb-5 flex shrink-0 items-start justify-between gap-4 border-b border-border pb-4">
                 <div>
                   {eyebrow ? (
                     <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-danger">
                       {eyebrow}
                     </p>
                   ) : null}
-                  <h2 className="mt-1 font-display text-2xl font-bold uppercase">{title}</h2>
+                  <Heading
+                    slot="title"
+                    level={2}
+                    className="mt-1 font-display text-2xl font-bold uppercase"
+                  >
+                    {title}
+                  </Heading>
                 </div>
                 <Button
                   type="button"
@@ -73,7 +76,7 @@ export function Modal({
                   <X size={16} aria-hidden />
                 </Button>
               </div>
-              {children}
+              <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
             </>
           )}
         </Dialog>

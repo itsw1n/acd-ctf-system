@@ -47,19 +47,25 @@ export function SolveFilters({
       />
       <Select
         name="teamId"
-        defaultValue={teamId}
-        onChange={(value) => updateFilters({ teamId: value })}
+        defaultValue={teamId || 'all'}
+        onChange={(value) => updateFilters({ teamId: value === 'all' ? '' : value })}
         aria-label="Filter by team"
         placeholder="All teams"
-        options={teams.map((team) => ({ id: team.id, label: team.name }))}
+        options={[
+          { id: 'all', label: 'All teams' },
+          ...teams.map((team) => ({ id: team.id, label: team.name })),
+        ]}
       />
       <Select
         name="category"
-        defaultValue={category}
-        onChange={(value) => updateFilters({ category: value })}
+        defaultValue={category || 'all'}
+        onChange={(value) => updateFilters({ category: value === 'all' ? '' : value })}
         aria-label="Filter by category"
         placeholder="All categories"
-        options={categories.map((value) => ({ id: value, label: value }))}
+        options={[
+          { id: 'all', label: 'All categories' },
+          ...categories.map((value) => ({ id: value, label: value })),
+        ]}
       />
     </div>
   )

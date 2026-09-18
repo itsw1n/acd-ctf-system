@@ -37,11 +37,14 @@ export function PlayerFilters({ search, teamId, teams }: PlayerFiltersProps) {
       />
       <Select
         name="teamId"
-        defaultValue={teamId}
-        onChange={(value) => updateFilters({ teamId: value })}
+        defaultValue={teamId || 'all'}
+        onChange={(value) => updateFilters({ teamId: value === 'all' ? '' : value })}
         aria-label="Filter by team"
         placeholder="All teams"
-        options={teams.map((team) => ({ id: team.id, label: team.name }))}
+        options={[
+          { id: 'all', label: 'All teams' },
+          ...teams.map((team) => ({ id: team.id, label: team.name })),
+        ]}
       />
     </div>
   )

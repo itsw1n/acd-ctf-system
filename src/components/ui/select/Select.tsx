@@ -125,7 +125,7 @@ export function Select({
                   id={option.id as Key}
                   textValue={option.label}
                   isDisabled={option.isDisabled}
-                  className="group flex cursor-pointer items-center justify-between px-3 py-3 font-mono text-sm text-foreground outline-none transition hover:bg-danger/15 focus:bg-danger/20 focus:text-white data-[selected]:bg-danger/25"
+                  className="group flex cursor-pointer items-center justify-between px-3 py-3 font-mono text-sm text-foreground outline-none transition hover:bg-danger/15 focus:bg-danger/20 focus:text-white data-[selected]:bg-danger/25 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50"
                 >
                   {option.label}
                   <Check
