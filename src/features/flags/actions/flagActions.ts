@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { flagSchema } from '@/features/flags/schemas/flagSchema'
 import { submitFlagForPlayer } from '@/features/flags/services/submitFlag'
 import { requireCurrentPlayer } from '@/features/sessions/services/sessionService'
+import { checkAuthRateLimit, RATE_LIMITED } from '@/lib/security/rateLimit'
 
 export type FlagState = {
   status?: 'correct' | 'duplicate' | 'incorrect' | 'error'
@@ -27,6 +28,15 @@ export async function submitFlagAction(
 
   if (!parsed.success) {
     return { status: 'error', message: 'Enter a valid flag.' }
+  }
+
+  try {
+    await checkAuthRateLimit(`flag:${player.id}`, { limit: 30, windowMs: 60_000 })
+  } catch (error) {
+    if (error instanceof Error && error.message === RATE_LIMITED) {
+      return { status: 'error', message: 'Too many attempts. Try again in a minute.' }
+    }
+    throw error
   }
 
   try {
