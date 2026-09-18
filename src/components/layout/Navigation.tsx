@@ -14,7 +14,7 @@ import {
   Users,
   UsersRound,
 } from 'lucide-react'
-import { Button } from '@/components/common/Button'
+import { LogoutButton } from '@/features/auth/components/LogoutButton'
 import { cn } from '@/lib/cn'
 
 const items = [
@@ -93,17 +93,15 @@ export function Navigation({
             </div>
           )}
           <div className="mt-auto border-t border-border p-5">
-            <form action={logoutAction}>
-              <Button
-                type="submit"
-                variant="warning"
-                size="md"
-                className="w-full font-mono text-xs tracking-[0.12em]"
-              >
-                <LogOut size={16} aria-hidden />
-                Log out
-              </Button>
-            </form>
+            <LogoutButton
+              action={logoutAction}
+              variant="warning"
+              size="md"
+              className="w-full font-mono text-xs tracking-[0.12em]"
+            >
+              <LogOut size={16} aria-hidden />
+              Log out
+            </LogoutButton>
           </div>
         </nav>
       </aside>

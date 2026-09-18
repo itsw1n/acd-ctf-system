@@ -23,7 +23,7 @@ export function RenameTeamDialog({
       <Button type="button" variant="secondary" size="sm" onPress={() => setIsOpen(true)}>
         Edit
       </Button>
-      <Modal title={`Edit ${teamName}`} isOpen={isOpen} onOpenChange={setIsOpen}>
+      <Modal title={`Edit ${teamName}`} eyebrow="// Admin" isOpen={isOpen} onOpenChange={setIsOpen}>
         <RenameTeamForm teamId={teamId} defaultName={teamName} action={action} />
       </Modal>
     </>

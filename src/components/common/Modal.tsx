@@ -19,8 +19,8 @@ export type ModalProps = {
 
 /**
  * Shared modal dialog. Generic structure + behavior only — feature content
- * is passed as children. Appearance reuses the existing admin dialog chrome
- * (surface, danger border, glow, `// Admin` eyebrow, X close button).
+ * is passed as children. Appearance reuses the existing dialog chrome
+ * (surface, danger border, glow, eyebrow line, X close button).
  *
  * Behavior (focus trap, Escape, scroll lock, backdrop blocking) comes from
  * React Aria Components; this file only owns presentation.
@@ -30,7 +30,7 @@ export function Modal({
   isOpen,
   onOpenChange,
   children,
-  eyebrow = '// Admin',
+  eyebrow,
   isDismissable = true,
   className,
 }: ModalProps) {
