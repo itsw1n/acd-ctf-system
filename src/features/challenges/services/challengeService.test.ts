@@ -10,6 +10,10 @@ vi.mock('@/lib/security/hash', () => ({
   sha256: () => 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
 }))
 
+vi.mock('@/lib/security/flagCrypto', () => ({
+  encryptFlag: (plaintext: string) => `enc:${plaintext}`,
+}))
+
 import {
   getChallengeFlagHash,
   insertChallenge,
@@ -31,7 +35,7 @@ const base = {
 }
 
 describe('challenge flag handling', () => {
-  it('stores the normalized flag and its submission hash on creation', async () => {
+  it('stores the encrypted flag and its submission hash on creation', async () => {
     vi.mocked(insertChallenge).mockResolvedValueOnce('challenge-id')
     await createChallenge({ ...base, flag: '  ACD{hello}  ' })
 
@@ -41,9 +45,11 @@ describe('challenge flag handling', () => {
     expect(vi.mocked(insertChallenge)).toHaveBeenCalledWith(
       expect.objectContaining({
         flagHash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
-        flag: 'ACD{hello}',
+        flagEncrypted: 'enc:ACD{hello}',
       })
     )
+    const payload = vi.mocked(insertChallenge).mock.calls[0]?.[0] as Record<string, unknown>
+    expect(payload).not.toHaveProperty('flag')
   })
 
   it('keeps the existing hash when the edit flag is blank', async () => {
@@ -62,6 +68,7 @@ describe('challenge flag handling', () => {
     )
     const payload = vi.mocked(updateChallengeRow).mock.calls[0]?.[1] as Record<string, unknown>
     expect(payload).not.toHaveProperty('flagHash')
+    expect(payload).not.toHaveProperty('flagEncrypted')
     expect(payload).not.toHaveProperty('flag')
   })
 
@@ -79,8 +86,10 @@ describe('challenge flag handling', () => {
       '4b2873c8-01b9-4c22-9482-858276b94c43',
       expect.objectContaining({
         flagHash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
-        flag: 'ACD{new}',
+        flagEncrypted: 'enc:ACD{new}',
       })
     )
+    const updated = vi.mocked(updateChallengeRow).mock.calls[0]?.[1] as Record<string, unknown>
+    expect(updated).not.toHaveProperty('flag')
   })
 })

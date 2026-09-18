@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { sha256 } from '@/lib/security/hash'
+import { encryptFlag } from '@/lib/security/flagCrypto'
 import type {
   CreateChallengeInput,
   UpdateChallengeInput,
@@ -29,7 +30,7 @@ export async function createChallenge(input: CreateChallengeInput) {
     type: input.type,
     points: input.points,
     flagHash,
-    flag: normalizeFlag(input.flag),
+    flagEncrypted: encryptFlag(normalizeFlag(input.flag)),
     externalUrl: input.externalUrl,
     fileUrl: input.fileUrl,
     active: input.active,
@@ -51,7 +52,7 @@ export async function updateChallenge(input: UpdateChallengeInput) {
     fileUrl: input.fileUrl,
     active: input.active,
     // Blank means keep the current flag and hash.
-    ...(trimmedFlag ? { flag: trimmedFlag } : {}),
+    ...(trimmedFlag ? { flagEncrypted: encryptFlag(trimmedFlag) } : {}),
     ...(trimmedFlag ? { flagHash: hashFlag(trimmedFlag) } : {}),
   })
 }

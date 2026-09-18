@@ -12,7 +12,10 @@
 --     file_url, updated_at) + challenges_type_check + challenges_url_rules_check
 --   004_teamless_admin.sql — players.team_id nullable +
 --     players_team_role_check (PLAYER needs a team, ADMIN must be teamless)
---   005_plaintext_challenge_flags.sql — challenges(flag, MVP-only plaintext)
+--   006_encrypted_challenge_flags.sql — challenges(flag_encrypted, AES-256-GCM;
+--     plaintext flag column removed). Seed stores flag_hash only, so demo
+--     submissions work; flag_encrypted stays NULL until an admin re-saves
+--     the flag via the edit form (display falls back to 'Not available').
 --
 -- Scoreboard this seed produces:
 --
@@ -59,7 +62,8 @@ values
 -- challengeService.ts (hashFlag) and src/lib/security/hash.ts (sha256):
 --   ACD{welcome_to_ctf}     -> 1b43b76b143c20b8ae84d75f648f2cb542cbd4f585eb384f1c60d4c063f9c805
 --   ACD{hidden_header_demo} -> 4ad75f150616cff694b38fedaec24b547fa9d7b44af2f8aa7d3975647a43c3d5
--- Both are type TEXT, so file_url/external_url stay NULL
+-- Flags are stored encrypted at rest (flag_encrypted, see 006); the seed
+-- keeps hashes only. Both are type TEXT, so file_url/external_url stay NULL
 -- (challenges_url_rules_check).
 
 insert into public.challenges (
@@ -68,7 +72,6 @@ insert into public.challenges (
   description,
   type,
   points,
-  flag,
   flag_hash,
   active
 )
@@ -79,7 +82,6 @@ values
     'Start here: submit the welcome flag to learn how scoring works.',
     'TEXT',
     50,
-    'ACD{welcome_to_ctf}',
     '1b43b76b143c20b8ae84d75f648f2cb542cbd4f585eb384f1c60d4c063f9c805',
     true
   ),
@@ -89,7 +91,6 @@ values
     'Inspect the HTTP response headers to find the hidden flag.',
     'TEXT',
     100,
-    'ACD{hidden_header_demo}',
     '4ad75f150616cff694b38fedaec24b547fa9d7b44af2f8aa7d3975647a43c3d5',
     true
   );
