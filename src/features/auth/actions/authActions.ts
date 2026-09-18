@@ -11,7 +11,13 @@ import type { PlayerRole } from '@/features/players/types'
 import { continueAfterSignup, signUp } from '@/features/auth/services/signUp'
 import { resetPassword } from '@/features/auth/services/resetPassword'
 import { clearCurrentSession } from '@/features/sessions/services/sessionService'
-import { checkAuthRateLimit } from '@/lib/security/rateLimit'
+import { checkAuthRateLimit, RATE_LIMITED } from '@/lib/security/rateLimit'
+
+function isRateLimited(error: unknown): boolean {
+  return error instanceof Error && error.message === RATE_LIMITED
+}
+
+const RATE_LIMIT_MESSAGE = 'Too many attempts. Try again in a minute.'
 
 export type SignUpState = {
   error?: string
@@ -36,7 +42,12 @@ export async function signUpAction(
     return { error: parsed.error.issues[0]?.message ?? 'Check your registration details.' }
   }
 
-  await checkAuthRateLimit(`signup:${parsed.data.alias.toLowerCase()}`)
+  try {
+    await checkAuthRateLimit(`signup:${parsed.data.alias.toLowerCase()}`)
+  } catch (error) {
+    if (isRateLimited(error)) return { error: RATE_LIMIT_MESSAGE }
+    throw error
+  }
 
   try {
     return await signUp(parsed.data)
@@ -72,7 +83,12 @@ export async function continueSignupAction(_previous: ContinueSignupState, formD
     return { error: 'Verification failed. Please sign in.' }
   }
 
-  await checkAuthRateLimit(`continue:${playerId}`)
+  try {
+    await checkAuthRateLimit(`continue:${playerId}`)
+  } catch (error) {
+    if (isRateLimited(error)) return { error: RATE_LIMIT_MESSAGE }
+    throw error
+  }
 
   try {
     await continueAfterSignup({ playerId, recoveryCode })
@@ -100,7 +116,13 @@ export async function signInAction(
     return { error: 'Invalid alias or password.' }
   }
 
-  await checkAuthRateLimit(`signin:${parsed.data.alias.toLowerCase()}`)
+  try {
+    await checkAuthRateLimit(`signin:${parsed.data.alias.toLowerCase()}`)
+  } catch (error) {
+    // Same generic shape as a failed login: never reveal alias existence.
+    if (isRateLimited(error)) return { error: 'Invalid alias or password.' }
+    throw error
+  }
 
   let role: PlayerRole
   try {
@@ -132,7 +154,12 @@ export async function resetPasswordAction(
     return { error: parsed.error.issues[0]?.message ?? 'Check the form and try again.' }
   }
 
-  await checkAuthRateLimit(`reset:${parsed.data.alias.toLowerCase()}`)
+  try {
+    await checkAuthRateLimit(`reset:${parsed.data.alias.toLowerCase()}`)
+  } catch (error) {
+    if (isRateLimited(error)) return { error: RATE_LIMIT_MESSAGE }
+    throw error
+  }
 
   try {
     await resetPassword({
