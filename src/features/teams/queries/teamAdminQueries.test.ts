@@ -4,6 +4,10 @@ vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: vi.fn(),
 }))
 
+vi.mock('@/features/admin/services/requireAdmin', () => ({
+  requireAdmin: vi.fn(async () => ({ role: 'ADMIN' })),
+}))
+
 import { createAdminClient } from '@/lib/supabase/admin'
 import { listTeamsWithStats } from '@/features/teams/queries/teamAdminQueries'
 

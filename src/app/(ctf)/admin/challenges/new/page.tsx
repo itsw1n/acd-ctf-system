@@ -13,7 +13,7 @@ export default function NewChallengePage() {
             New <span className="text-danger-bright">Challenge</span>
           </h1>
           <p className="mt-3 font-mono text-xs uppercase tracking-[0.14em] text-muted sm:text-sm">
-            The flag is hashed on the server and never stored in plaintext.
+            The flag is retained for admin recovery and hashed for player submissions.
           </p>
         </div>
 

@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { requireAdmin } from '@/features/admin/services/requireAdmin'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export type AdminSolveRow = {
@@ -21,6 +22,7 @@ export async function listSolvesForAdmin(input?: {
   teamId?: string
   category?: string
 }): Promise<AdminSolveRow[]> {
+  await requireAdmin()
   const supabase = createAdminClient()
   const search = input?.search?.trim() ?? ''
   const teamId = input?.teamId?.trim() ?? ''

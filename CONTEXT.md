@@ -50,8 +50,10 @@ from README direction (user-approved onboarding).
 - Service-role key stays server-only (never NEXT*PUBLIC*\*).
 - Admin pages/mutations require ADMIN via `requireAdmin()`; signup never
   accepts a role and always creates PLAYER.
-- Challenge flags are SHA-256 hashed server-side; plaintext is never stored
-  or returned; blank edit flag keeps the current hash.
+- Challenge flags are SHA-256 hashed server-side for submissions. During the
+  MVP, plaintext flags are also stored for admin recovery/editing; this must be
+  replaced with encrypted-at-rest storage before production. Blank edit flag
+  keeps the current flag and hash.
 - `npm run lint && npm run typecheck && npm test && npm run build` pass.
 
 ## Out of Scope
@@ -78,7 +80,7 @@ from README direction (user-approved onboarding).
 
 - 2026-09-13 (user): v1 = static global flags only; auth = team + full name +
   unique alias with HttpOnly session cookie + one-time recovery code; admins
-  seed flags via SQL (`node scripts/hash-flag.mjs`, store SHA-256 digest only).
+  manage flags through the admin UI, with SHA-256 hashes used for submissions.
 - 2026-09-13 (user): leaderboards (team + player), personal activity, simple
   profile are in scope; Docker challenges are out.
 - 2026-09-13 (user): admin area (`/admin/*`: overview, players, teams,
@@ -99,6 +101,9 @@ from README direction (user-approved onboarding).
   management without production SQL. Files: `supabase/migrations/003_admin_challenges.sql`,
   `src/features/admin/**`, `src/features/challenges/**`, `src/app/(ctf)/admin/**`.
   Scope stays static flags only; no hosting/lifecycle controls.
+- 2026-09-13 (approver: user/spec author): MVP challenge flags may be stored in
+  plaintext for admin recovery/editing. This is temporary and must be replaced
+  with encrypted-at-rest storage before production.
 
 ## Notes
 

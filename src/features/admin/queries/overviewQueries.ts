@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { requireAdmin } from '@/features/admin/services/requireAdmin'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { listTeamsWithStats } from '@/features/teams/queries/teamAdminQueries'
 
@@ -23,6 +24,7 @@ export type AdminOverview = {
  * players/teams/challenges/solves features.
  */
 export async function getAdminOverview(): Promise<AdminOverview> {
+  await requireAdmin()
   const supabase = createAdminClient()
 
   const [

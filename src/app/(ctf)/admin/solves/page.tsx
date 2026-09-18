@@ -1,9 +1,7 @@
-import { ChevronDown, Search } from 'lucide-react'
-
 import { TacticalPanel } from '@/components/common/TacticalPanel'
-import { Input } from '@/components/common/Input'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
+import { SolveFilters } from './_components/SolveFilters'
 import { listSolvesForAdmin } from '@/features/solves/queries/solveAdminQueries'
 import { listTeamsAdmin } from '@/features/teams/repositories/teamRepository'
 
@@ -20,6 +18,7 @@ export default async function AdminSolvesPage({
     listSolvesForAdmin({ search, teamId, category }),
     listTeamsAdmin(),
   ])
+  const categories = [...new Set(solves.map((solve) => solve.category))].sort()
 
   return (
     <Section data-ui="admin-solves">
@@ -35,57 +34,13 @@ export default async function AdminSolvesPage({
         </div>
 
         <TacticalPanel label="Solves" className="p-5 sm:p-7">
-          <form
-            method="get"
-            className="mb-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_200px_200px_auto]"
-          >
-            <div className="relative">
-              <Search
-                size={16}
-                aria-hidden
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-muted"
-              />
-              <Input
-                name="search"
-                defaultValue={search}
-                placeholder="Search player, alias, or challenge"
-                className="pl-11"
-                aria-label="Search solves"
-              />
-            </div>
-            <div className="relative">
-              <select
-                name="teamId"
-                defaultValue={teamId}
-                aria-label="Filter by team"
-                className="clip-input h-12 w-full appearance-none border border-border-strong bg-background/90 pl-4 pr-11 font-mono text-sm text-foreground outline-none transition focus:border-danger"
-              >
-                <option value="">All teams</option>
-                {teams.map((team) => (
-                  <option key={team.id} value={team.id}>
-                    {team.name}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown
-                size={17}
-                aria-hidden
-                className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-danger"
-              />
-            </div>
-            <Input
-              name="category"
-              defaultValue={category}
-              placeholder="Category filter"
-              aria-label="Filter by category"
-            />
-            <button
-              type="submit"
-              className="clip-button inline-flex min-h-12 items-center justify-center border border-border-strong bg-surface px-6 font-display text-sm font-semibold uppercase tracking-[0.14em] hover:border-danger"
-            >
-              Filter
-            </button>
-          </form>
+          <SolveFilters
+            search={search}
+            teamId={teamId}
+            category={category}
+            teams={teams}
+            categories={categories}
+          />
 
           <div className="overflow-x-auto">
             <table className="w-full min-w-[860px] border-collapse text-left font-mono">

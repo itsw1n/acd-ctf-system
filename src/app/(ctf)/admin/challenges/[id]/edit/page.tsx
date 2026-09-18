@@ -20,7 +20,7 @@ export default async function EditChallengePage({ params }: { params: Promise<{ 
             Edit <span className="text-danger-bright">Challenge</span>
           </h1>
           <p className="mt-3 font-mono text-xs uppercase tracking-[0.14em] text-muted sm:text-sm">
-            The existing flag is never shown. Leave it blank to keep it.
+            The current flag is loaded into the editable field. Change it when needed.
           </p>
         </div>
 

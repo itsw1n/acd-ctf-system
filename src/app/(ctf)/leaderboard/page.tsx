@@ -3,11 +3,11 @@ import { TacticalPanel } from '@/components/common/TacticalPanel'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
 import { getLeaderboards } from '@/features/leaderboard/queries/leaderboardQueries'
-import { requireCurrentPlayer } from '@/features/sessions/services/sessionService'
+import { requirePlayer } from '@/features/admin/services/requirePlayer'
 import { cn } from '@/lib/cn'
 
 export default async function LeaderboardPage() {
-  const [player, boards] = await Promise.all([requireCurrentPlayer(), getLeaderboards()])
+  const [player, boards] = await Promise.all([requirePlayer(), getLeaderboards()])
 
   return (
     <Section data-ui="leaderboard">

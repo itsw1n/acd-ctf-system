@@ -2,6 +2,7 @@ import 'server-only'
 import { verifyPassword } from '@/lib/security/hash'
 import { getPlayerCredentialsByAlias } from '@/features/players/repositories/playerRepository'
 import { issuePlayerSession } from '@/features/sessions/services/sessionService'
+import type { PlayerRole } from '@/features/players/types'
 
 // Pre-generated Argon2id hash of a random string. Verified against when the
 // alias does not exist (or has no password yet) so unknown aliases cost the
@@ -9,7 +10,7 @@ import { issuePlayerSession } from '@/features/sessions/services/sessionService'
 const DUMMY_HASH =
   '$argon2id$v=19$m=65536,p=4,t=3$vl2uaQaIhTAiA1cpL9UP0g$A34cRr5WOztZr9zti1UuiM8GcZ700uyxq0GchOY7WNE'
 
-export async function signIn(input: { alias: string; password: string }): Promise<void> {
+export async function signIn(input: { alias: string; password: string }): Promise<PlayerRole> {
   const credentials = await getPlayerCredentialsByAlias(input.alias)
 
   // Exact case-insensitive match: ilike treats `_` as a wildcard, so confirm
@@ -25,4 +26,5 @@ export async function signIn(input: { alias: string; password: string }): Promis
   if (!exact || !valid) throw new Error('INVALID_CREDENTIALS')
 
   await issuePlayerSession(exact.id)
+  return exact.role
 }

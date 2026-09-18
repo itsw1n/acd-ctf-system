@@ -2,9 +2,13 @@ import { AlertTriangle } from 'lucide-react'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
+import { requirePlayer } from '@/features/admin/services/requirePlayer'
 import { FlagSubmissionForm } from '@/features/flags/components/FlagSubmissionForm'
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  // PLAYER-only: ADMIN accounts are routed to /admin.
+  await requirePlayer()
+
   return (
     <Section data-ui="dashboard">
       <Container>

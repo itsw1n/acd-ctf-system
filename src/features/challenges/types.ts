@@ -3,7 +3,7 @@ import type { ChallengeType } from '@/features/challenges/schemas/challengeSchem
 /**
  * Challenge data shaped for the admin edit form. Owned here (not in the
  * repository) so Client Components can use it without importing
- * server-only persistence modules. Never includes flag_hash.
+ * server-only persistence modules.
  */
 export type ChallengeEditRow = {
   id: string
@@ -12,6 +12,7 @@ export type ChallengeEditRow = {
   description: string
   type: ChallengeType
   points: number
+  flag: string | null
   externalUrl: string | null
   fileUrl: string | null
   active: boolean

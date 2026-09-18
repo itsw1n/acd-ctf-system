@@ -11,6 +11,7 @@ import {
 import { getPlayerById } from '@/features/players/repositories/playerRepository'
 
 const SESSION_DAYS = 3
+const SESSION_MAX_AGE_SECONDS = SESSION_DAYS * 24 * 60 * 60
 
 export async function issuePlayerSession(playerId: string) {
   const rawToken = createSessionToken()
@@ -29,6 +30,7 @@ export async function issuePlayerSession(playerId: string) {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
+    maxAge: SESSION_MAX_AGE_SECONDS,
     expires: expiresAt,
   })
 }

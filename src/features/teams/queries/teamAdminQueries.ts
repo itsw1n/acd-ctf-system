@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { requireAdmin } from '@/features/admin/services/requireAdmin'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export type AdminTeamStats = {
@@ -11,6 +12,7 @@ export type AdminTeamStats = {
 }
 
 export async function listTeamsWithStats(): Promise<AdminTeamStats[]> {
+  await requireAdmin()
   const supabase = createAdminClient()
 
   const [{ data: teams, error: teamsError }, { data: players, error: playersError }] =

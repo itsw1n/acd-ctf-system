@@ -31,6 +31,14 @@
 --   ACD{hidden_header_demo} (unsolved by dan + rapz → fresh solve;
 --                            solved by the rest → duplicate guard)
 
+-- MVP-only: the admin editor needs the plaintext flag to remain recoverable.
+update public.challenges
+set flag = case title
+  when 'Welcome Flag' then 'ACD{welcome_to_ctf}'
+  when 'Hidden Header' then 'ACD{hidden_header_demo}'
+end
+where title in ('Welcome Flag', 'Hidden Header') and flag is null;
+
 -- 1. players(full_name, alias, team_id, recovery_code_hash, password_hash, role).
 --    Password hash is Argon2id('ctf-demo-1234') from the app's hashPassword;
 --    recovery hashes are SHA-256 of the codes above. Role is always PLAYER
@@ -97,7 +105,7 @@ select
   'Root',
   'root',
   null,
-  '3b06e4e9e758a0b5b5d5c5f5a5b5c5d5e5f5a5b5c5d5e5f5a5b5c5d5e5f5a5b5',
+  '6a61fa8754cfa3368f26cca51476b3664b3c9fb2b1eec79e5d0561a977be19b4',
   demo_password.password_hash,
   'ADMIN'
 from demo_password
