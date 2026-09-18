@@ -57,5 +57,8 @@ re-saved, which stores it encrypted.
   env, never commit it) before creating real challenges.
 - Promote organizers: `UPDATE players SET role = 'ADMIN' WHERE
 lower(alias) = lower('myalias');`
-- Integrate the rate-limit provider (see `src/lib/security/rateLimit.ts`)
-  and review CSRF hardening for cookie-authenticated writes.
+- Rate limiting is enforced in-memory (`src/lib/security/rateLimit.ts`):
+  correct for a single classroom server. Before any multi-instance or public
+  event, swap the store for a shared provider (e.g. Redis) behind the same
+  `checkAuthRateLimit` signature, and review CSRF hardening for
+  cookie-authenticated writes.
