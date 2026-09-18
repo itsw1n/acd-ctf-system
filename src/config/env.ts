@@ -7,7 +7,10 @@ const schema = z.object({
   SESSION_COOKIE_NAME: z.string().min(1).default('acd_ctf_session'),
   FLAG_ENCRYPTION_KEY: z
     .string()
-    .regex(/^[0-9a-fA-F]{64}$/, 'Must be 64 hex chars (32 bytes). Generate with: openssl rand -hex 32'),
+    .regex(
+      /^[0-9a-fA-F]{64}$/,
+      'Must be 64 hex chars (32 bytes). Generate with: openssl rand -hex 32'
+    ),
 })
 
 export const env = schema.parse({

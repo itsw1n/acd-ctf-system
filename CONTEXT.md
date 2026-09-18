@@ -103,7 +103,7 @@ from README direction (user-approved onboarding).
   Scope stays static flags only; no hosting/lifecycle controls.
 - 2026-09-13 (approver: user/spec author): MVP challenge flags were stored in
   plaintext for admin recovery/editing. SUPERSEDED 2026-09-18 by
-  `supabase/migrations/006_encrypted_challenge_flags.sql` + 
+  `supabase/migrations/006_encrypted_challenge_flags.sql` +
   `src/lib/security/flagCrypto.ts` (AES-256-GCM at rest, server-side decrypt
   for the admin edit form only).
 
