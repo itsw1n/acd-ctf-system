@@ -29,7 +29,7 @@ function linkClass(active: boolean) {
   )
 }
 
-export function Sidebar({
+export function Navigation({
   isAdmin = false,
   logoutAction,
 }: {
