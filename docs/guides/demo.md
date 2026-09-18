@@ -4,7 +4,7 @@
 
 ```bash
 npm run supabase:start
-npm run supabase:reset   # migrations 001 + 002, then supabase/seed.sql
+npm run supabase:reset   # replays all migrations, then supabase/seed.sql
 npm run dev
 ```
 
@@ -32,6 +32,9 @@ players). Recovery code: `ACD-ROOT-ADMIN-001`. Sign in as `root` to
 exercise `/admin/*`; `root` cannot submit flags.
 
 Submittable demo flags: `ACD{welcome_to_ctf}`, `ACD{hidden_header_demo}`.
+Seeded challenges carry flag hashes only (flags are encrypted at rest since
+migration 006); the admin edit form shows "Not available" until a flag is
+re-saved, which stores it encrypted.
 
 ## Suggested walkthrough
 
@@ -47,7 +50,11 @@ Submittable demo flags: `ACD{welcome_to_ctf}`, `ACD{hidden_header_demo}`.
 - Delete demo players, demo solves, and demo challenges (or start from a
   clean hosted project and run migrations only — seed never applies there).
   This includes the seeded `root` admin.
-- Add real challenges with `node scripts/hash-flag.mjs` (store digests only).
+- Add real challenges through the admin UI (flags are hashed for scoring and
+  encrypted at rest on save). `node scripts/hash-flag.mjs` remains available
+  to verify a digest matches the app's hashing logic.
+- Set a production `FLAG_ENCRYPTION_KEY` (`openssl rand -hex 32`, server-only
+  env, never commit it) before creating real challenges.
 - Promote organizers: `UPDATE players SET role = 'ADMIN' WHERE
 lower(alias) = lower('myalias');`
 - Integrate the rate-limit provider (see `src/lib/security/rateLimit.ts`)
