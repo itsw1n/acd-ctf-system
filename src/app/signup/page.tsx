@@ -8,7 +8,7 @@ import { getCurrentPlayer } from '@/features/sessions/services/sessionService'
 
 export default async function SignUpPage() {
   const currentPlayer = await getCurrentPlayer()
-  if (currentPlayer) redirect('/dashboard')
+  if (currentPlayer) redirect(currentPlayer.role === 'ADMIN' ? '/admin' : '/dashboard')
 
   const teams = await listTeams()
 

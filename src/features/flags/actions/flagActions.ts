@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { flagSchema } from '@/features/flags/schemas/flagSchema'
 import { submitFlagForPlayer } from '@/features/flags/services/submitFlag'
 import { requireCurrentPlayer } from '@/features/sessions/services/sessionService'
+import { checkAuthRateLimit, RATE_LIMITED } from '@/lib/security/rateLimit'
 
 export type FlagState = {
   status?: 'correct' | 'duplicate' | 'incorrect' | 'error'
@@ -15,10 +16,27 @@ export async function submitFlagAction(
   formData: FormData
 ): Promise<FlagState> {
   const player = await requireCurrentPlayer()
+
+  // Organizer accounts have no competition team, so their solves would
+  // contaminate team scores, totals, and statistics. Enforced here at the
+  // only submission entry point; player.role is DB-derived, never client input.
+  if (player.role !== 'PLAYER') {
+    return { status: 'error', message: 'Organizer accounts cannot submit competition flags.' }
+  }
+
   const parsed = flagSchema.safeParse({ flag: formData.get('flag') })
 
   if (!parsed.success) {
     return { status: 'error', message: 'Enter a valid flag.' }
+  }
+
+  try {
+    await checkAuthRateLimit(`flag:${player.id}`, { limit: 30, windowMs: 60_000 })
+  } catch (error) {
+    if (error instanceof Error && error.message === RATE_LIMITED) {
+      return { status: 'error', message: 'Too many attempts. Try again in a minute.' }
+    }
+    throw error
   }
 
   try {

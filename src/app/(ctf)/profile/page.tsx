@@ -3,15 +3,15 @@ import { Button } from '@/components/common/Button'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
-import { requireCurrentPlayer } from '@/features/sessions/services/sessionService'
+import { requirePlayer } from '@/features/admin/services/requirePlayer'
 import { logoutAction } from '@/features/auth/actions/authActions'
 
 export default async function ProfilePage() {
-  const player = await requireCurrentPlayer()
+  const player = await requirePlayer()
 
   const rows: Array<{ label: string; value: string; tone?: 'default' | 'success' }> = [
     { label: 'Full name', value: player.fullName },
-    { label: 'Team', value: player.team.name },
+    { label: 'Team', value: player.team?.name ?? '—' },
     { label: 'Role', value: player.role },
     // Rendered only with a valid session, so presence here means active.
     { label: 'Session', value: 'ACTIVE', tone: 'success' },

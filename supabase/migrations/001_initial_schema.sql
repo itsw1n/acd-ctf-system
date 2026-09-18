@@ -74,17 +74,6 @@ grant all on table public.player_sessions to service_role;
 grant all on table public.challenges to service_role;
 grant all on table public.solves to service_role;
 
-insert into public.teams (name, slug)
-values
-  ('IT Innovators', 'it-innovators'),
-  ('Data Wizard', 'data-wizard'),
-  ('Tech Pioneers', 'tech-pioneers'),
-  ('Cyber Knights', 'cyber-knights')
-on conflict (slug) do nothing;
-
--- Demo hashes only. Remove these rows before the real event and add your own hashed flags.
-insert into public.challenges (title, category, points, flag_hash)
-values
-  ('Welcome Flag', 'Misc', 50, '1b43b76b143c20b8ae84d75f648f2cb542cbd4f585eb384f1c60d4c063f9c805'),
-  ('Hidden Header', 'Web', 100, '4ad75f150616cff694b38fedaec24b547fa9d7b44af2f8aa7d3975647a43c3d5')
-on conflict (flag_hash) do nothing;
+-- NOTE: demo teams/challenges live in supabase/seed.sql (local `supabase db
+-- reset` only). Migrations stay structural so the seed can insert cleanly
+-- without conflicting with rows created here.

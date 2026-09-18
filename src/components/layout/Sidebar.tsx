@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Activity, Gauge, Trophy, UserRound } from 'lucide-react'
+import { Activity, Gauge, LogOut, Shield, Trophy, UserRound } from 'lucide-react'
+import { Button } from '@/components/common/Button'
 import { cn } from '@/lib/cn'
 
 const items = [
@@ -12,7 +13,29 @@ const items = [
   { href: '/profile', label: 'Profile', icon: UserRound },
 ]
 
-export function Sidebar() {
+const adminItems = [
+  { href: '/admin', label: 'Dashboard', icon: Shield },
+  { href: '/admin/players', label: 'Players', icon: Shield },
+  { href: '/admin/teams', label: 'Teams', icon: Shield },
+  { href: '/admin/challenges', label: 'Challenges', icon: Shield },
+  { href: '/admin/solves', label: 'Solves', icon: Shield },
+]
+
+function linkClass(active: boolean) {
+  return cn(
+    'relative flex h-14 items-center gap-4 border-b border-border/55 px-6 font-mono text-sm uppercase tracking-[0.08em] text-muted transition hover:bg-primary/10 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-danger',
+    active &&
+      'border-y-danger/70 bg-[linear-gradient(90deg,rgba(143,17,17,.75),rgba(143,17,17,.08))] text-foreground before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-danger before:shadow-[0_0_12px_rgba(227,38,54,.8)]'
+  )
+}
+
+export function Sidebar({
+  isAdmin = false,
+  logoutAction,
+}: {
+  isAdmin?: boolean
+  logoutAction: () => Promise<void>
+}) {
   const pathname = usePathname()
 
   return (
@@ -25,41 +48,71 @@ export function Sidebar() {
           <div className="border-b border-border px-5 py-4 font-mono text-[10px] uppercase tracking-[0.2em] text-muted">
             {'// Navigation'}
           </div>
-          <div className="py-2">
-            {items.map(({ href, label, icon: Icon }) => {
-              const active = pathname === href
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  aria-current={active ? 'page' : undefined}
-                  className={cn(
-                    'relative flex h-14 items-center gap-4 border-b border-border/55 px-6 font-mono text-sm uppercase tracking-[0.08em] text-muted transition hover:bg-primary/10 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-danger',
-                    active &&
-                      'border-y-danger/70 bg-[linear-gradient(90deg,rgba(143,17,17,.75),rgba(143,17,17,.08))] text-foreground before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-danger before:shadow-[0_0_12px_rgba(227,38,54,.8)]'
-                  )}
-                >
-                  <Icon size={20} strokeWidth={1.7} aria-hidden />
-                  {label}
-                </Link>
-              )
-            })}
-          </div>
-          <div className="mt-auto border-t border-border p-5 font-mono text-[10px] uppercase leading-5 tracking-[0.12em] text-muted/70">
-            Same students.
-            <br />
-            Different weaponry.
-            <div className="mt-3 h-0.5 w-5 bg-danger" />
+          {!isAdmin && (
+            <div className="py-2">
+              {items.map(({ href, label, icon: Icon }) => {
+                const active = pathname === href
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    aria-current={active ? 'page' : undefined}
+                    className={linkClass(active)}
+                  >
+                    <Icon size={20} strokeWidth={1.7} aria-hidden />
+                    {label}
+                  </Link>
+                )
+              })}
+            </div>
+          )}
+          {isAdmin && (
+            <div className="py-2">
+              <div className="flex items-center gap-2 px-6 py-3 font-mono text-[10px] uppercase tracking-[0.2em] text-muted">
+                <Shield size={13} aria-hidden className="text-danger" />
+                {'// Admin'}
+              </div>
+              {adminItems.map(({ href, label, icon: Icon }) => {
+                const active = pathname === href
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    aria-current={active ? 'page' : undefined}
+                    className={linkClass(active)}
+                  >
+                    <Icon size={18} strokeWidth={1.7} aria-hidden />
+                    {label}
+                  </Link>
+                )
+              })}
+            </div>
+          )}
+          <div className="mt-auto border-t border-border p-5">
+            <form action={logoutAction}>
+              <Button
+                type="submit"
+                variant="warning"
+                size="md"
+                className="w-full font-mono text-xs tracking-[0.12em]"
+              >
+                <LogOut size={16} aria-hidden />
+                Log out
+              </Button>
+            </form>
           </div>
         </nav>
       </aside>
 
       <nav
         aria-label="CTF mobile navigation"
-        className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-4 border-t border-border bg-background/95 backdrop-blur lg:hidden"
+        className={cn(
+          'fixed inset-x-0 bottom-0 z-50 grid border-t border-border bg-background/95 backdrop-blur lg:hidden',
+          isAdmin ? 'grid-cols-5' : 'grid-cols-4'
+        )}
         data-ui="mobile-navigation"
       >
-        {items.map(({ href, label, icon: Icon }) => {
+        {(isAdmin ? adminItems : items).map(({ href, label, icon: Icon }) => {
           const active = pathname === href
           return (
             <Link

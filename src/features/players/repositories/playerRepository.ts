@@ -6,7 +6,7 @@ type PlayerRow = {
   id: string
   full_name: string
   alias: string
-  team_id: string
+  team_id: string | null
   role: PlayerRole
 }
 
@@ -14,6 +14,7 @@ type PlayerCredentialsRow = {
   id: string
   alias: string
   password_hash: string | null
+  role: PlayerRole
 }
 
 type TeamRow = {
@@ -66,19 +67,45 @@ export async function getPlayerById(playerId: string): Promise<Player | null> {
   if (playerError) throw new Error(`Unable to load player: ${playerError.message}`)
   if (!player) return null
 
+  const role = (player as PlayerRow).role
+
+  // A null team_id never implies ADMIN on its own: PLAYER rows without a
+  // team are corrupt and must not resolve, even if DB integrity were bypassed.
+  if (player.team_id === null) {
+    if (role !== 'ADMIN') throw new Error('Unable to load player team: missing team for PLAYER.')
+    return {
+      id: player.id,
+      fullName: player.full_name,
+      alias: player.alias,
+      role,
+      team: null,
+    }
+  }
+
   const { data: team, error: teamError } = await supabase
     .from('teams')
     .select('id,name,slug')
     .eq('id', player.team_id)
-    .single()
+    .maybeSingle()
 
   if (teamError) throw new Error(`Unable to load player team: ${teamError.message}`)
+  if (!team) {
+    // Dangling FK: corrupt for PLAYER, tolerable for ADMIN (no team anyway).
+    if (role !== 'ADMIN') throw new Error('Unable to load player team: missing team for PLAYER.')
+    return {
+      id: player.id,
+      fullName: player.full_name,
+      alias: player.alias,
+      role,
+      team: null,
+    }
+  }
 
   return {
     id: player.id,
     fullName: player.full_name,
     alias: player.alias,
-    role: (player as PlayerRow).role,
+    role,
     team: team as TeamRow,
   }
 }
@@ -122,7 +149,7 @@ export async function getPlayerCredentialsByAlias(
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('players')
-    .select('id,alias,password_hash')
+    .select('id,alias,password_hash,role')
     .ilike('alias', alias)
     .maybeSingle()
 

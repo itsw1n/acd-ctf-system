@@ -3,10 +3,10 @@ import { TacticalPanel } from '@/components/common/TacticalPanel'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
 import { getPlayerActivity } from '@/features/activity/queries/activityQueries'
-import { requireCurrentPlayer } from '@/features/sessions/services/sessionService'
+import { requirePlayer } from '@/features/admin/services/requirePlayer'
 
 export default async function ActivityPage() {
-  const player = await requireCurrentPlayer()
+  const player = await requirePlayer()
   const activity = await getPlayerActivity(player.id)
   const totalPoints = activity.reduce((sum, row) => sum + row.points, 0)
 
