@@ -2,8 +2,19 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Activity, Gauge, LogOut, Shield, Trophy, UserRound } from 'lucide-react'
-import { Button } from '@/components/common/Button'
+import {
+  Activity,
+  Crosshair,
+  Gauge,
+  LayoutDashboard,
+  LogOut,
+  ScrollText,
+  Trophy,
+  UserRound,
+  Users,
+  UsersRound,
+} from 'lucide-react'
+import { LogoutButton } from '@/features/auth/components/LogoutButton'
 import { cn } from '@/lib/cn'
 
 const items = [
@@ -14,11 +25,11 @@ const items = [
 ]
 
 const adminItems = [
-  { href: '/admin', label: 'Dashboard', icon: Shield },
-  { href: '/admin/players', label: 'Players', icon: Shield },
-  { href: '/admin/teams', label: 'Teams', icon: Shield },
-  { href: '/admin/challenges', label: 'Challenges', icon: Shield },
-  { href: '/admin/solves', label: 'Solves', icon: Shield },
+  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/admin/players', label: 'Players', icon: Users },
+  { href: '/admin/teams', label: 'Teams', icon: UsersRound },
+  { href: '/admin/challenges', label: 'Challenges', icon: Crosshair },
+  { href: '/admin/solves', label: 'Solves', icon: ScrollText },
 ]
 
 function linkClass(active: boolean) {
@@ -29,7 +40,7 @@ function linkClass(active: boolean) {
   )
 }
 
-export function Sidebar({
+export function Navigation({
   isAdmin = false,
   logoutAction,
 }: {
@@ -45,9 +56,6 @@ export function Sidebar({
           aria-label="CTF navigation"
           className="sticky top-[85px] flex h-[calc(100vh-85px)] w-60 flex-col"
         >
-          <div className="border-b border-border px-5 py-4 font-mono text-[10px] uppercase tracking-[0.2em] text-muted">
-            {'// Navigation'}
-          </div>
           {!isAdmin && (
             <div className="py-2">
               {items.map(({ href, label, icon: Icon }) => {
@@ -68,10 +76,6 @@ export function Sidebar({
           )}
           {isAdmin && (
             <div className="py-2">
-              <div className="flex items-center gap-2 px-6 py-3 font-mono text-[10px] uppercase tracking-[0.2em] text-muted">
-                <Shield size={13} aria-hidden className="text-danger" />
-                {'// Admin'}
-              </div>
               {adminItems.map(({ href, label, icon: Icon }) => {
                 const active = pathname === href
                 return (
@@ -89,17 +93,15 @@ export function Sidebar({
             </div>
           )}
           <div className="mt-auto border-t border-border p-5">
-            <form action={logoutAction}>
-              <Button
-                type="submit"
-                variant="warning"
-                size="md"
-                className="w-full font-mono text-xs tracking-[0.12em]"
-              >
-                <LogOut size={16} aria-hidden />
-                Log out
-              </Button>
-            </form>
+            <LogoutButton
+              action={logoutAction}
+              variant="warning"
+              size="md"
+              className="w-full font-mono text-xs tracking-[0.12em]"
+            >
+              <LogOut size={16} aria-hidden />
+              Log out
+            </LogoutButton>
           </div>
         </nav>
       </aside>

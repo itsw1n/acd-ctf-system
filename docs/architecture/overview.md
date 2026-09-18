@@ -25,7 +25,7 @@ acd-ctf-system/
 │   │   └── page.tsx          redirects by session (→ /dashboard or /signin)
 │   ├── components/
 │   │   ├── common/           Button, Input, TacticalPanel (shared primitives)
-│   │   └── layout/           AppShell, Sidebar, Topbar, Container, Section
+│   │   └── layout/           AppShell, Navigation, Topbar, Container, Section
 │   ├── features/
 │   │   ├── auth/             schemas, services, actions, forms
 │   │   ├── players/          team/player repositories, types

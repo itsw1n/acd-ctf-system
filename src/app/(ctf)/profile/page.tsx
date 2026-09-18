@@ -1,10 +1,10 @@
 import { ShieldCheck } from 'lucide-react'
-import { Button } from '@/components/common/Button'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
 import { requirePlayer } from '@/features/admin/services/requirePlayer'
 import { logoutAction } from '@/features/auth/actions/authActions'
+import { LogoutButton } from '@/features/auth/components/LogoutButton'
 
 export default async function ProfilePage() {
   const player = await requirePlayer()
@@ -76,11 +76,9 @@ export default async function ProfilePage() {
                 <p className="font-mono text-[10px] leading-5 text-muted">
                   Recovery is handled through your secure browser session and recovery code.
                 </p>
-                <form action={logoutAction}>
-                  <Button type="submit" className="w-full sm:w-auto">
-                    End session
-                  </Button>
-                </form>
+                <LogoutButton action={logoutAction} className="w-full sm:w-auto">
+                  End session
+                </LogoutButton>
               </div>
             </div>
           </div>
