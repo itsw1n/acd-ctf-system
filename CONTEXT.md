@@ -50,10 +50,10 @@ from README direction (user-approved onboarding).
 - Service-role key stays server-only (never NEXT*PUBLIC*\*).
 - Admin pages/mutations require ADMIN via `requireAdmin()`; signup never
   accepts a role and always creates PLAYER.
-- Challenge flags are SHA-256 hashed server-side for submissions. During the
-  MVP, plaintext flags are also stored for admin recovery/editing; this must be
-  replaced with encrypted-at-rest storage before production. Blank edit flag
-  keeps the current flag and hash.
+- Challenge flags are SHA-256 hashed server-side for submissions; recoverable
+  copies are stored AES-256-GCM encrypted at rest (`flag_encrypted`, key in
+  server-only `FLAG_ENCRYPTION_KEY`) and decrypted server-side only for the
+  admin edit form. Blank edit flag keeps the current flag and hash.
 - `npm run lint && npm run typecheck && npm test && npm run build` pass.
 
 ## Out of Scope
@@ -101,9 +101,11 @@ from README direction (user-approved onboarding).
   management without production SQL. Files: `supabase/migrations/003_admin_challenges.sql`,
   `src/features/admin/**`, `src/features/challenges/**`, `src/app/(ctf)/admin/**`.
   Scope stays static flags only; no hosting/lifecycle controls.
-- 2026-09-13 (approver: user/spec author): MVP challenge flags may be stored in
-  plaintext for admin recovery/editing. This is temporary and must be replaced
-  with encrypted-at-rest storage before production.
+- 2026-09-13 (approver: user/spec author): MVP challenge flags were stored in
+  plaintext for admin recovery/editing. SUPERSEDED 2026-09-18 by
+  `supabase/migrations/006_encrypted_challenge_flags.sql` + 
+  `src/lib/security/flagCrypto.ts` (AES-256-GCM at rest, server-side decrypt
+  for the admin edit form only).
 
 ## Notes
 
