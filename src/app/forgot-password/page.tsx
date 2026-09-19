@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { ShieldAlert } from 'lucide-react'
+import { LogoMark } from '@/components/common/LogoMark'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
 import { ResetPasswordForm } from '@/features/auth/components/ResetPasswordForm'
@@ -13,6 +14,7 @@ export default async function ForgotPasswordPage() {
     <main className="min-h-screen bg-background px-4 py-6 text-foreground tactical-grid scanlines sm:px-6 lg:px-10">
       <header className="mx-auto flex max-w-[1480px] items-center justify-between border-b border-border pb-5">
         <div className="flex items-center gap-4">
+          <LogoMark />
           <div className="font-display text-2xl font-extrabold uppercase sm:text-4xl">
             ACD <span className="text-danger-bright">CTF</span>
           </div>
