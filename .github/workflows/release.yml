@@ -3,6 +3,7 @@ name: Release
 # Cut a versioned release every time a PR lands on main. Direct pushes
 # cannot release (main only ever moves via PR), and no code or config
 # changes are involved — the job only tags and writes release notes.
+# Label the release PR `major` to cut a major version (e.g. v1.0.0).
 on:
   pull_request:
     types: [closed]
@@ -60,6 +61,11 @@ jobs:
 
       - name: Compute next version
         id: version
+        env:
+          # Maintainers cut a major release by labeling the release PR
+          # `major`. The event is pull_request:closed, so the merged PR's
+          # labels are available here.
+          IS_MAJOR: ${{ contains(github.event.pull_request.labels.*.name, 'major') }}
         run: |
           last="$(git describe --tags --abbrev=0 --match 'v[0-9]*' 2>/dev/null || echo v0.0.0)"
           echo "Previous tag: $last"
@@ -71,7 +77,7 @@ jobs:
           major="$(echo "$last" | cut -d. -f1 | tr -dc '0-9')"
           minor="$(echo "$last" | cut -d. -f2)"
           patch="$(echo "$last" | cut -d. -f3)"
-          if echo "$subjects" | grep -qiE 'breaking change'; then
+          if [ "$IS_MAJOR" = true ] || echo "$subjects" | grep -qiE 'breaking change'; then
             major=$((major + 1)); minor=0; patch=0
           elif echo "$subjects" | grep -qiE '^feat(\(|:)'; then
             minor=$((minor + 1)); patch=0
