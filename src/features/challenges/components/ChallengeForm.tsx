@@ -8,7 +8,7 @@ import type { ChallengeActionState } from '@/features/challenges/actions/challen
 import type { ChallengeEditRow } from '@/features/challenges/types'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
-import { Select } from '@/components/ui/select/Select'
+import { Select } from '@/components/common/Select'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 
 const inputWrap = 'relative'

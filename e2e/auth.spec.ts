@@ -69,6 +69,10 @@ test('signin rejects wrong passwords with a generic error', async ({ page }) => 
 
   await page.goto('/profile')
   await page.getByRole('button', { name: /end session/i }).click()
+  await page
+    .getByRole('dialog')
+    .getByRole('button', { name: /^log out$/i })
+    .click()
   await expect(page).toHaveURL('/signin')
 
   await page.goto('/signin')
@@ -110,6 +114,10 @@ test('forgot-password resets the password and revokes old sessions', async ({ pa
 
   await page.goto('/profile')
   await page.getByRole('button', { name: /end session/i }).click()
+  await page
+    .getByRole('dialog')
+    .getByRole('button', { name: /^log out$/i })
+    .click()
   await expect(page).toHaveURL('/signin')
 
   await page.goto('/forgot-password')

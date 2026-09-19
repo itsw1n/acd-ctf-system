@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Plus } from 'lucide-react'
 
 import { Button } from '@/components/common/Button'
-import { Modal } from '@/components/layout/modal/Modal'
+import { Modal } from '@/components/common/Modal'
 import type { ChallengeActionState } from '@/features/challenges/actions/challengeActions'
 import type { ChallengeEditRow } from '@/features/challenges/types'
 import { ChallengeForm } from '@/features/challenges/components/ChallengeForm'
@@ -23,7 +23,7 @@ export function CreateChallengeDialog({ action }: { action: ChallengeAction }) {
         <Plus size={18} aria-hidden />
         Create challenge
       </Button>
-      <Modal title="Create challenge" isOpen={isOpen} onOpenChange={setIsOpen}>
+      <Modal title="Create challenge" eyebrow="// Admin" isOpen={isOpen} onOpenChange={setIsOpen}>
         <ChallengeForm mode="create" action={action} />
       </Modal>
     </>
@@ -44,7 +44,7 @@ export function EditChallengeDialog({
       <Button type="button" variant="secondary" size="sm" onPress={() => setIsOpen(true)}>
         Edit
       </Button>
-      <Modal title={challenge.title} isOpen={isOpen} onOpenChange={setIsOpen}>
+      <Modal title={challenge.title} eyebrow="// Admin" isOpen={isOpen} onOpenChange={setIsOpen}>
         <ChallengeForm mode="edit" initial={challenge} action={action} />
       </Modal>
     </>
