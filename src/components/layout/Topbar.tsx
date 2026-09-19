@@ -1,5 +1,6 @@
 import { ShieldAlert } from 'lucide-react'
 import type { Player } from '@/features/players/types'
+import { LogoMark } from '@/components/common/LogoMark'
 
 export function Topbar({ player, score }: { player: Player; score: number }) {
   return (
@@ -8,6 +9,7 @@ export function Topbar({ player, score }: { player: Player; score: number }) {
       data-ui="topbar"
     >
       <div className="flex min-w-0 flex-1 items-center gap-4 px-4 sm:px-7">
+        <LogoMark />
         <div className="font-display text-2xl font-extrabold uppercase tracking-tight text-foreground sm:text-4xl">
           ACD <span className="text-danger-bright">CTF</span>
         </div>
