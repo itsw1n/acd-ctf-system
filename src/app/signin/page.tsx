@@ -1,8 +1,7 @@
 import { redirect } from 'next/navigation'
-import { ShieldAlert } from 'lucide-react'
-import { LogoMark } from '@/components/common/LogoMark'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
+import { PublicHeader } from '@/components/layout/PublicHeader'
 import { SignInForm } from '@/features/auth/components/SignInForm'
 import { getCurrentPlayer } from '@/features/sessions/services/sessionService'
 
@@ -12,27 +11,12 @@ export default async function SignInPage({
   searchParams: Promise<{ reset?: string }>
 }) {
   const currentPlayer = await getCurrentPlayer()
-  if (currentPlayer) redirect(currentPlayer.role === 'ADMIN' ? '/admin' : '/dashboard')
-
+  if (currentPlayer) redirect(currentPlayer.role === 'ADMIN' ? '/admin' : '/challenges')
   const params = await searchParams
 
   return (
     <main className="min-h-screen bg-background px-4 py-6 text-foreground tactical-grid scanlines sm:px-6 lg:px-10">
-      <header className="mx-auto flex max-w-[1480px] items-center justify-between border-b border-border pb-5">
-        <div className="flex items-center gap-4">
-          <LogoMark />
-          <div className="font-display text-2xl font-extrabold uppercase sm:text-4xl">
-            ACD <span className="text-danger-bright">CTF</span>
-          </div>
-          <div className="hidden h-10 w-px bg-border sm:block" />
-          <div className="hidden font-mono text-[10px] uppercase tracking-[0.14em] text-muted sm:block">
-            School Capture The Flag
-            <br />
-            Learn &gt; Break &gt; Solve &gt; Grow
-          </div>
-        </div>
-        <ShieldAlert className="text-danger" size={30} aria-label="CTF security emblem" />
-      </header>
+      <PublicHeader actionHref="/signup" actionLabel="Sign up" />
 
       <Section className="py-10 sm:py-16" data-ui="signin">
         <Container className="max-w-[1280px]">

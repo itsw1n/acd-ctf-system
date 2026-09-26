@@ -53,6 +53,7 @@ export async function submitFlagAction(
       }
     }
 
+    revalidatePath('/challenges')
     revalidatePath('/dashboard')
     revalidatePath('/leaderboard')
     revalidatePath('/activity')

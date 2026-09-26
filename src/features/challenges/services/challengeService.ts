@@ -25,14 +25,16 @@ export async function createChallenge(input: CreateChallengeInput) {
   const flagHash = hashFlag(input.flag)
   return insertChallenge({
     title: input.title,
+    author: input.author,
     category: input.category,
     description: input.description,
+    difficulty: input.difficulty,
+    hint: input.hint ?? null,
     type: input.type,
     points: input.points,
     flagHash,
     flagEncrypted: encryptFlag(normalizeFlag(input.flag)),
     externalUrl: input.externalUrl,
-    fileUrl: input.fileUrl,
     active: input.active,
   })
 }
@@ -44,12 +46,14 @@ export async function updateChallenge(input: UpdateChallengeInput) {
   const trimmedFlag = input.flag?.trim()
   await updateChallengeRow(input.id, {
     title: input.title,
+    author: input.author,
     category: input.category,
     description: input.description,
+    difficulty: input.difficulty,
+    hint: input.hint,
     type: input.type,
     points: input.points,
     externalUrl: input.externalUrl,
-    fileUrl: input.fileUrl,
     active: input.active,
     // Blank means keep the current flag and hash.
     ...(trimmedFlag ? { flagEncrypted: encryptFlag(trimmedFlag) } : {}),

@@ -20,6 +20,9 @@ export function AppShell({
         <Navigation isAdmin={player.role === 'ADMIN'} logoutAction={logoutAction} />
         <main className="min-w-0 pb-24 lg:pb-10">{children}</main>
       </div>
+      <footer className="border-t border-border px-5 py-4 text-center font-mono text-[9px] uppercase tracking-[0.16em] text-muted/70 lg:ml-60">
+        © itsw1n
+      </footer>
     </div>
   )
 }

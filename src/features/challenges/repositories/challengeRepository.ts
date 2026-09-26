@@ -2,14 +2,19 @@ import 'server-only'
 
 import { createAdminClient } from '@/lib/supabase/admin'
 import { decryptFlag } from '@/lib/security/flagCrypto'
-import type { ChallengeType } from '@/features/challenges/schemas/challengeSchemas'
+import type {
+  ChallengeDifficulty,
+  ChallengeType,
+} from '@/features/challenges/schemas/challengeSchemas'
 import type { ChallengeEditRow } from '@/features/challenges/types'
 
 export type AdminChallengeRow = {
   id: string
   title: string
+  author: string
   category: string
   type: ChallengeType
+  difficulty: ChallengeDifficulty
   points: number
   active: boolean
   createdAt: string
@@ -21,12 +26,14 @@ export type InsertChallengeRow = {
   title: string
   category: string
   description: string
+  difficulty: ChallengeDifficulty
+  hint: string | null
   type: ChallengeType
   points: number
   flagHash: string
   flagEncrypted: string
+  author: string
   externalUrl?: string
-  fileUrl?: string
   active: boolean
 }
 
@@ -34,7 +41,7 @@ export async function listChallengesAdmin(): Promise<AdminChallengeRow[]> {
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('challenges')
-    .select('id,title,category,type,points,active,created_at')
+    .select('id,title,author,category,type,difficulty,points,active,created_at')
     .order('created_at', { ascending: false })
 
   if (error) throw new Error(`Unable to load challenges: ${error.message}`)
@@ -42,8 +49,10 @@ export async function listChallengesAdmin(): Promise<AdminChallengeRow[]> {
   return (data ?? []).map((row) => ({
     id: row.id,
     title: row.title,
+    author: row.author,
     category: row.category,
     type: row.type as ChallengeType,
+    difficulty: row.difficulty as ChallengeDifficulty,
     points: row.points,
     active: row.active,
     createdAt: row.created_at,
@@ -54,7 +63,9 @@ export async function getChallengeForEdit(challengeId: string): Promise<Challeng
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('challenges')
-    .select('id,title,category,description,type,points,flag_encrypted,external_url,file_url,active')
+    .select(
+      'id,title,author,category,description,type,difficulty,hint,points,flag_encrypted,external_url,active'
+    )
     .eq('id', challengeId)
     .maybeSingle()
 
@@ -73,13 +84,15 @@ export async function getChallengeForEdit(challengeId: string): Promise<Challeng
   return {
     id: data.id,
     title: data.title,
+    author: data.author,
     category: data.category,
     description: data.description,
     type: data.type as ChallengeType,
+    difficulty: data.difficulty as ChallengeDifficulty,
+    hint: data.hint,
     points: data.points,
     flag,
     externalUrl: data.external_url,
-    fileUrl: data.file_url,
     active: data.active,
   }
 }
@@ -102,14 +115,16 @@ export async function insertChallenge(input: InsertChallengeRow) {
     .from('challenges')
     .insert({
       title: input.title,
+      author: input.author,
       category: input.category,
       description: input.description,
       type: input.type,
+      difficulty: input.difficulty,
+      hint: input.hint ?? null,
       points: input.points,
       flag_hash: input.flagHash,
       flag_encrypted: input.flagEncrypted,
       external_url: input.externalUrl ?? null,
-      file_url: input.fileUrl ?? null,
       active: input.active,
     })
     .select('id')
@@ -127,13 +142,15 @@ export async function updateChallengeRow(
   challengeId: string,
   input: {
     title: string
+    author: string
     category: string
     description: string
     type: ChallengeType
+    difficulty: ChallengeDifficulty
+    hint?: string
     points: number
     flagEncrypted?: string
     externalUrl?: string
-    fileUrl?: string
     active: boolean
     flagHash?: string
   }
@@ -141,12 +158,14 @@ export async function updateChallengeRow(
   const supabase = createAdminClient()
   const patch: Record<string, unknown> = {
     title: input.title,
+    author: input.author,
     category: input.category,
     description: input.description,
     type: input.type,
+    difficulty: input.difficulty,
+    hint: input.hint ?? null,
     points: input.points,
     external_url: input.externalUrl ?? null,
-    file_url: input.fileUrl ?? null,
     active: input.active,
     updated_at: new Date().toISOString(),
   }

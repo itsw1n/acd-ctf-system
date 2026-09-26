@@ -27,9 +27,11 @@ import {
 
 const base = {
   title: 'Welcome Flag',
+  author: 'ACD Team',
   category: 'Misc',
   description: 'Find the hidden flag in the welcome post.',
   type: 'TEXT' as const,
+  difficulty: 'MEDIUM' as const,
   points: 50,
   active: true,
 }

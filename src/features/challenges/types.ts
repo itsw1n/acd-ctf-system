@@ -1,4 +1,7 @@
-import type { ChallengeType } from '@/features/challenges/schemas/challengeSchemas'
+import type {
+  ChallengeDifficulty,
+  ChallengeType,
+} from '@/features/challenges/schemas/challengeSchemas'
 
 /**
  * Challenge data shaped for the admin edit form. Owned here (not in the
@@ -8,12 +11,14 @@ import type { ChallengeType } from '@/features/challenges/schemas/challengeSchem
 export type ChallengeEditRow = {
   id: string
   title: string
+  author: string
   category: string
   description: string
   type: ChallengeType
+  difficulty: ChallengeDifficulty
+  hint: string | null
   points: number
   flag: string | null
   externalUrl: string | null
-  fileUrl: string | null
   active: boolean
 }

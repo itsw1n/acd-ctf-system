@@ -11,6 +11,7 @@ export type AdminPlayerRow = {
   teamId: string | null
   team: string
   role: PlayerRole
+  accessLocked: boolean
   createdAt: string
 }
 
@@ -29,7 +30,7 @@ export async function listPlayersForAdmin(input?: {
 
   let query = supabase
     .from('players')
-    .select('id,full_name,alias,team_id,role,created_at')
+    .select('id,full_name,alias,team_id,role,access_locked,created_at')
     .order('created_at', { ascending: false })
     .limit(200)
 
@@ -52,6 +53,7 @@ export async function listPlayersForAdmin(input?: {
     // Teamless ADMINs have no team; '—' marks the absence explicitly.
     team: player.team_id ? (teamById.get(player.team_id) ?? 'Unknown') : '—',
     role: player.role as PlayerRole,
+    accessLocked: player.access_locked,
     createdAt: player.created_at,
   }))
 }

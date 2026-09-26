@@ -23,12 +23,12 @@ function mockChallengeRow(data: unknown) {
 const baseRow = {
   id: 'challenge-1',
   title: 'Welcome Flag',
+  author: 'ACD Team',
   category: 'Misc',
   description: 'Start here.',
   type: 'TEXT',
   points: 50,
   external_url: null,
-  file_url: null,
   active: true,
 }
 

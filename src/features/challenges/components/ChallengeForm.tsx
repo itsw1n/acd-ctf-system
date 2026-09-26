@@ -43,6 +43,11 @@ export function ChallengeForm({
           </div>
         </TextField>
 
+        <TextField name="author" isRequired>
+          <Label className={labelClass}>Author</Label>
+          <Input placeholder="Challenge author" defaultValue={initial?.author ?? ''} />
+        </TextField>
+
         <div className="grid gap-5 sm:grid-cols-2">
           <TextField name="category" isRequired>
             <Label className={labelClass}>Category</Label>
@@ -57,9 +62,35 @@ export function ChallengeForm({
             defaultValue={initial?.type ?? 'TEXT'}
             options={[
               { id: 'TEXT', label: 'TEXT' },
-              { id: 'FILE', label: 'FILE' },
               { id: 'EXTERNAL', label: 'EXTERNAL' },
             ]}
+          />
+
+          <Select
+            id="difficulty"
+            name="difficulty"
+            label="Difficulty"
+            required
+            defaultValue={initial?.difficulty ?? 'MEDIUM'}
+            options={[
+              { id: 'EASY', label: 'EASY' },
+              { id: 'MEDIUM', label: 'MEDIUM' },
+              { id: 'HARD', label: 'HARD' },
+            ]}
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="hint" className={labelClass}>
+            Hint (optional)
+          </Label>
+          <textarea
+            id="hint"
+            name="hint"
+            maxLength={1000}
+            defaultValue={initial?.hint ?? ''}
+            placeholder="Give players a nudge without revealing the solution."
+            className={textareaClass}
           />
         </div>
 
@@ -103,7 +134,7 @@ export function ChallengeForm({
             <Label className={labelClass}>{mode === 'edit' ? 'Replacement flag' : 'Flag'}</Label>
             <Input
               defaultValue={initial?.flag ?? ''}
-              placeholder="ACD{...}"
+              placeholder="ACDCTF{...}"
               autoComplete="off"
               spellCheck={false}
             />
@@ -111,22 +142,12 @@ export function ChallengeForm({
         </div>
 
         <TextField name="externalUrl">
-          <Label className={labelClass}>External URL (EXTERNAL only)</Label>
+          <Label className={labelClass}>Challenge link (EXTERNAL only)</Label>
           <Input
             type="url"
             inputMode="url"
-            placeholder="https://challenge.example.com"
+            placeholder="https://drive.google.com/..."
             defaultValue={initial?.externalUrl ?? ''}
-          />
-        </TextField>
-
-        <TextField name="fileUrl">
-          <Label className={labelClass}>File URL (FILE only)</Label>
-          <Input
-            type="url"
-            inputMode="url"
-            placeholder="https://files.example.com/challenge.zip"
-            defaultValue={initial?.fileUrl ?? ''}
           />
         </TextField>
 

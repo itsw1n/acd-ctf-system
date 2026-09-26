@@ -6,7 +6,7 @@ import { getPlayerScore } from '@/features/activity/queries/activityQueries'
 /**
  * Authentication gate for the whole /(ctf) subtree (player pages AND /admin).
  * Role routing lives in the leaves: player pages call requirePlayer()
- * (ADMIN -> /admin) and the admin layout redirects non-admins to /dashboard.
+ * (ADMIN -> /admin) and the admin layout redirects non-admins to /challenges.
  * The gate stays here (not in the leaves) so /admin keeps working while the
  * role checks stay per-area and loop-free.
  */

@@ -23,6 +23,7 @@ function credentials(overrides: Record<string, unknown> = {}) {
     alias: 'tester',
     password_hash: 'stored-hash',
     role: 'PLAYER',
+    access_locked: false,
     ...overrides,
   } as never
 }
@@ -53,6 +54,18 @@ describe('signIn', () => {
 
     await expect(signIn({ alias: 'tester', password: 'wrong-password' })).rejects.toThrow(
       'INVALID_CREDENTIALS'
+    )
+    expect(vi.mocked(issuePlayerSession)).not.toHaveBeenCalled()
+  })
+
+  it('rejects a locked account after verifying the password', async () => {
+    vi.mocked(getPlayerCredentialsByAlias).mockResolvedValueOnce(
+      credentials({ access_locked: true })
+    )
+    vi.mocked(verifyPassword).mockResolvedValueOnce(true)
+
+    await expect(signIn({ alias: 'tester', password: 'correct-password' })).rejects.toThrow(
+      'PLAYER_ACCOUNT_LOCKED'
     )
     expect(vi.mocked(issuePlayerSession)).not.toHaveBeenCalled()
   })

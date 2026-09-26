@@ -36,6 +36,7 @@ describe('resetPassword', () => {
     vi.mocked(getPlayerByAlias).mockResolvedValueOnce({
       id: 'player-1',
       alias: 'tester',
+      access_locked: false,
     } as never)
     vi.mocked(verifyRecoveryCode).mockResolvedValueOnce(true)
 
@@ -62,6 +63,7 @@ describe('resetPassword', () => {
     vi.mocked(getPlayerByAlias).mockResolvedValueOnce({
       id: 'player-1',
       alias: 'tester',
+      access_locked: false,
     } as never)
     vi.mocked(verifyRecoveryCode).mockResolvedValueOnce(false)
 

@@ -2,7 +2,7 @@
 
 ## Status
 
-🟢 CTF implementation merged to main — live on dev server
+🟡 CTF feature branch ready for PR review — hosted migration pending merge
 
 ---
 
@@ -33,17 +33,19 @@
 
 ## In Progress
 
-- Admin area (`/admin/*`): overview, players, teams, challenges (CRUD + flag
-  hashing), solves; migration `003_admin_challenges.sql`; `requireAdmin()`
-  enforcement; tests for auth/flag/validation/secret-safety.
+- Open and review the feature PR from `feat/ctf-access-controls` into `main`.
+- Apply migrations `007` through `010` to hosted Supabase only after merge and
+  release approval.
 
-## Up Next
+## Completed in the current feature branch
 
-1. Design CTF tables (teams, players, sessions, challenges, solves) + RLS/service-role access.
-2. Join + session + recovery-code flow with tests.
-3. Flag submission with hash lookup + duplicate protection + tests.
-4. Leaderboards, activity, profile pages.
-5. Replace starter tests/E2E with CTF behavior tests.
+- Challenge board with search, category/difficulty filters, hints, authors,
+  and external links.
+- Public and authenticated leaderboards plus admin team/player rankings.
+- Competition-wide access lock and per-player lock/unlock controls.
+- Component ownership cleanup: shared primitives in `components/common`, shell
+  pieces in `components/layout`, and feature UI in `features/*/components`.
+- Challenge author field and single external-link schema migration `010`.
 
 ## Blocked
 

@@ -74,6 +74,8 @@ export function Select({
   }
 
   const selectedKey = isControlled ? value || null : internalKey
+  const selectedLabel =
+    options.find((option) => option.id === String(selectedKey))?.label ?? placeholder ?? ''
 
   return (
     <AriaSelect
@@ -104,7 +106,7 @@ export function Select({
               className
             )}
           >
-            <SelectValue>{({ selectedText }) => selectedText || placeholder || ''}</SelectValue>
+            <SelectValue>{selectedLabel}</SelectValue>
             <ChevronDown
               size={17}
               aria-hidden

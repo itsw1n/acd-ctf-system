@@ -1,7 +1,7 @@
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
-import { SolveFilters } from './_components/SolveFilters'
+import { SolveFilters } from '@/features/solves/components/SolveFilters'
 import { listSolvesForAdmin } from '@/features/solves/queries/solveAdminQueries'
 import { listTeamsAdmin } from '@/features/teams/repositories/teamRepository'
 

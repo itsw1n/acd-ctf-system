@@ -12,6 +12,6 @@ import { getCurrentPlayer } from '@/features/sessions/services/sessionService'
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const player = await getCurrentPlayer()
   if (!player) redirect('/signin')
-  if (player.role !== 'ADMIN') redirect('/dashboard')
+  if (player.role !== 'ADMIN') redirect('/challenges')
   return <>{children}</>
 }

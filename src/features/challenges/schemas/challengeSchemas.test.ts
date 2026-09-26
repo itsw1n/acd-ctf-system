@@ -8,10 +8,12 @@ import {
 
 const base = {
   title: 'Welcome Flag',
+  author: 'ACD Team',
   category: 'Misc',
   description: 'Find the hidden flag in the welcome post.',
   points: 50,
   active: 'on' as const,
+  difficulty: 'MEDIUM' as const,
 }
 
 describe('challenge schemas', () => {
@@ -30,15 +32,6 @@ describe('challenge schemas', () => {
     expect(result.success).toBe(false)
   })
 
-  it('requires fileUrl for FILE challenges', () => {
-    const result = createChallengeSchema.safeParse({
-      ...base,
-      type: 'FILE',
-      flag: 'ACD{hello}',
-    })
-    expect(result.success).toBe(false)
-  })
-
   it('requires externalUrl for EXTERNAL challenges', () => {
     const result = createChallengeSchema.safeParse({
       ...base,
@@ -52,21 +45,13 @@ describe('challenge schemas', () => {
     const result = createChallengeSchema.safeParse({
       ...base,
       type: 'TEXT',
-      fileUrl: 'https://example.com/file.zip',
+      externalUrl: 'https://example.com/file.zip',
       flag: 'ACD{hello}',
     })
     expect(result.success).toBe(false)
   })
 
   it('rejects non-http(s) URLs via real parsing', () => {
-    const file = createChallengeSchema.safeParse({
-      ...base,
-      type: 'FILE',
-      fileUrl: 'ftp://example.com/file.zip',
-      flag: 'ACD{hello}',
-    })
-    expect(file.success).toBe(false)
-
     const external = createChallengeSchema.safeParse({
       ...base,
       type: 'EXTERNAL',

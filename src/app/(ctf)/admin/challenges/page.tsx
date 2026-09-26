@@ -51,6 +51,7 @@ export default async function AdminChallengesPage() {
               <thead>
                 <tr className="border-y border-border bg-background/70 text-[10px] uppercase tracking-[0.12em] text-muted">
                   <th className="px-4 py-3 font-normal">Title</th>
+                  <th className="px-4 py-3 font-normal">Author</th>
                   <th className="px-4 py-3 font-normal">Category</th>
                   <th className="px-4 py-3 font-normal">Type</th>
                   <th className="px-4 py-3 text-right font-normal">Points</th>
@@ -65,6 +66,7 @@ export default async function AdminChallengesPage() {
                     <td className="max-w-[240px] truncate px-4 py-4 font-semibold">
                       {challenge.title}
                     </td>
+                    <td className="px-4 py-4 text-muted">{challenge.author}</td>
                     <td className="px-4 py-4 text-muted">{challenge.category}</td>
                     <td className="px-4 py-4">{challenge.type}</td>
                     <td className="px-4 py-4 text-right font-bold text-danger-bright">

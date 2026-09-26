@@ -15,7 +15,7 @@ local resets — the Supabase CLI never applies it to hosted projects.
 ## Seeded data
 
 - 4 teams: IT Innovators, Data Wizard, Tech Pioneers, Cyber Knights
-- 2 demo challenges: Welcome Flag (50 pts), Hidden Header (100 pts)
+- 2 demo challenges: Welcome Flag (50 pts), Hidden Header (100 pts), both by `ACD Team`
 - 5 demo players, all password `ctf-demo-1234`:
 
 | Alias    | Team          | Pre-solved    | Recovery code        |
@@ -38,12 +38,14 @@ re-saved, which stores it encrypted.
 
 ## Suggested walkthrough
 
-1. Sign in as `rapz` → dashboard shows the flag module.
+1. Sign in as `rapz` → `/challenges` shows the challenge board.
 2. Submit `ACD{hidden_header_demo}` → success, +100 pts.
 3. Resubmit it → duplicate guard message, no points.
 4. Open leaderboard → Cyber Knights on top; activity → live solve rows.
 5. Sign up a fresh alias → both flags accepted (solves are per-player).
 6. Forgot-password with a demo recovery code → sessions revoked, fresh login.
+7. Sign in as `root` → admin overview shows team/player leaderboards; use the
+   competition lock or a player row lock to verify access controls.
 
 ## Before a real event
 
@@ -51,7 +53,8 @@ re-saved, which stores it encrypted.
   clean hosted project and run migrations only — seed never applies there).
   This includes the seeded `root` admin.
 - Add real challenges through the admin UI (flags are hashed for scoring and
-  encrypted at rest on save). `node scripts/hash-flag.mjs` remains available
+  encrypted at rest on save; each challenge has an author and one optional
+  external Drive or hosted-resource link). `node scripts/hash-flag.mjs` remains available
   to verify a digest matches the app's hashing logic.
 - Set a production `FLAG_ENCRYPTION_KEY` (`openssl rand -hex 32`, server-only
   env, never commit it) before creating real challenges.

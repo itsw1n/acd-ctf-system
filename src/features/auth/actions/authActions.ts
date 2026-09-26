@@ -12,6 +12,7 @@ import { continueAfterSignup, signUp } from '@/features/auth/services/signUp'
 import { resetPassword } from '@/features/auth/services/resetPassword'
 import { clearCurrentSession } from '@/features/sessions/services/sessionService'
 import { checkAuthRateLimit, RATE_LIMITED } from '@/lib/security/rateLimit'
+import { getSignupLock } from '@/features/competition/repositories/competitionRepository'
 
 function isRateLimited(error: unknown): boolean {
   return error instanceof Error && error.message === RATE_LIMITED
@@ -30,6 +31,8 @@ export async function signUpAction(
   _previous: SignUpState,
   formData: FormData
 ): Promise<SignUpState> {
+  if (await getSignupLock()) return { error: 'Competition is ongoing.' }
+
   const parsed = signUpSchema.safeParse({
     teamId: formData.get('teamId'),
     fullName: formData.get('fullName'),
@@ -96,7 +99,7 @@ export async function continueSignupAction(_previous: ContinueSignupState, formD
     return { error: 'Verification failed. Please sign in.' }
   }
 
-  redirect('/dashboard')
+  redirect('/challenges')
 }
 
 export type SignInState = {
@@ -107,6 +110,8 @@ export async function signInAction(
   _previous: SignInState,
   formData: FormData
 ): Promise<SignInState> {
+  const accessLocked = await getSignupLock()
+
   const parsed = signInSchema.safeParse({
     alias: formData.get('alias'),
     password: formData.get('password'),
@@ -126,13 +131,19 @@ export async function signInAction(
 
   let role: PlayerRole
   try {
-    role = await signIn(parsed.data)
-  } catch {
+    role = await signIn(parsed.data, { lockPlayers: accessLocked })
+  } catch (error) {
+    if (error instanceof Error && error.message === 'PLAYER_ACCESS_LOCKED') {
+      return { error: 'Competition is ongoing.' }
+    }
+    if (error instanceof Error && error.message === 'PLAYER_ACCOUNT_LOCKED') {
+      return { error: 'This account has been locked by an administrator.' }
+    }
     // Generic failure for unknown alias AND wrong password alike.
     return { error: 'Invalid alias or password.' }
   }
 
-  redirect(role === 'ADMIN' ? '/admin' : '/dashboard')
+  redirect(role === 'ADMIN' ? '/admin' : '/challenges')
 }
 
 export type ResetPasswordState = {

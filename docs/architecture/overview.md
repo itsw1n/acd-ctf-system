@@ -18,20 +18,27 @@ specific stack and architecture profile. Tooling, deployment, and guidance files
 acd-ctf-system/
 ├── src/
 │   ├── app/
-│   │   ├── (ctf)/            protected: dashboard, leaderboard, activity, profile
+│   │   ├── (ctf)/            protected: challenges, leaderboard, activity, profile, admin
 │   │   ├── signin/ signup/ forgot-password/
 │   │   ├── globals.css       Tailwind import, @theme tokens, base rules
 │   │   ├── layout.tsx        Oxanium + JetBrains Mono via next/font
-│   │   └── page.tsx          redirects by session (→ /dashboard or /signin)
+│   │   └── page.tsx          public team/player leaderboard
 │   ├── components/
+<<<<<<< HEAD
 │   │   ├── common/           Button, Input, TacticalPanel (shared primitives)
 │   │   └── layout/           AppShell, Navigation, Topbar, Container, Section
+=======
+│   │   ├── common/           Button, Input, Select, Modal, TacticalPanel (shared primitives)
+│   │   └── layout/           AppShell, PublicHeader, Navigation, Topbar, Container, Section
+>>>>>>> 4c676ee (docs: align project guidance with current ctf flow)
 │   ├── features/
 │   │   ├── auth/             schemas, services, actions, forms
-│   │   ├── players/          team/player repositories, types
+│   │   ├── players/          account lock, filters, repositories, types
 │   │   ├── sessions/         session repository + service
 │   │   ├── flags/            submission schema, service, repository, form
-│   │   ├── leaderboard/      ranking queries
+│   │   ├── leaderboard/      team/player ranking queries
+│   │   ├── challenges/       challenge board, metadata, admin CRUD
+│   │   ├── competition/      competition-wide access lock
 │   │   └── activity/         solve-history queries
 │   ├── config/               server-only env validation
 │   ├── lib/                  cn(), security (hash, rate-limit boundary),
@@ -40,7 +47,7 @@ acd-ctf-system/
 ├── e2e/                      Playwright auth + access flows
 ├── scripts/                  hash-flag.mjs
 └── supabase/
-    ├── migrations/           001 schema + RLS, 002 password auth
+    ├── migrations/           001–010 ordered schema and access changes
     ├── seed.sql              local-only demo data
     └── config.toml
 ```
@@ -52,7 +59,10 @@ enforced beside protected data (`requireCurrentPlayer`) and side effects.
 
 ## Detailed structure rules
 
-- `playbooks/stack/nextjs/structure.md`
+- `src/app/` contains route entrypoints and page composition only.
+- Feature-owned UI lives under `src/features/*/components`.
+- Reusable primitives live under `src/components/common`.
+- App and public shell pieces live under `src/components/layout`.
 
 The structure playbooks show available destinations and profile growth rules. Create a folder only
 when its responsibility exists. Before an agent removes or reorganizes user-created architecture,
