@@ -41,6 +41,7 @@ function formData(entries: Record<string, string>) {
 const validForm = () =>
   formData({
     title: 'Welcome Flag',
+    author: 'ACD Team',
     category: 'Misc',
     description: 'Find the hidden flag in the welcome post.',
     type: 'TEXT',

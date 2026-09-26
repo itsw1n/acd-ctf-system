@@ -43,6 +43,11 @@ export function ChallengeForm({
           </div>
         </TextField>
 
+        <TextField name="author" isRequired>
+          <Label className={labelClass}>Author</Label>
+          <Input placeholder="Challenge author" defaultValue={initial?.author ?? ''} />
+        </TextField>
+
         <div className="grid gap-5 sm:grid-cols-2">
           <TextField name="category" isRequired>
             <Label className={labelClass}>Category</Label>
@@ -57,7 +62,6 @@ export function ChallengeForm({
             defaultValue={initial?.type ?? 'TEXT'}
             options={[
               { id: 'TEXT', label: 'TEXT' },
-              { id: 'FILE', label: 'FILE' },
               { id: 'EXTERNAL', label: 'EXTERNAL' },
             ]}
           />
@@ -138,22 +142,12 @@ export function ChallengeForm({
         </div>
 
         <TextField name="externalUrl">
-          <Label className={labelClass}>External URL (EXTERNAL only)</Label>
+          <Label className={labelClass}>Challenge link (EXTERNAL only)</Label>
           <Input
             type="url"
             inputMode="url"
-            placeholder="https://challenge.example.com"
+            placeholder="https://drive.google.com/..."
             defaultValue={initial?.externalUrl ?? ''}
-          />
-        </TextField>
-
-        <TextField name="fileUrl">
-          <Label className={labelClass}>File URL (FILE only)</Label>
-          <Input
-            type="url"
-            inputMode="url"
-            placeholder="https://files.example.com/challenge.zip"
-            defaultValue={initial?.fileUrl ?? ''}
           />
         </TextField>
 

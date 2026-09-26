@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useMemo, useState } from 'react'
-import { CheckCircle2, ExternalLink, FileDown, Lightbulb, LockKeyhole, Trophy } from 'lucide-react'
+import { CheckCircle2, ExternalLink, Lightbulb, LockKeyhole, Trophy } from 'lucide-react'
 import { Modal } from '@/components/common/Modal'
 import { FlagSubmissionForm } from '@/features/flags/components/FlagSubmissionForm'
 import type { PlayerChallenge } from '@/features/challenges/queries/challengePlayerQueries'
@@ -122,6 +122,9 @@ export function ChallengeCards({ challenges }: { challenges: PlayerChallenge[] }
               {selected.solved && <span className="text-success">Solved</span>}
             </div>
             <p className="font-mono text-sm leading-7 text-muted">{selected.description}</p>
+            <p className="font-mono text-xs uppercase tracking-[0.1em] text-muted">
+              Author: <span className="text-foreground">{selected.author}</span>
+            </p>
             {selected.hint && (
               <div className="border border-warning/40 bg-warning/5 p-4">
                 <p className="flex items-center gap-2 font-mono text-xs uppercase text-warning">
@@ -130,19 +133,14 @@ export function ChallengeCards({ challenges }: { challenges: PlayerChallenge[] }
                 <p className="mt-2 font-mono text-sm leading-6 text-muted">{selected.hint}</p>
               </div>
             )}
-            {(selected.fileUrl || selected.externalUrl) && (
+            {selected.externalUrl && (
               <a
-                href={selected.fileUrl ?? selected.externalUrl ?? '#'}
+                href={selected.externalUrl}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex min-h-11 items-center gap-2 border border-border-strong px-4 font-mono text-xs uppercase text-foreground hover:border-danger"
               >
-                {selected.fileUrl ? (
-                  <FileDown size={16} aria-hidden />
-                ) : (
-                  <ExternalLink size={16} aria-hidden />
-                )}{' '}
-                {selected.fileUrl ? 'Download challenge file' : 'Open challenge'}
+                <ExternalLink size={16} aria-hidden /> Open challenge link
               </a>
             )}
             <div className="border-t border-border pt-5">

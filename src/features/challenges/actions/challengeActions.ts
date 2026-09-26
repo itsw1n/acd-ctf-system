@@ -20,6 +20,7 @@ function formValues(formData: FormData) {
   return {
     id: formData.get('id'),
     title: formData.get('title'),
+    author: formData.get('author'),
     category: formData.get('category'),
     description: formData.get('description'),
     type: formData.get('type'),
@@ -28,7 +29,6 @@ function formValues(formData: FormData) {
     points: formData.get('points'),
     flag: formData.get('flag'),
     externalUrl: formData.get('externalUrl'),
-    fileUrl: formData.get('fileUrl'),
     active: formData.get('active'),
   }
 }

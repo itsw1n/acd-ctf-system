@@ -9,7 +9,7 @@
 --     solves(id, player_id, challenge_id, points_awarded)
 --   002_account_auth.sql — players(password_hash, role)
 --   003_admin_challenges.sql — challenges(description, type, external_url,
---     file_url, updated_at) + challenges_type_check + challenges_url_rules_check
+--     updated_at) + challenges_type_check + challenges_url_rules_check
 --   004_teamless_admin.sql — players.team_id nullable +
 --     players_team_role_check (PLAYER needs a team, ADMIN must be teamless)
 --   006_encrypted_challenge_flags.sql — challenges(flag_encrypted, AES-256-GCM;
@@ -63,11 +63,12 @@ values
 --   ACD{welcome_to_ctf}     -> 1b43b76b143c20b8ae84d75f648f2cb542cbd4f585eb384f1c60d4c063f9c805
 --   ACD{hidden_header_demo} -> 4ad75f150616cff694b38fedaec24b547fa9d7b44af2f8aa7d3975647a43c3d5
 -- Flags are stored encrypted at rest (flag_encrypted, see 006); the seed
--- keeps hashes only. Both are type TEXT, so file_url/external_url stay NULL
+-- keeps hashes only. Both are type TEXT, so external_url stays NULL
 -- (challenges_url_rules_check).
 
 insert into public.challenges (
   title,
+  author,
   category,
   description,
   type,
@@ -79,6 +80,7 @@ insert into public.challenges (
 values
   (
     'Welcome Flag',
+    'ACD Team',
     'Misc',
     'Start here: submit the welcome flag to learn how scoring works.',
     'TEXT',
@@ -89,6 +91,7 @@ values
   ),
   (
     'Hidden Header',
+    'ACD Team',
     'Web',
     'Inspect the HTTP response headers to find the hidden flag.',
     'TEXT',

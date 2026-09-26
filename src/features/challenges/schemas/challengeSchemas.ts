@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const challengeTypeEnum = z.enum(['TEXT', 'FILE', 'EXTERNAL'])
+export const challengeTypeEnum = z.enum(['TEXT', 'EXTERNAL'])
 export type ChallengeType = z.infer<typeof challengeTypeEnum>
 export const challengeDifficultyEnum = z.enum(['EASY', 'MEDIUM', 'HARD'])
 export type ChallengeDifficulty = z.infer<typeof challengeDifficultyEnum>
@@ -50,6 +50,7 @@ const optionalHttpUrl = z.preprocess(
 
 const baseChallengeFields = z.object({
   title: z.string().trim().min(3, 'Title must be at least 3 characters.').max(120),
+  author: z.string().trim().min(2, 'Author is required.').max(120),
   category: z.string().trim().min(2, 'Category is required.').max(40),
   description: z.string().trim().min(10, 'Description must be at least 10 characters.').max(4000),
   type: challengeTypeEnum,
@@ -57,21 +58,10 @@ const baseChallengeFields = z.object({
   hint: z.preprocess(emptyToUndefined, z.string().trim().max(1000).optional()),
   points: z.coerce.number().int().min(1).max(1000),
   externalUrl: optionalHttpUrl,
-  fileUrl: optionalHttpUrl,
   active: activeInput,
 })
 
-function checkUrlRules(
-  value: { type: ChallengeType; externalUrl?: string; fileUrl?: string },
-  ctx: z.RefinementCtx
-) {
-  if (value.type === 'FILE' && !value.fileUrl) {
-    ctx.addIssue({
-      code: 'custom',
-      path: ['fileUrl'],
-      message: 'FILE challenges require a file URL.',
-    })
-  }
+function checkUrlRules(value: { type: ChallengeType; externalUrl?: string }, ctx: z.RefinementCtx) {
   if (value.type === 'EXTERNAL' && !value.externalUrl) {
     ctx.addIssue({
       code: 'custom',
@@ -79,11 +69,11 @@ function checkUrlRules(
       message: 'EXTERNAL challenges require an external URL.',
     })
   }
-  if (value.type === 'TEXT' && (value.fileUrl || value.externalUrl)) {
+  if (value.type === 'TEXT' && value.externalUrl) {
     ctx.addIssue({
       code: 'custom',
-      path: ['fileUrl'],
-      message: 'TEXT challenges must not have file or external URLs.',
+      path: ['externalUrl'],
+      message: 'TEXT challenges must not have an external URL.',
     })
   }
 }

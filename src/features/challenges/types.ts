@@ -11,6 +11,7 @@ import type {
 export type ChallengeEditRow = {
   id: string
   title: string
+  author: string
   category: string
   description: string
   type: ChallengeType
@@ -19,6 +20,5 @@ export type ChallengeEditRow = {
   points: number
   flag: string | null
   externalUrl: string | null
-  fileUrl: string | null
   active: boolean
 }

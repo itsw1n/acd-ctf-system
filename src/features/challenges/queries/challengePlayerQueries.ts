@@ -9,6 +9,7 @@ import type {
 export type PlayerChallenge = {
   id: string
   title: string
+  author: string
   category: string
   description: string
   type: ChallengeType
@@ -16,7 +17,6 @@ export type PlayerChallenge = {
   hint: string | null
   points: number
   externalUrl: string | null
-  fileUrl: string | null
   solved: boolean
 }
 
@@ -25,7 +25,7 @@ export async function listChallengesForPlayer(playerId: string): Promise<PlayerC
   const [{ data: challenges, error }, { data: solves, error: solveError }] = await Promise.all([
     supabase
       .from('challenges')
-      .select('id,title,category,description,type,difficulty,hint,points,external_url,file_url')
+      .select('id,title,author,category,description,type,difficulty,hint,points,external_url')
       .eq('active', true)
       .order('points')
       .order('title'),
@@ -36,6 +36,7 @@ export async function listChallengesForPlayer(playerId: string): Promise<PlayerC
   return (challenges ?? []).map((row) => ({
     id: row.id,
     title: row.title,
+    author: row.author,
     category: row.category,
     description: row.description,
     type: row.type as ChallengeType,
@@ -43,7 +44,6 @@ export async function listChallengesForPlayer(playerId: string): Promise<PlayerC
     hint: row.hint,
     points: row.points,
     externalUrl: row.external_url,
-    fileUrl: row.file_url,
     solved: solved.has(row.id),
   }))
 }
