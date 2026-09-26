@@ -2,7 +2,10 @@ import 'server-only'
 
 import { createAdminClient } from '@/lib/supabase/admin'
 import { decryptFlag } from '@/lib/security/flagCrypto'
-import type { ChallengeType } from '@/features/challenges/schemas/challengeSchemas'
+import type {
+  ChallengeDifficulty,
+  ChallengeType,
+} from '@/features/challenges/schemas/challengeSchemas'
 import type { ChallengeEditRow } from '@/features/challenges/types'
 
 export type AdminChallengeRow = {
@@ -10,6 +13,7 @@ export type AdminChallengeRow = {
   title: string
   category: string
   type: ChallengeType
+  difficulty: ChallengeDifficulty
   points: number
   active: boolean
   createdAt: string
@@ -21,6 +25,8 @@ export type InsertChallengeRow = {
   title: string
   category: string
   description: string
+  difficulty: ChallengeDifficulty
+  hint: string | null
   type: ChallengeType
   points: number
   flagHash: string
@@ -34,7 +40,7 @@ export async function listChallengesAdmin(): Promise<AdminChallengeRow[]> {
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('challenges')
-    .select('id,title,category,type,points,active,created_at')
+    .select('id,title,category,type,difficulty,points,active,created_at')
     .order('created_at', { ascending: false })
 
   if (error) throw new Error(`Unable to load challenges: ${error.message}`)
@@ -44,6 +50,7 @@ export async function listChallengesAdmin(): Promise<AdminChallengeRow[]> {
     title: row.title,
     category: row.category,
     type: row.type as ChallengeType,
+    difficulty: row.difficulty as ChallengeDifficulty,
     points: row.points,
     active: row.active,
     createdAt: row.created_at,
@@ -54,7 +61,9 @@ export async function getChallengeForEdit(challengeId: string): Promise<Challeng
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('challenges')
-    .select('id,title,category,description,type,points,flag_encrypted,external_url,file_url,active')
+    .select(
+      'id,title,category,description,type,difficulty,hint,points,flag_encrypted,external_url,file_url,active'
+    )
     .eq('id', challengeId)
     .maybeSingle()
 
@@ -76,6 +85,8 @@ export async function getChallengeForEdit(challengeId: string): Promise<Challeng
     category: data.category,
     description: data.description,
     type: data.type as ChallengeType,
+    difficulty: data.difficulty as ChallengeDifficulty,
+    hint: data.hint,
     points: data.points,
     flag,
     externalUrl: data.external_url,
@@ -105,6 +116,8 @@ export async function insertChallenge(input: InsertChallengeRow) {
       category: input.category,
       description: input.description,
       type: input.type,
+      difficulty: input.difficulty,
+      hint: input.hint ?? null,
       points: input.points,
       flag_hash: input.flagHash,
       flag_encrypted: input.flagEncrypted,
@@ -130,6 +143,8 @@ export async function updateChallengeRow(
     category: string
     description: string
     type: ChallengeType
+    difficulty: ChallengeDifficulty
+    hint?: string
     points: number
     flagEncrypted?: string
     externalUrl?: string
@@ -144,6 +159,8 @@ export async function updateChallengeRow(
     category: input.category,
     description: input.description,
     type: input.type,
+    difficulty: input.difficulty,
+    hint: input.hint ?? null,
     points: input.points,
     external_url: input.externalUrl ?? null,
     file_url: input.fileUrl ?? null,

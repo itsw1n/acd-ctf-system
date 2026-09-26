@@ -44,6 +44,7 @@ const validForm = () =>
     category: 'Misc',
     description: 'Find the hidden flag in the welcome post.',
     type: 'TEXT',
+    difficulty: 'MEDIUM',
     points: '50',
     flag: 'ACD{hello}',
     active: 'on',

@@ -15,5 +15,6 @@ export async function requirePlayer() {
   const player = await getCurrentPlayer()
   if (!player) redirect('/signin')
   if (player.role !== 'PLAYER') redirect('/admin')
+  if (player.accessLocked) redirect('/signin')
   return player
 }

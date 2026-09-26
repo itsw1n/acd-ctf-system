@@ -71,6 +71,7 @@ insert into public.challenges (
   category,
   description,
   type,
+  difficulty,
   points,
   flag_hash,
   active
@@ -81,6 +82,7 @@ values
     'Misc',
     'Start here: submit the welcome flag to learn how scoring works.',
     'TEXT',
+    'EASY',
     50,
     '1b43b76b143c20b8ae84d75f648f2cb542cbd4f585eb384f1c60d4c063f9c805',
     true
@@ -90,6 +92,7 @@ values
     'Web',
     'Inspect the HTTP response headers to find the hidden flag.',
     'TEXT',
+    'MEDIUM',
     100,
     '4ad75f150616cff694b38fedaec24b547fa9d7b44af2f8aa7d3975647a43c3d5',
     true

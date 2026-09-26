@@ -2,6 +2,8 @@ import { z } from 'zod'
 
 export const challengeTypeEnum = z.enum(['TEXT', 'FILE', 'EXTERNAL'])
 export type ChallengeType = z.infer<typeof challengeTypeEnum>
+export const challengeDifficultyEnum = z.enum(['EASY', 'MEDIUM', 'HARD'])
+export type ChallengeDifficulty = z.infer<typeof challengeDifficultyEnum>
 
 /**
  * FormData checkoxes arrive as 'on' when checked and null when unchecked.
@@ -51,6 +53,8 @@ const baseChallengeFields = z.object({
   category: z.string().trim().min(2, 'Category is required.').max(40),
   description: z.string().trim().min(10, 'Description must be at least 10 characters.').max(4000),
   type: challengeTypeEnum,
+  difficulty: challengeDifficultyEnum,
+  hint: z.preprocess(emptyToUndefined, z.string().trim().max(1000).optional()),
   points: z.coerce.number().int().min(1).max(1000),
   externalUrl: optionalHttpUrl,
   fileUrl: optionalHttpUrl,

@@ -61,6 +61,33 @@ export function ChallengeForm({
               { id: 'EXTERNAL', label: 'EXTERNAL' },
             ]}
           />
+
+          <Select
+            id="difficulty"
+            name="difficulty"
+            label="Difficulty"
+            required
+            defaultValue={initial?.difficulty ?? 'MEDIUM'}
+            options={[
+              { id: 'EASY', label: 'EASY' },
+              { id: 'MEDIUM', label: 'MEDIUM' },
+              { id: 'HARD', label: 'HARD' },
+            ]}
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="hint" className={labelClass}>
+            Hint (optional)
+          </Label>
+          <textarea
+            id="hint"
+            name="hint"
+            maxLength={1000}
+            defaultValue={initial?.hint ?? ''}
+            placeholder="Give players a nudge without revealing the solution."
+            className={textareaClass}
+          />
         </div>
 
         <div>

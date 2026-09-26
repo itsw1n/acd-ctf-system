@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import {
   Activity,
   Crosshair,
-  Gauge,
+  ListChecks,
   LayoutDashboard,
   LogOut,
   ScrollText,
@@ -18,7 +18,7 @@ import { LogoutButton } from '@/features/auth/components/LogoutButton'
 import { cn } from '@/lib/cn'
 
 const items = [
-  { href: '/dashboard', label: 'Dashboard', icon: Gauge },
+  { href: '/challenges', label: 'Challenges', icon: ListChecks },
   { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
   { href: '/activity', label: 'Activity', icon: Activity },
   { href: '/profile', label: 'Profile', icon: UserRound },

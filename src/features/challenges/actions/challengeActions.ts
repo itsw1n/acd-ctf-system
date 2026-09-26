@@ -23,6 +23,8 @@ function formValues(formData: FormData) {
     category: formData.get('category'),
     description: formData.get('description'),
     type: formData.get('type'),
+    difficulty: formData.get('difficulty'),
+    hint: formData.get('hint'),
     points: formData.get('points'),
     flag: formData.get('flag'),
     externalUrl: formData.get('externalUrl'),

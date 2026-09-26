@@ -78,7 +78,7 @@ export default async function ActivityPage() {
             </table>
             {!activity.length && (
               <p className="py-14 text-center font-mono text-sm text-muted">
-                No solves yet. Submit your first flag from the dashboard.
+                No solves yet. Open a challenge to submit your first flag.
               </p>
             )}
           </div>

@@ -12,6 +12,7 @@ const base = {
   description: 'Find the hidden flag in the welcome post.',
   points: 50,
   active: 'on' as const,
+  difficulty: 'MEDIUM' as const,
 }
 
 describe('challenge schemas', () => {
