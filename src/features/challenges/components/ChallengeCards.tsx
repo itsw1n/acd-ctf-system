@@ -53,8 +53,8 @@ export function ChallengeCards({ challenges }: { challenges: PlayerChallenge[] }
           aria-label="Search challenges"
         />
         <Select
-          label="Category"
           aria-label="Filter by category"
+          placeholder="All categories"
           value={category}
           onChange={setCategory}
           options={[
@@ -63,8 +63,8 @@ export function ChallengeCards({ challenges }: { challenges: PlayerChallenge[] }
           ]}
         />
         <Select
-          label="Difficulty"
           aria-label="Filter by difficulty"
+          placeholder="All difficulties"
           value={difficulty}
           onChange={setDifficulty}
           options={[
