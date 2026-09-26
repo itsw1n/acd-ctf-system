@@ -52,7 +52,7 @@ export default async function AdminOverviewPage() {
           ))}
         </div>
 
-        <TacticalPanel label="Leaderboards" className="mt-5 p-5 sm:p-7">
+        <TacticalPanel label="Leaderboards" className="mt-8 p-5 sm:p-7">
           <div className="grid gap-5 min-[1500px]:grid-cols-2">
             <div className="overflow-x-auto">
               <h2 className="mb-3 flex items-center gap-2 font-mono text-xs uppercase tracking-[0.14em] text-muted">
