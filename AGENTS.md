@@ -16,6 +16,7 @@ acd-ctf-system — ctf system for school competition
 - Develop: `npm run dev`
 - Validate: `npm run lint && npm run typecheck && npm run test --if-present && npm run build`
 - End-to-end: `npm run test:e2e --if-present`
+- Local database: `npm run supabase:start`, `npm run supabase:reset`, or `npx supabase db push --local`
 - Spring backend, when present: `cd backend && ./mvnw --batch-mode test` (`mvnw.cmd` on Windows)
 
 ## Required workflow
@@ -48,6 +49,7 @@ acd-ctf-system — ctf system for school competition
 
 - Do not deploy, publish, merge, push, send messages, or modify production data unless explicitly asked.
 - Do not delete user work or weaken tests/security controls to make a check pass.
+- Prepare migrations locally and review them through the PR first. Apply migrations to hosted Supabase only after the PR is merged and the release target is explicitly confirmed.
 
 ## Definition of done
 
@@ -59,3 +61,13 @@ acd-ctf-system — ctf system for school competition
 ## Deviation policy
 
 Agents may recommend alternatives, but must propose the change and receive explicit approval before changing the selected architecture, provider, authentication model, data boundary, production baseline, or major dependency. Record approved deviations and their rationale in `CONTEXT.md`.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

@@ -13,7 +13,7 @@ validate input (team, name, alias, password == confirmation)
   → create player (role forced to PLAYER, never from client data)
   → show recovery code ONCE behind an explicit continue gate
   → gate action re-verifies the code, then issues the first session
-  → redirect /dashboard
+  → redirect /challenges
 ```
 
 The session cookie is deliberately NOT issued during signup itself: setting a
@@ -29,7 +29,8 @@ validate input
     because ilike treats `_` as a wildcard)
   → Argon2id-verify (dummy hash when alias unknown or passwordless,
     so timing reveals nothing)
-  → issue persistent session → redirect /dashboard
+  → reject locked/competition-blocked players, issue persistent session
+  → redirect /challenges (admins → /admin)
 ```
 
 Failure is always `Invalid alias or password.` — unknown alias and wrong
@@ -52,6 +53,11 @@ on reads.
 Validation on every protected route and action (`requireCurrentPlayer`):
 cookie → hash → row lookup → expiry check → player load, else redirect
 `/signin`. Client state is never trusted for authorization.
+
+If `players.access_locked` is true, session validation deletes the current
+session and cookie. Locked players cannot sign in or use password recovery.
+The competition-wide lock blocks player signups and signins while allowing
+admins to sign in.
 
 ## Logout
 

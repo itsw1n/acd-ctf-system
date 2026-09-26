@@ -19,10 +19,12 @@ from README direction (user-approved onboarding).
 ## Users
 
 - Players (students): sign up with team name, full name, unique alias, and
-  password; sign in with alias + password.
+  password; sign in with alias + password. They solve challenges at
+  `/challenges` and view rankings at `/leaderboard`.
 - Admins (organizers): manage challenges/teams and review players/solves via
   `/admin/*` (guarded by `requireAdmin()`); accounts are promoted manually in
-  Supabase. No Docker/hosting controls.
+  Supabase. The admin overview includes team and player leaderboards. No
+  Docker/hosting controls.
 
 ## Core Workflows
 
@@ -38,6 +40,11 @@ from README direction (user-approved onboarding).
 5. Duplicate-solve protection at DB layer: UNIQUE(player_id, challenge_id).
 6. Leaderboards: team leaderboard, player leaderboard.
 7. Personal activity page + simple profile page (shows role + session status).
+8. Admin access controls: competition-wide player signup/signin lock and
+   per-player account lock/unlock. Locked players lose active sessions and
+   cannot sign in or reset their password; admins remain unaffected.
+9. Challenge management: title, author, category, description, difficulty,
+   points, flag, and one optional external link for Drive or hosted resources.
 
 ## Acceptance Criteria
 
@@ -47,6 +54,12 @@ from README direction (user-approved onboarding).
 - Correct flag awards points exactly once per player per challenge.
 - Wrong/duplicate submissions are rejected with safe errors.
 - Leaderboards and activity reflect solves.
+- Public `/` shows visitor rankings; authenticated `/leaderboard` stays inside
+  the app shell with its sidebar and header.
+- Admin overview shows team and player rankings alongside competition stats.
+- Challenge types are `TEXT` and `EXTERNAL`; `EXTERNAL` uses one
+  `external_url` field. The legacy `FILE`/`file_url` path is removed.
+- Every challenge has an author.
 - Service-role key stays server-only (never NEXT*PUBLIC*\*).
 - Admin pages/mutations require ADMIN via `requireAdmin()`; signup never
   accepts a role and always creates PLAYER.
@@ -87,7 +100,15 @@ from README direction (user-approved onboarding).
   profile are in scope; Docker challenges are out.
 - 2026-09-13 (user): admin area (`/admin/*`: overview, players, teams,
   challenges, solves) is in scope; challenge management is the primary
-  feature with server-hashed flags and strict TEXT/FILE/EXTERNAL URL rules.
+  feature with server-hashed flags, authors, and strict TEXT/EXTERNAL URL
+  rules.
+- 2026-09-26 (user): keep public rankings at `/` and the authenticated
+  `/leaderboard` inside the app shell.
+- 2026-09-26 (user): use one external challenge link, add an author field, and
+  remove the legacy file URL path.
+- 2026-09-26 (user): replace admin leading-team and recent-solves panels with
+  team and player leaderboards.
+- 2026-09-26 (user): add competition-wide and per-player access locking.
 
 ## Approved Deviations
 
@@ -119,6 +140,9 @@ from README direction (user-approved onboarding).
   16), ports shifted to 55421/55422/55423 because a sibling `nextjs-supabase`
   stack occupies 54322 on this machine. Revisit if the CLI gains PG16 support.
 - `.env.local` points at the local stack; never commit real credentials.
+- Migrations `007` through `010` cover challenge metadata, competition lock,
+  player account lock, and challenge author/external-link normalization. Apply
+  them to hosted Supabase only after the reviewed PR is merged.
 
 ## Expected Concerns (advisory)
 

@@ -7,8 +7,8 @@
 ![Tailwind v4](https://img.shields.io/badge/Tailwind-v4-38BDF8?logo=tailwindcss)
 ![TypeScript strict](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
 
-School Capture The Flag platform — team signups, static flag submission, and
-live leaderboards. Built with Next.js App Router, Tailwind CSS v4, Supabase
+School Capture The Flag platform — team signups, challenge solving, static flag
+submission, and live leaderboards. Built with Next.js App Router, Tailwind CSS v4, Supabase
 PostgreSQL, React Aria Components, and Lucide React.
 
 ## Quickstart
@@ -68,7 +68,11 @@ against hosted projects. **Remove demo rows before the real event.**
 - Forgot-password flow revokes all sessions and requires a fresh login
 - Persistent HttpOnly browser session
 - Global flag submission with duplicate-solve protection
-- Team and player leaderboards, personal activity, profile with role display
+- Challenge board with search, category/difficulty filters, authors, hints, and
+  one external resource link
+- Team and player leaderboards, public visitor rankings, personal activity,
+  profile with role display, and an authenticated app-shell leaderboard
+- Admin competition lock, per-player account lock/unlock, and leaderboard overview
 - No Supabase Auth — custom password accounts on PostgreSQL only
 
 How it fits together: [`docs/architecture/overview.md`](docs/architecture/overview.md) ·
