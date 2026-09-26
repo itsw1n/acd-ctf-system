@@ -134,7 +134,7 @@ export function ChallengeForm({
             <Label className={labelClass}>{mode === 'edit' ? 'Replacement flag' : 'Flag'}</Label>
             <Input
               defaultValue={initial?.flag ?? ''}
-              placeholder="ACD{...}"
+              placeholder="ACDCTF{...}"
               autoComplete="off"
               spellCheck={false}
             />

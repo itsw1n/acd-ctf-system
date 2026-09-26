@@ -24,7 +24,7 @@ export function FlagSubmissionForm() {
           <Input
             autoComplete="off"
             spellCheck={false}
-            placeholder="ACD{____________________________}"
+            placeholder="ACDCTF{________________________}"
             className="h-16 px-5 text-lg tracking-[0.08em] placeholder:text-muted/45 focus:shadow-[inset_0_0_22px_rgba(227,38,54,.06),0_0_12px_rgba(227,38,54,.12)]"
           />
         </TextField>
