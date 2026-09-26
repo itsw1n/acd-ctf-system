@@ -33,14 +33,22 @@ function cookieWith(token: string | undefined) {
   } as never)
 }
 
-function dbPlayer(role: 'PLAYER' | 'ADMIN') {
+function dbPlayer(role: 'PLAYER' | 'ADMIN'): {
+  id: string
+  fullName: string
+  alias: string
+  role: 'PLAYER' | 'ADMIN'
+  accessLocked: boolean
+  team: { id: string; name: string; slug: string }
+} {
   return {
     id: 'player-1',
     fullName: 'Test User',
     alias: 'tester',
     role,
+    accessLocked: false,
     team: { id: 't1', name: 'Ops', slug: 'ops' },
-  } as never
+  }
 }
 
 describe('session role resolution', () => {
@@ -66,6 +74,20 @@ describe('session role resolution', () => {
     const player = await getCurrentPlayer()
 
     expect(player).toMatchObject({ role: 'PLAYER' })
+  })
+
+  it('revokes the cookie when the account is locked', async () => {
+    const storeDelete = vi.fn()
+    vi.mocked(cookies).mockResolvedValueOnce({
+      get: () => ({ value: 'locked-token' }),
+      delete: storeDelete,
+    } as never)
+    vi.mocked(getSessionPlayerId).mockResolvedValueOnce('player-1')
+    vi.mocked(getPlayerById).mockResolvedValueOnce({ ...dbPlayer('PLAYER'), accessLocked: true })
+
+    await expect(getCurrentPlayer()).resolves.toBeNull()
+    expect(vi.mocked(deleteSessionByTokenHash)).toHaveBeenCalled()
+    expect(storeDelete).toHaveBeenCalledWith('test_session_cookie')
   })
 
   it('returns null without a cookie', async () => {

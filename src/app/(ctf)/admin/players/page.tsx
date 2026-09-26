@@ -4,6 +4,7 @@ import { Section } from '@/components/layout/Section'
 import { listPlayersForAdmin } from '@/features/players/queries/playerAdminQueries'
 import { listTeamsAdmin } from '@/features/teams/repositories/teamRepository'
 import { PlayerFilters } from './_components/PlayerFilters'
+import { PlayerAccessAction } from '@/features/players/components/PlayerAccessAction'
 
 export default async function AdminPlayersPage({
   searchParams,
@@ -27,7 +28,7 @@ export default async function AdminPlayersPage({
             Play<span className="text-danger-bright">ers</span>
           </h1>
           <p className="mt-3 font-mono text-xs uppercase tracking-[0.14em] text-muted sm:text-sm">
-            Searchable roster, read-only
+            Searchable roster and account access controls
           </p>
         </div>
 
@@ -43,6 +44,7 @@ export default async function AdminPlayersPage({
                   <th className="px-4 py-3 font-normal">Team</th>
                   <th className="px-4 py-3 font-normal">Role</th>
                   <th className="px-4 py-3 font-normal">Created at</th>
+                  <th className="px-4 py-3 font-normal">Access</th>
                 </tr>
               </thead>
               <tbody>
@@ -54,6 +56,17 @@ export default async function AdminPlayersPage({
                     <td className="px-4 py-4">{player.role}</td>
                     <td className="px-4 py-4 text-muted">
                       {new Date(player.createdAt).toLocaleString()}
+                    </td>
+                    <td className="px-4 py-4">
+                      {player.role === 'PLAYER' ? (
+                        <PlayerAccessAction
+                          playerId={player.id}
+                          alias={player.alias}
+                          locked={player.accessLocked}
+                        />
+                      ) : (
+                        <span className="text-muted">Admin</span>
+                      )}
                     </td>
                   </tr>
                 ))}

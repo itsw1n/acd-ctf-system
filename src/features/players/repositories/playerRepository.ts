@@ -8,6 +8,7 @@ type PlayerRow = {
   alias: string
   team_id: string | null
   role: PlayerRole
+  access_locked: boolean
 }
 
 type PlayerCredentialsRow = {
@@ -15,6 +16,7 @@ type PlayerCredentialsRow = {
   alias: string
   password_hash: string | null
   role: PlayerRole
+  access_locked: boolean
 }
 
 type TeamRow = {
@@ -47,7 +49,7 @@ export async function getPlayerByAlias(alias: string): Promise<PlayerRow | null>
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('players')
-    .select('id,full_name,alias,team_id')
+    .select('id,full_name,alias,team_id,role,access_locked')
     .ilike('alias', alias)
     .maybeSingle()
 
@@ -60,7 +62,7 @@ export async function getPlayerById(playerId: string): Promise<Player | null> {
 
   const { data: player, error: playerError } = await supabase
     .from('players')
-    .select('id,full_name,alias,team_id,role')
+    .select('id,full_name,alias,team_id,role,access_locked')
     .eq('id', playerId)
     .maybeSingle()
 
@@ -78,6 +80,7 @@ export async function getPlayerById(playerId: string): Promise<Player | null> {
       fullName: player.full_name,
       alias: player.alias,
       role,
+      accessLocked: player.access_locked,
       team: null,
     }
   }
@@ -97,6 +100,7 @@ export async function getPlayerById(playerId: string): Promise<Player | null> {
       fullName: player.full_name,
       alias: player.alias,
       role,
+      accessLocked: player.access_locked,
       team: null,
     }
   }
@@ -106,6 +110,7 @@ export async function getPlayerById(playerId: string): Promise<Player | null> {
     fullName: player.full_name,
     alias: player.alias,
     role,
+    accessLocked: player.access_locked,
     team: team as TeamRow,
   }
 }
@@ -149,12 +154,26 @@ export async function getPlayerCredentialsByAlias(
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('players')
-    .select('id,alias,password_hash,role')
+    .select('id,alias,password_hash,role,access_locked')
     .ilike('alias', alias)
     .maybeSingle()
 
   if (error) throw new Error(`Unable to find player: ${error.message}`)
   return (data as PlayerCredentialsRow | null) ?? null
+}
+
+export async function setPlayerAccessLocked(playerId: string, locked: boolean) {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('players')
+    .update({ access_locked: locked })
+    .eq('id', playerId)
+    .eq('role', 'PLAYER')
+    .select('id')
+    .maybeSingle()
+
+  if (error) throw new Error(`Unable to update player access: ${error.message}`)
+  if (!data) throw new Error('PLAYER_NOT_FOUND')
 }
 
 export async function updatePlayerPassword(playerId: string, passwordHash: string) {

@@ -43,7 +43,13 @@ export async function getCurrentPlayer() {
   const playerId = await getSessionPlayerId(sha256(rawToken))
   if (!playerId) return null
 
-  return getPlayerById(playerId)
+  const player = await getPlayerById(playerId)
+  if (player?.accessLocked) {
+    await deleteSessionByTokenHash(sha256(rawToken))
+    store.delete(env.SESSION_COOKIE_NAME)
+    return null
+  }
+  return player
 }
 
 export async function requireCurrentPlayer() {
