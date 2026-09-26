@@ -21,12 +21,12 @@ test('admin login lands on /admin', async ({ page }) => {
   await expect(page).toHaveURL('/admin')
 })
 
-test('player visiting /admin is sent to /dashboard', async ({ page }) => {
+test('player visiting /admin is sent to /challenges', async ({ page }) => {
   await signIn(page, PLAYER.alias, PLAYER.password)
-  await expect(page).toHaveURL('/dashboard')
+  await expect(page).toHaveURL('/challenges')
 
   await page.goto('/admin')
-  await expect(page).toHaveURL('/dashboard')
+  await expect(page).toHaveURL('/challenges')
 })
 
 test('admin visiting player routes is sent to /admin', async ({ page }) => {

@@ -23,15 +23,15 @@ async function signUp(page: Page, alias: string, password: string = PASSWORD) {
   await page.getByRole('button', { name: /create account/i }).click()
 }
 
-test('root and dashboard redirect logged-out visitors to signin', async ({ page }) => {
+test('public root is available and dashboard redirects logged-out visitors to signin', async ({ page }) => {
   await page.goto('/')
-  await expect(page).toHaveURL('/signin')
-  await page.goto('/dashboard')
+  await expect(page).toHaveURL('/')
+  await page.goto('/challenges')
   await expect(page).toHaveURL('/signin')
   await expect(page.getByRole('heading', { name: 'Enter the CTF' })).toBeVisible()
 })
 
-test('signup shows the recovery code once, then continues to the dashboard', async ({ page }) => {
+test('signup shows the recovery code once, then continues to the challenge board', async ({ page }) => {
   const alias = uniqueAlias('e2ecode')
   await signUp(page, alias)
 
@@ -39,7 +39,7 @@ test('signup shows the recovery code once, then continues to the dashboard', asy
   await expect(code).toBeVisible()
 
   await page.getByRole('button', { name: /i saved my code/i }).click()
-  await expect(page).toHaveURL('/dashboard')
+  await expect(page).toHaveURL('/challenges')
 
   await page.goto('/profile')
   await expect(page.getByText('PLAYER').first()).toBeVisible()
@@ -65,7 +65,7 @@ test('signin rejects wrong passwords with a generic error', async ({ page }) => 
   await signUp(page, alias)
   await expect(page.getByText(/ACD-[A-Z2-9]{4}/)).toBeVisible()
   await page.getByRole('button', { name: /i saved my code/i }).click()
-  await expect(page).toHaveURL('/dashboard')
+  await expect(page).toHaveURL('/challenges')
 
   await page.goto('/profile')
   await page.getByRole('button', { name: /end session/i }).click()
@@ -97,7 +97,7 @@ test('signin rejects wrong passwords with a generic error', async ({ page }) => 
   await page.getByPlaceholder('Enter your alias').fill(alias)
   await page.getByPlaceholder('Enter your password').fill(PASSWORD)
   await page.getByRole('button', { name: /^sign in$/i }).click()
-  await expect(page).toHaveURL('/dashboard')
+  await expect(page).toHaveURL('/challenges')
 })
 
 test('forgot-password resets the password and revokes old sessions', async ({ page, context }) => {
@@ -106,7 +106,7 @@ test('forgot-password resets the password and revokes old sessions', async ({ pa
   const code = await page.getByText(/ACD-[A-Z2-9]{4}-[A-Z2-9]{4}-[A-Z2-9]{4}/).textContent()
 
   await page.getByRole('button', { name: /i saved my code/i }).click()
-  await expect(page).toHaveURL('/dashboard')
+  await expect(page).toHaveURL('/challenges')
 
   const oldCookies = await context.cookies()
   const oldSession = oldCookies.find((c) => c.name === 'acd_ctf_session')?.value
@@ -149,5 +149,5 @@ test('forgot-password resets the password and revokes old sessions', async ({ pa
   await page.getByPlaceholder('Enter your alias').fill(alias)
   await page.getByPlaceholder('Enter your password').fill('brand-new-password')
   await page.getByRole('button', { name: /^sign in$/i }).click()
-  await expect(page).toHaveURL('/dashboard')
+  await expect(page).toHaveURL('/challenges')
 })
