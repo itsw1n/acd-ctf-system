@@ -3,7 +3,7 @@ import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
 import { listPlayersForAdmin } from '@/features/players/queries/playerAdminQueries'
 import { listTeamsAdmin } from '@/features/teams/repositories/teamRepository'
-import { PlayerFilters } from './_components/PlayerFilters'
+import { PlayerFilters } from '@/features/players/components/PlayerFilters'
 import { PlayerAccessAction } from '@/features/players/components/PlayerAccessAction'
 
 export default async function AdminPlayersPage({
