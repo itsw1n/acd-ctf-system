@@ -4,9 +4,12 @@ import { TacticalPanel } from '@/components/common/TacticalPanel'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
 import { getAdminOverview } from '@/features/admin/queries/overviewQueries'
+import { getSignupLock } from '@/features/competition/repositories/competitionRepository'
+import { SignupLockControl } from '@/features/competition/components/SignupLockControl'
 
 export default async function AdminOverviewPage() {
   const overview = await getAdminOverview()
+  const locked = await getSignupLock()
 
   const stats = [
     { label: 'Total players', value: String(overview.totalPlayers), icon: Users },
@@ -26,6 +29,10 @@ export default async function AdminOverviewPage() {
           <p className="mt-3 font-mono text-xs uppercase tracking-[0.14em] text-muted sm:text-sm">
             Operational status at a glance
           </p>
+        </div>
+
+        <div className="mt-5">
+          <SignupLockControl locked={locked} />
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
