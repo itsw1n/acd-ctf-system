@@ -1,11 +1,7 @@
 import type { ReactNode } from 'react'
 import type { Player } from '@/features/players/types'
 import { logoutAction } from '@/features/auth/actions/authActions'
-<<<<<<< HEAD
 import { Navigation } from '@/components/layout/Navigation'
-=======
-import { Navigation } from '@/components/layout/Sidebar'
->>>>>>> 454acb2 (chore(ui): include shared components required by ctf flow)
 import { Topbar } from '@/components/layout/Topbar'
 
 export function AppShell({

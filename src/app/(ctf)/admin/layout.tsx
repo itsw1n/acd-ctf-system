@@ -12,10 +12,6 @@ import { getCurrentPlayer } from '@/features/sessions/services/sessionService'
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const player = await getCurrentPlayer()
   if (!player) redirect('/signin')
-<<<<<<< HEAD
-  if (player.role !== 'ADMIN') redirect('/dashboard')
-=======
   if (player.role !== 'ADMIN') redirect('/challenges')
->>>>>>> 4504ff2 (feat(access): add competition-wide signup lock)
   return <>{children}</>
 }
