@@ -23,7 +23,9 @@ async function signUp(page: Page, alias: string, password: string = PASSWORD) {
   await page.getByRole('button', { name: /create account/i }).click()
 }
 
-test('public root is available and dashboard redirects logged-out visitors to signin', async ({ page }) => {
+test('public root is available and dashboard redirects logged-out visitors to signin', async ({
+  page,
+}) => {
   await page.goto('/')
   await expect(page).toHaveURL('/')
   await page.goto('/challenges')
@@ -31,7 +33,9 @@ test('public root is available and dashboard redirects logged-out visitors to si
   await expect(page.getByRole('heading', { name: 'Enter the CTF' })).toBeVisible()
 })
 
-test('signup shows the recovery code once, then continues to the challenge board', async ({ page }) => {
+test('signup shows the recovery code once, then continues to the challenge board', async ({
+  page,
+}) => {
   const alias = uniqueAlias('e2ecode')
   await signUp(page, alias)
 
