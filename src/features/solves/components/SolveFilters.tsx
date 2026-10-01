@@ -1,6 +1,6 @@
 'use client'
 
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 import { SearchBar } from '@/components/common/SearchBar'
 import { Select } from '@/components/common/Select'
@@ -22,16 +22,20 @@ export function SolveFilters({
 }: SolveFiltersProps) {
   const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   function updateFilters(next: { search?: string; teamId?: string; category?: string }) {
-    const params = new URLSearchParams()
-    const nextSearch = next.search ?? initialSearch
-    const nextTeamId = next.teamId ?? teamId
-    const nextCategory = next.category ?? category
+    const params = new URLSearchParams(searchParams.toString())
+    const nextSearch = next.search ?? params.get('search') ?? initialSearch
+    const nextTeamId = next.teamId ?? params.get('teamId') ?? teamId
+    const nextCategory = next.category ?? params.get('category') ?? category
 
     if (nextSearch.trim()) params.set('search', nextSearch.trim())
+    else params.delete('search')
     if (nextTeamId) params.set('teamId', nextTeamId)
+    else params.delete('teamId')
     if (nextCategory) params.set('category', nextCategory)
+    else params.delete('category')
 
     const query = params.toString()
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })

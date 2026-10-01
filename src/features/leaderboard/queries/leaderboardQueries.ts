@@ -6,6 +6,7 @@ export type PlayerRank = {
   alias: string
   team: string
   points: number
+  scoreReachedAt: string | null
 }
 
 export type TeamRank = {
@@ -26,7 +27,7 @@ export async function getLeaderboards() {
     // Competitors only: teamless ADMIN accounts must not appear on the
     // player board nor leak points into team totals.
     supabase.from('players').select('id,alias,team_id,role').eq('role', 'PLAYER'),
-    supabase.from('solves').select('player_id,points_awarded'),
+    supabase.from('solves').select('player_id,points_awarded,solved_at'),
   ])
 
   if (teamsError || playersError || solvesError) {
@@ -36,12 +37,17 @@ export async function getLeaderboards() {
   const teamById = new Map((teams ?? []).map((team) => [team.id, team.name]))
   const playerById = new Map((players ?? []).map((player) => [player.id, player]))
   const playerPoints = new Map<string, number>()
+  const playerLastSolveAt = new Map<string, string>()
 
   for (const solve of solves ?? []) {
     playerPoints.set(
       solve.player_id,
       (playerPoints.get(solve.player_id) ?? 0) + solve.points_awarded
     )
+    const previousSolveAt = playerLastSolveAt.get(solve.player_id)
+    if (!previousSolveAt || solve.solved_at > previousSolveAt) {
+      playerLastSolveAt.set(solve.player_id, solve.solved_at)
+    }
   }
 
   const playerRanks: PlayerRank[] = (players ?? [])
@@ -50,8 +56,17 @@ export async function getLeaderboards() {
       alias: player.alias,
       team: teamById.get(player.team_id) ?? 'Unknown',
       points: playerPoints.get(player.id) ?? 0,
+      scoreReachedAt: playerLastSolveAt.get(player.id) ?? null,
     }))
-    .sort((a, b) => b.points - a.points || a.alias.localeCompare(b.alias))
+    .sort((a, b) => {
+      if (a.points !== b.points) return b.points - a.points
+      if (a.scoreReachedAt && b.scoreReachedAt && a.scoreReachedAt !== b.scoreReachedAt) {
+        return a.scoreReachedAt.localeCompare(b.scoreReachedAt)
+      }
+      if (a.scoreReachedAt !== b.scoreReachedAt) return a.scoreReachedAt ? -1 : 1
+      // Equal points and solve times are a true tie; preserve database order.
+      return 0
+    })
 
   const teamPoints = new Map<string, number>()
   for (const rank of playerRanks) {

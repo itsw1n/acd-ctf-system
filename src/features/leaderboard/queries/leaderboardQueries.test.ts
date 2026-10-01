@@ -36,8 +36,12 @@ describe('leaderboard excludes teamless ADMINs', () => {
           select: () =>
             Promise.resolve({
               data: [
-                { player_id: 'p1', points_awarded: 50 },
-                { player_id: 'admin-1', points_awarded: 1000 },
+                { player_id: 'p1', points_awarded: 50, solved_at: '2026-01-01T10:00:00.000Z' },
+                {
+                  player_id: 'admin-1',
+                  points_awarded: 1000,
+                  solved_at: '2026-01-01T11:00:00.000Z',
+                },
               ],
               error: null,
             }),
@@ -51,5 +55,44 @@ describe('leaderboard excludes teamless ADMINs', () => {
     // The ADMIN solve references an unknown player_id and must not leak in.
     expect(teamRanks).toHaveLength(1)
     expect(teamRanks[0]).toMatchObject({ team: 'Cyber Knights', points: 50 })
+  })
+
+  it('does not use aliases to break an exact points and time tie', async () => {
+    vi.mocked(createAdminClient).mockReturnValue({
+      from: ((table: string) => {
+        if (table === 'teams') {
+          return {
+            select: () => Promise.resolve({ data: [{ id: 't1', name: 'Team' }], error: null }),
+          }
+        }
+        if (table === 'players') {
+          const chain: Record<string, unknown> = {}
+          chain.select = vi.fn(() => chain)
+          chain.eq = vi.fn(() =>
+            Promise.resolve({
+              data: [
+                { id: 'p1', alias: 'zulu', team_id: 't1', role: 'PLAYER' },
+                { id: 'p2', alias: 'alpha', team_id: 't1', role: 'PLAYER' },
+              ],
+              error: null,
+            })
+          )
+          return chain
+        }
+        return {
+          select: () =>
+            Promise.resolve({
+              data: [
+                { player_id: 'p1', points_awarded: 1500, solved_at: '2026-01-01T10:00:00.000Z' },
+                { player_id: 'p2', points_awarded: 1500, solved_at: '2026-01-01T10:00:00.000Z' },
+              ],
+              error: null,
+            }),
+        }
+      }) as never,
+    } as never)
+
+    const { playerRanks } = await getLeaderboards()
+    expect(playerRanks.map((rank) => rank.alias)).toEqual(['zulu', 'alpha'])
   })
 })

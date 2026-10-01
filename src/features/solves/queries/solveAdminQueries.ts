@@ -74,12 +74,7 @@ export async function listSolvesForAdmin(input?: {
     const allowedPlayerIds = new Set(
       (players ?? []).filter((player) => player.team_id === teamId).map((player) => player.id)
     )
-    const solvePlayerByAlias = new Map(
-      rows.map((row, index) => [solves[index]?.player_id ?? row.id, row])
-    )
-    rows = [...solvePlayerByAlias.entries()]
-      .filter(([playerId]) => allowedPlayerIds.has(playerId))
-      .map(([, row]) => row)
+    rows = rows.filter((_, index) => allowedPlayerIds.has(solves[index].player_id))
   }
 
   if (category) {
@@ -97,4 +92,12 @@ export async function listSolvesForAdmin(input?: {
   }
 
   return rows
+}
+
+/** Category choices must remain available when the current result set is empty. */
+export async function listSolveCategoriesForAdmin(): Promise<string[]> {
+  await requireAdmin()
+  const { data, error } = await createAdminClient().from('challenges').select('category')
+  if (error) throw new Error('Unable to load solve categories.')
+  return [...new Set((data ?? []).map((challenge) => challenge.category))].sort()
 }

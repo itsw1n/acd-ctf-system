@@ -1,6 +1,6 @@
 'use client'
 
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 import { SearchBar } from '@/components/common/SearchBar'
 import { Select } from '@/components/common/Select'
@@ -14,14 +14,17 @@ type PlayerFiltersProps = {
 export function PlayerFilters({ search, teamId, teams }: PlayerFiltersProps) {
   const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   function updateFilters(next: { search?: string; teamId?: string }) {
-    const params = new URLSearchParams()
-    const nextSearch = next.search ?? search
-    const nextTeamId = next.teamId ?? teamId
+    const params = new URLSearchParams(searchParams.toString())
+    const nextSearch = next.search ?? params.get('search') ?? search
+    const nextTeamId = next.teamId ?? params.get('teamId') ?? teamId
 
     if (nextSearch.trim()) params.set('search', nextSearch.trim())
+    else params.delete('search')
     if (nextTeamId) params.set('teamId', nextTeamId)
+    else params.delete('teamId')
 
     const query = params.toString()
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
