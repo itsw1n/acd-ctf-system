@@ -2,7 +2,10 @@ import { TacticalPanel } from '@/components/common/TacticalPanel'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
 import { SolveFilters } from '@/features/solves/components/SolveFilters'
-import { listSolvesForAdmin } from '@/features/solves/queries/solveAdminQueries'
+import {
+  listSolveCategoriesForAdmin,
+  listSolvesForAdmin,
+} from '@/features/solves/queries/solveAdminQueries'
 import { listTeamsAdmin } from '@/features/teams/repositories/teamRepository'
 
 export default async function AdminSolvesPage({
@@ -14,11 +17,11 @@ export default async function AdminSolvesPage({
   const search = params.search ?? ''
   const teamId = params.teamId ?? ''
   const category = params.category ?? ''
-  const [solves, teams] = await Promise.all([
+  const [solves, teams, categories] = await Promise.all([
     listSolvesForAdmin({ search, teamId, category }),
     listTeamsAdmin(),
+    listSolveCategoriesForAdmin(),
   ])
-  const categories = [...new Set(solves.map((solve) => solve.category))].sort()
 
   return (
     <Section data-ui="admin-solves">

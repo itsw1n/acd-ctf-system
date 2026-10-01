@@ -28,8 +28,8 @@ export function SearchBar({
   }
 
   useEffect(() => {
-    if (debouncedValue !== value) onSearch(debouncedValue)
-  }, [debouncedValue, onSearch, value])
+    if (debouncedValue === inputValue && debouncedValue !== value) onSearch(debouncedValue)
+  }, [debouncedValue, inputValue, onSearch, value])
 
   return (
     <div className="relative">
