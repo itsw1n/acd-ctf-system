@@ -14,7 +14,7 @@ export function JoinCodePanel({
 }: {
   roomId: string
   code: string | null
-  action: (roomId: string, previous: RoomActionState) => Promise<RoomActionState>
+  action: (roomId: string) => Promise<RoomActionState>
 }) {
   const [state, formAction, pending] = useActionState(action.bind(null, roomId), {})
   const [copied, setCopied] = useState(false)

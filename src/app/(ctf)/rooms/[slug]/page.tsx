@@ -1,7 +1,9 @@
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
+import { Button } from '@/components/common/Button'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 import { requireRoomMember } from '@/features/rooms/services/requireRoom'
+import { leaveRoomAction } from '@/features/rooms/actions/roomActions'
 import { getLeaderboards } from '@/features/leaderboard/queries/leaderboardQueries'
 import { getPlayerScore } from '@/features/activity/queries/activityQueries'
 import { cn } from '@/lib/cn'
@@ -27,6 +29,13 @@ export default async function RoomOverviewPage({ params }: { params: Promise<{ s
           <p className="mt-3 font-mono text-xs uppercase tracking-[0.14em] text-muted sm:text-sm">
             Your score: <span className="font-bold text-danger-bright">{score} PTS</span>
           </p>
+          {membership.role !== 'OWNER' && (
+            <form action={leaveRoomAction.bind(null, room.id)} className="mt-4">
+              <Button type="submit" variant="secondary" size="sm">
+                Leave room
+              </Button>
+            </form>
+          )}
         </div>
 
         <TacticalPanel label="Room leaderboard" className="p-5 sm:p-7">

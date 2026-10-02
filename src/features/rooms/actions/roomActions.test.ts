@@ -117,7 +117,7 @@ describe('room actions authorization', () => {
 
   it('denies leaving for non-members', async () => {
     vi.mocked(requireRoomMemberById).mockRejectedValueOnce(new Error('REDIRECT:/rooms'))
-    await expect(leaveRoomAction(ROOM_ID, {})).rejects.toThrow('REDIRECT:/rooms')
+    await expect(leaveRoomAction(ROOM_ID)).rejects.toThrow('REDIRECT:/rooms')
     expect(vi.mocked(leaveRoom)).not.toHaveBeenCalled()
   })
 
@@ -126,7 +126,7 @@ describe('room actions authorization', () => {
       player: { id: PLAYER_ID },
       membership: { role: 'PARTICIPANT' },
     } as never)
-    await expect(leaveRoomAction(ROOM_ID, {})).rejects.toThrow('REDIRECT:/rooms')
+    await expect(leaveRoomAction(ROOM_ID)).rejects.toThrow('REDIRECT:/rooms')
     expect(vi.mocked(leaveRoom)).toHaveBeenCalledWith({ playerId: PLAYER_ID, roomId: ROOM_ID })
   })
 
@@ -167,7 +167,7 @@ describe('room actions authorization', () => {
       membership: { role: 'OWNER' },
     } as never)
     vi.mocked(regenerateJoinCode).mockResolvedValueOnce('RM-NEWC0D')
-    await expect(regenerateJoinCodeAction(ROOM_ID, {})).resolves.toMatchObject({
+    await expect(regenerateJoinCodeAction(ROOM_ID)).resolves.toMatchObject({
       code: 'RM-NEWC0D',
     })
   })

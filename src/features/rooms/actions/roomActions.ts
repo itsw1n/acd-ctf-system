@@ -124,7 +124,7 @@ export async function joinRoomAction(
   redirect(`/rooms/${await roomSlug(roomId)}`)
 }
 
-export async function leaveRoomAction(roomId: string, _previous: RoomActionState) {
+export async function leaveRoomAction(roomId: string) {
   const { player } = await requireRoomMemberById(roomId)
   await leaveRoom({ playerId: player.id, roomId })
   redirect('/rooms')
@@ -144,10 +144,7 @@ export async function setMemberLockedAction(roomId: string, formData: FormData) 
   revalidatePath(`/rooms/${roomId}`)
 }
 
-export async function regenerateJoinCodeAction(
-  roomId: string,
-  _previous: RoomActionState
-): Promise<RoomActionState> {
+export async function regenerateJoinCodeAction(roomId: string): Promise<RoomActionState> {
   await requireRoomOwnerById(roomId)
   const code = await regenerateJoinCode({ roomId })
   revalidatePath(`/rooms/${roomId}`)
