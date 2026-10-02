@@ -4,7 +4,7 @@ vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: vi.fn(),
 }))
 
-vi.mock('@/features/admin/services/requireAdmin', () => ({
+vi.mock('@/features/auth/services/requireAdmin', () => ({
   requireAdmin: vi.fn(async () => ({ role: 'ADMIN' })),
 }))
 

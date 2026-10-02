@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { requireAdmin } from '@/features/admin/services/requireAdmin'
+import { requireAdmin } from '@/features/auth/services/requireAdmin'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { PlayerRole } from '@/features/players/types'
 
