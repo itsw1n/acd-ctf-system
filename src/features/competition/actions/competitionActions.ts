@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { requireAdmin } from '@/features/admin/services/requireAdmin'
+import { requireAdmin } from '@/features/auth/services/requireAdmin'
 import { setSignupLock } from '@/features/competition/repositories/competitionRepository'
 
 export async function setSignupLockAction(formData: FormData) {

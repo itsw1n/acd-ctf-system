@@ -10,7 +10,7 @@ import {
   type ContinueSignupState,
   type SignUpState,
 } from '@/features/auth/actions/authActions'
-import type { Team } from '@/features/players/types'
+import type { Team } from '@/features/teams/types'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
 import { Select } from '@/components/common/Select'

@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
-import { requireAdmin } from '@/features/admin/services/requireAdmin'
+import { requireAdmin } from '@/features/auth/services/requireAdmin'
 import {
   createChallengeSchema,
   toggleChallengeActiveSchema,

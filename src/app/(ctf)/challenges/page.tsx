@@ -2,7 +2,7 @@ import { AlertTriangle } from 'lucide-react'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
-import { requirePlayer } from '@/features/admin/services/requirePlayer'
+import { requirePlayer } from '@/features/auth/services/requirePlayer'
 import { ChallengeCards } from '@/features/challenges/components/ChallengeCards'
 import { listChallengesForPlayer } from '@/features/challenges/queries/challengePlayerQueries'
 

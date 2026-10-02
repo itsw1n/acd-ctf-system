@@ -14,7 +14,7 @@ vi.mock('next/navigation', () => ({
 }))
 
 import { getCurrentPlayer } from '@/features/sessions/services/sessionService'
-import { requireAdmin } from '@/features/admin/services/requireAdmin'
+import { requireAdmin } from '@/features/auth/services/requireAdmin'
 import type { Player } from '@/features/players/types'
 
 function adminPlayer(): Player {

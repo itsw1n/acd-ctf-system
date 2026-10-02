@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from 'vitest'
 
-vi.mock('@/features/admin/services/requireAdmin', () => ({
+vi.mock('@/features/auth/services/requireAdmin', () => ({
   requireAdmin: vi.fn(async () => ({ role: 'ADMIN' })),
 }))
 vi.mock('@/lib/supabase/admin', () => ({ createAdminClient: vi.fn() }))
 
 import { createAdminClient } from '@/lib/supabase/admin'
-import { listSolveCategoriesForAdmin, listSolvesForAdmin } from './solveAdminQueries'
+import { listSolveCategoriesForAdmin, listSolvesForAdmin } from './solveQueries'
 
 function result(data: unknown) {
   const chain = {

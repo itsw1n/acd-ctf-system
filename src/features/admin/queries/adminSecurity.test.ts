@@ -6,12 +6,12 @@ vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: vi.fn(),
 }))
 
-vi.mock('@/features/admin/services/requireAdmin', () => ({
+vi.mock('@/features/auth/services/requireAdmin', () => ({
   requireAdmin: vi.fn(),
 }))
 
 import { createAdminClient } from '@/lib/supabase/admin'
-import { requireAdmin } from '@/features/admin/services/requireAdmin'
+import { requireAdmin } from '@/features/auth/services/requireAdmin'
 import { listPlayersForAdmin } from '@/features/players/queries/playerAdminQueries'
 
 function tableChain(result: { data: unknown; error: null }) {

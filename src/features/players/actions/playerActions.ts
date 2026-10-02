@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
-import { requireAdmin } from '@/features/admin/services/requireAdmin'
+import { requireAdmin } from '@/features/auth/services/requireAdmin'
 import { setPlayerAccessLocked } from '@/features/players/repositories/playerRepository'
 import { deleteAllSessionsForPlayer } from '@/features/sessions/repositories/sessionRepository'
 

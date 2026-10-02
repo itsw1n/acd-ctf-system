@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-vi.mock('@/features/admin/services/requireAdmin', () => ({
+vi.mock('@/features/auth/services/requireAdmin', () => ({
   requireAdmin: vi.fn(),
 }))
 
@@ -26,7 +26,7 @@ vi.mock('next/navigation', () => ({
   },
 }))
 
-import { requireAdmin } from '@/features/admin/services/requireAdmin'
+import { requireAdmin } from '@/features/auth/services/requireAdmin'
 import { createTeam, renameTeam } from '@/features/teams/services/teamService'
 import { createTeamAction, renameTeamAction } from '@/features/teams/actions/teamActions'
 

@@ -1,11 +1,11 @@
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
-import { SolveFilters } from '@/features/solves/components/SolveFilters'
+import { SolveFilters } from '@/features/admin/components/SolveFilters'
 import {
   listSolveCategoriesForAdmin,
   listSolvesForAdmin,
-} from '@/features/solves/queries/solveAdminQueries'
+} from '@/features/admin/queries/solveQueries'
 import { listTeamsAdmin } from '@/features/teams/repositories/teamRepository'
 
 export default async function AdminSolvesPage({
