@@ -60,6 +60,7 @@ import {
   leaveRoomAction,
   regenerateJoinCodeAction,
   setJoinLockedAction,
+  setMemberLockedAction,
   unbanMemberAction,
   updateRoomAction,
 } from '@/features/rooms/actions/roomActions'
@@ -174,5 +175,21 @@ describe('room actions authorization', () => {
     await expect(regenerateJoinCodeAction(ROOM_ID, {})).resolves.toMatchObject({
       code: 'RM-NEWC0D',
     })
+  })
+})
+
+describe('member lock authorization', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('denies lock changes for non-owners', async () => {
+    vi.mocked(requireRoomOwnerById).mockRejectedValueOnce(new Error('FORBIDDEN'))
+    await expect(
+      setMemberLockedAction('22222222-2222-4222-8222-222222222222', (() => {
+        const form = new FormData()
+        form.set('playerId', '11111111-1111-4111-8111-111111111111')
+        form.set('locked', 'true')
+        return form
+      })())
+    ).rejects.toThrow('FORBIDDEN')
   })
 })

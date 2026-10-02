@@ -18,6 +18,7 @@ vi.mock('@/features/rooms/repositories/roomRepository', async (importOriginal) =
     getRoomTeam: vi.fn(),
     isBanned: vi.fn(),
     setJoinLockedRow: vi.fn(),
+    setMemberLockedRow: vi.fn(),
     updateJoinCodeRow: vi.fn(),
     banMembership: vi.fn(),
     unbanMembership: vi.fn(),
@@ -42,6 +43,7 @@ import {
   listPublicRooms as listPublicRoomsRepo,
   listRoomMembers as listRoomMembersRepo,
   setJoinLockedRow,
+  setMemberLockedRow,
   unbanMembership,
   updateJoinCodeRow,
   updateRoomRow,
@@ -58,6 +60,7 @@ import {
   listRoomMembers,
   regenerateJoinCode,
   setJoinLocked,
+  setMemberLocked,
   unbanMember,
   updateRoom,
 } from '@/features/rooms/services/roomService'
@@ -370,5 +373,22 @@ describe('room listings', () => {
     await expect(listRoomMembers('22222222-2222-4222-8222-222222222222')).resolves.toEqual([
       { alias: 'tester' },
     ])
+  })
+})
+
+describe('setMemberLocked', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('persists the member lock flag', async () => {
+    await setMemberLocked({
+      roomId: '22222222-2222-4222-8222-222222222222',
+      playerId: '11111111-1111-4111-8111-111111111111',
+      locked: true,
+    })
+    expect(vi.mocked(setMemberLockedRow)).toHaveBeenCalledWith(
+      '22222222-2222-4222-8222-222222222222',
+      '11111111-1111-4111-8111-111111111111',
+      true
+    )
   })
 })

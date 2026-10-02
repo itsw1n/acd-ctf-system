@@ -16,6 +16,7 @@ import {
   leaveRoom,
   regenerateJoinCode,
   setJoinLocked,
+  setMemberLocked,
   unbanMember,
   updateRoom,
 } from '@/features/rooms/services/roomService'
@@ -135,6 +136,14 @@ export async function leaveRoomAction(roomId: string, _previous: RoomActionState
 export async function setJoinLockedAction(roomId: string, formData: FormData) {
   await requireRoomOwnerById(roomId)
   await setJoinLocked({ roomId, locked: formData.get('locked') === 'true' })
+  revalidatePath(`/rooms/${roomId}`)
+}
+
+export async function setMemberLockedAction(roomId: string, formData: FormData) {
+  await requireRoomOwnerById(roomId)
+  const playerId = formData.get('playerId')
+  if (typeof playerId !== 'string' || !playerId) return
+  await setMemberLocked({ roomId, playerId, locked: formData.get('locked') === 'true' })
   revalidatePath(`/rooms/${roomId}`)
 }
 

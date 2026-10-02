@@ -17,6 +17,7 @@ import {
   listPublicRooms as fetchPublicRooms,
   listRoomMembers as fetchRoomMembers,
   setJoinLockedRow,
+  setMemberLockedRow,
   slugifyRoomName,
   unbanMembership,
   updateJoinCodeRow,
@@ -138,6 +139,17 @@ export async function leaveRoom(input: z.infer<typeof leaveSchema>) {
 export async function setJoinLocked(input: { roomId: string; locked: boolean }) {
   const parsed = z.object({ roomId: z.string().uuid(), locked: z.boolean() }).parse(input)
   await setJoinLockedRow(parsed.roomId, parsed.locked)
+}
+
+const memberLockSchema = z.object({
+  playerId: z.string().uuid(),
+  roomId: z.string().uuid(),
+  locked: z.boolean(),
+})
+
+export async function setMemberLocked(input: z.input<typeof memberLockSchema>) {
+  const parsed = memberLockSchema.parse(input)
+  await setMemberLockedRow(parsed.roomId, parsed.playerId, parsed.locked)
 }
 
 export async function regenerateJoinCode(input: { roomId: string }) {

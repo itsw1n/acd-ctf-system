@@ -159,6 +159,17 @@ export async function banMembership(roomId: string, playerId: string) {
   if (banError && banError.code !== '23505') throw banError
 }
 
+export async function setMemberLockedRow(roomId: string, playerId: string, locked: boolean) {
+  const supabase = createAdminClient()
+  const { error } = await supabase
+    .from('room_memberships')
+    .update({ access_locked: locked })
+    .eq('room_id', roomId)
+    .eq('player_id', playerId)
+
+  if (error) throw error
+}
+
 export async function unbanMembership(roomId: string, playerId: string) {
   const supabase = createAdminClient()
   const { error } = await supabase

@@ -6,9 +6,11 @@ import { Section } from '@/components/layout/Section'
 import { getAdminOverview } from '@/features/admin/queries/overviewQueries'
 import { getSignupLock } from '@/features/competition/repositories/competitionRepository'
 import { SignupLockControl } from '@/features/competition/components/SignupLockControl'
+import { getDefaultRoom } from '@/features/rooms/repositories/roomRepository'
 
 export default async function AdminOverviewPage() {
-  const overview = await getAdminOverview()
+  const room = await getDefaultRoom()
+  const overview = await getAdminOverview(room.id)
   const locked = await getSignupLock()
 
   const stats = [
