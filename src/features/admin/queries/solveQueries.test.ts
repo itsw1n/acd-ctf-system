@@ -77,9 +77,9 @@ describe('admin solve filters', () => {
     const rows = await listSolvesForAdmin(ROOM_ID, { teamId: 't1' })
     expect(rows.map((row) => row.id)).toEqual(['s1', 's2'])
     expect(
-      (await listSolvesForAdmin(ROOM_ID, { teamId: 't1', category: 'Crypto', search: 'Second' })).map(
-        (row) => row.id
-      )
+      (
+        await listSolvesForAdmin(ROOM_ID, { teamId: 't1', category: 'Crypto', search: 'Second' })
+      ).map((row) => row.id)
     ).toEqual(['s2'])
     expect(await listSolveCategoriesForAdmin(ROOM_ID)).toEqual(['Crypto', 'Web'])
   })

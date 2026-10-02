@@ -196,11 +196,7 @@ export async function updateChallengeRow(
   }
 }
 
-export async function setChallengeActive(
-  challengeId: string,
-  roomId: string,
-  active: boolean
-) {
+export async function setChallengeActive(challengeId: string, roomId: string, active: boolean) {
   const supabase = createAdminClient()
   const { error } = await supabase
     .from('challenges')

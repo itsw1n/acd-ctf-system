@@ -9,10 +9,7 @@ export type ActivityItem = {
   points: number
 }
 
-export async function getPlayerActivity(
-  playerId: string,
-  roomId: string
-): Promise<ActivityItem[]> {
+export async function getPlayerActivity(playerId: string, roomId: string): Promise<ActivityItem[]> {
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('solves')

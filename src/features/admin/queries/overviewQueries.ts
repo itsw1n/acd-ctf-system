@@ -28,7 +28,10 @@ export async function getAdminOverview(): Promise<AdminOverview> {
     { count: activeCount, error: challengesError },
     { count: solveCount, error: solvesError },
   ] = await Promise.all([
-    supabase.from('room_memberships').select('id', { count: 'exact', head: true }).eq('room_id', room.id),
+    supabase
+      .from('room_memberships')
+      .select('id', { count: 'exact', head: true })
+      .eq('room_id', room.id),
     supabase.from('teams').select('id', { count: 'exact', head: true }).eq('room_id', room.id),
     supabase
       .from('challenges')

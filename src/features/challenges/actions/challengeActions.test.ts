@@ -77,7 +77,9 @@ describe('admin challenge actions authorization', () => {
   })
 
   it('allows room owners to create challenges in their room', async () => {
-    vi.mocked(requireRoomOwnerById).mockResolvedValueOnce({ membership: { role: 'OWNER' } } as never)
+    vi.mocked(requireRoomOwnerById).mockResolvedValueOnce({
+      membership: { role: 'OWNER' },
+    } as never)
     vi.mocked(createChallenge).mockResolvedValueOnce('new-id' as never)
     await expect(createChallengeAction({}, validForm())).rejects.toThrow(
       'REDIRECT:/admin/challenges'

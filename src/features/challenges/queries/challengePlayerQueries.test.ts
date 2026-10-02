@@ -27,7 +27,8 @@ describe('listChallengesForPlayer room scoping', () => {
     const challenges = queryResult({ data: [], error: null })
     const solves = queryResult({ data: [], error: null })
     vi.mocked(createAdminClient).mockReturnValue({
-      from: ((table: string) => (table === 'challenges' ? challenges.chain : solves.chain)) as never,
+      from: ((table: string) =>
+        table === 'challenges' ? challenges.chain : solves.chain) as never,
     } as never)
 
     await listChallengesForPlayer('player-1', ROOM_ID)

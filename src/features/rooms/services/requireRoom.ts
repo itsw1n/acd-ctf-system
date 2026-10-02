@@ -59,11 +59,7 @@ export async function requireRoomOwnerById(roomId: string) {
   return ownerInRoom(player, room, membership)
 }
 
-function ownerInRoom(
-  player: Player,
-  room: Room,
-  membership: RoomMembership
-) {
+function ownerInRoom(player: Player, room: Room, membership: RoomMembership) {
   if (membership.role !== 'OWNER') forbidden()
   return { player, room, membership }
 }

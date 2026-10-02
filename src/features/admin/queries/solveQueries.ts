@@ -50,7 +50,11 @@ export async function listSolvesForAdmin(
     { data: memberships, error: membershipsError },
   ] = await Promise.all([
     supabase.from('players').select('id,alias,full_name').in('id', playerIds),
-    supabase.from('challenges').select('id,title,category').eq('room_id', roomId).in('id', challengeIds),
+    supabase
+      .from('challenges')
+      .select('id,title,category')
+      .eq('room_id', roomId)
+      .in('id', challengeIds),
     supabase.from('room_memberships').select('player_id,team_id').eq('room_id', roomId),
   ])
 
@@ -89,7 +93,9 @@ export async function listSolvesForAdmin(
 
   if (teamId) {
     const allowedPlayerIds = new Set(
-      (memberships ?? []).filter((player) => player.team_id === teamId).map((player) => player.player_id)
+      (memberships ?? [])
+        .filter((player) => player.team_id === teamId)
+        .map((player) => player.player_id)
     )
     rows = rows.filter((_, index) => allowedPlayerIds.has(solves[index].player_id))
   }

@@ -28,8 +28,7 @@ function counted(count: number) {
     eqCalls.push([column, value])
     return chain
   })
-  chain.then = (resolve: (value: unknown) => unknown) =>
-    resolve({ count, error: null, data: null })
+  chain.then = (resolve: (value: unknown) => unknown) => resolve({ count, error: null, data: null })
   return { chain, eqCalls }
 }
 
@@ -54,13 +53,8 @@ describe('getAdminOverview room scoping', () => {
       totalSolves: 7,
     })
     for (const table of Object.values(tables)) {
-      expect(table.eqCalls).toContainEqual([
-        'room_id',
-        '22222222-2222-4222-8222-222222222222',
-      ])
+      expect(table.eqCalls).toContainEqual(['room_id', '22222222-2222-4222-8222-222222222222'])
     }
-    expect(vi.mocked(getLeaderboards)).toHaveBeenCalledWith(
-      '22222222-2222-4222-8222-222222222222'
-    )
+    expect(vi.mocked(getLeaderboards)).toHaveBeenCalledWith('22222222-2222-4222-8222-222222222222')
   })
 })

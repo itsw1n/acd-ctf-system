@@ -64,7 +64,9 @@ describe('admin team actions authorization', () => {
   })
 
   it('allows room owners to create teams in their room', async () => {
-    vi.mocked(requireRoomOwnerById).mockResolvedValueOnce({ membership: { role: 'OWNER' } } as never)
+    vi.mocked(requireRoomOwnerById).mockResolvedValueOnce({
+      membership: { role: 'OWNER' },
+    } as never)
     vi.mocked(createTeam).mockResolvedValueOnce('team-id' as never)
     await expect(createTeamAction({}, formData({ name: 'Ops' }))).rejects.toThrow(
       'REDIRECT:/admin/teams'

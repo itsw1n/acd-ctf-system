@@ -26,10 +26,7 @@ export async function getLeaderboards(roomId: string) {
     supabase.from('teams').select('id,name').eq('room_id', roomId),
     // Competitors only: teamless OWNERs must not appear on the player
     // board nor leak points into team totals.
-    supabase
-      .from('room_memberships')
-      .select('player_id,team_id,role')
-      .eq('room_id', roomId),
+    supabase.from('room_memberships').select('player_id,team_id,role').eq('room_id', roomId),
     supabase.from('solves').select('player_id,points_awarded,solved_at').eq('room_id', roomId),
   ])
 

@@ -153,10 +153,7 @@ export async function isBanned(roomId: string, playerId: string): Promise<boolea
   return data !== null
 }
 
-export async function getRoomTeam(
-  teamId: string,
-  roomId: string
-): Promise<{ id: string } | null> {
+export async function getRoomTeam(teamId: string, roomId: string): Promise<{ id: string } | null> {
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('teams')
@@ -171,10 +168,7 @@ export async function getRoomTeam(
 
 export async function setJoinLockedRow(roomId: string, locked: boolean) {
   const supabase = createAdminClient()
-  const { error } = await supabase
-    .from('rooms')
-    .update({ join_locked: locked })
-    .eq('id', roomId)
+  const { error } = await supabase.from('rooms').update({ join_locked: locked }).eq('id', roomId)
 
   if (error) throw error
 }

@@ -23,7 +23,11 @@ vi.mock('next/navigation', () => ({
 }))
 
 import { getCurrentPlayer } from '@/features/sessions/services/sessionService'
-import { getMembership, getRoomById, getRoomBySlug } from '@/features/rooms/repositories/roomRepository'
+import {
+  getMembership,
+  getRoomById,
+  getRoomBySlug,
+} from '@/features/rooms/repositories/roomRepository'
 import {
   requireAccount,
   requireRoomMember,
@@ -79,9 +83,7 @@ describe('requireRoomMember', () => {
     vi.mocked(getCurrentPlayer).mockResolvedValueOnce(player())
     vi.mocked(getRoomBySlug).mockResolvedValueOnce(room())
     vi.mocked(getMembership).mockResolvedValueOnce(null)
-    await expect(requireRoomMember('test-room')).rejects.toThrow(
-      'REDIRECT:/rooms/test-room/join'
-    )
+    await expect(requireRoomMember('test-room')).rejects.toThrow('REDIRECT:/rooms/test-room/join')
   })
 
   it('redirects locked members to /signin', async () => {
@@ -118,18 +120,18 @@ describe('requireRoomMemberById / requireRoomOwnerById', () => {
   it('returns 404 for an unknown room id', async () => {
     vi.mocked(getCurrentPlayer).mockResolvedValueOnce(player())
     vi.mocked(getRoomById).mockResolvedValueOnce(null)
-    await expect(
-      requireRoomOwnerById('22222222-2222-4222-8222-222222222222')
-    ).rejects.toThrow('NOTFOUND')
+    await expect(requireRoomOwnerById('22222222-2222-4222-8222-222222222222')).rejects.toThrow(
+      'NOTFOUND'
+    )
   })
 
   it('denies participating non-owners by id', async () => {
     vi.mocked(getCurrentPlayer).mockResolvedValueOnce(player())
     vi.mocked(getRoomById).mockResolvedValueOnce(room())
     vi.mocked(getMembership).mockResolvedValueOnce(membership('PARTICIPANT'))
-    await expect(
-      requireRoomOwnerById('22222222-2222-4222-8222-222222222222')
-    ).rejects.toThrow('FORBIDDEN')
+    await expect(requireRoomOwnerById('22222222-2222-4222-8222-222222222222')).rejects.toThrow(
+      'FORBIDDEN'
+    )
   })
 })
 
