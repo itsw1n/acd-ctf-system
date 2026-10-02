@@ -5,8 +5,10 @@ import { createTeamAction, renameTeamAction } from '@/features/teams/actions/tea
 import { CreateTeamForm } from '@/features/teams/components/TeamForms'
 import { RenameTeamDialog } from '@/features/teams/components/TeamDialogs'
 import { listTeamsWithStats } from '@/features/teams/queries/teamAdminQueries'
+import { getDefaultRoom } from '@/features/rooms/repositories/roomRepository'
 
 export default async function AdminTeamsPage() {
+  const room = await getDefaultRoom()
   const teams = await listTeamsWithStats()
 
   return (
@@ -23,7 +25,7 @@ export default async function AdminTeamsPage() {
         </div>
 
         <div className="grid gap-5">
-          <CreateTeamForm action={createTeamAction} />
+          <CreateTeamForm action={createTeamAction.bind(null, room.id)} />
 
           <TacticalPanel label="Manage teams" className="p-5 sm:p-7">
             <div className="overflow-x-auto">
@@ -50,7 +52,7 @@ export default async function AdminTeamsPage() {
                         <RenameTeamDialog
                           teamId={team.id}
                           teamName={team.name}
-                          action={renameTeamAction}
+                          action={renameTeamAction.bind(null, room.id)}
                         />
                       </td>
                     </tr>

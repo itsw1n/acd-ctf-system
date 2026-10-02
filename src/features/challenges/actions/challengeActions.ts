@@ -4,7 +4,6 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 import { requireRoomOwnerById } from '@/features/rooms/services/requireRoom'
-import { getDefaultRoom } from '@/features/rooms/repositories/roomRepository'
 import {
   createChallengeSchema,
   toggleChallengeActiveSchema,
@@ -34,17 +33,12 @@ function formValues(formData: FormData) {
   }
 }
 
-async function requireDefaultRoomOwner() {
-  const room = await getDefaultRoom()
-  await requireRoomOwnerById(room.id)
-  return room
-}
-
 export async function createChallengeAction(
+  roomId: string,
   _previous: ChallengeActionState,
   formData: FormData
 ): Promise<ChallengeActionState> {
-  const room = await requireDefaultRoomOwner()
+  await requireRoomOwnerById(roomId)
 
   const parsed = createChallengeSchema.safeParse(formValues(formData))
   if (!parsed.success) {
@@ -52,7 +46,7 @@ export async function createChallengeAction(
   }
 
   try {
-    await createChallenge(room.id, parsed.data)
+    await createChallenge(roomId, parsed.data)
   } catch (error) {
     if (error instanceof Error && error.message === 'FLAG_IN_USE') {
       return { error: 'That flag is already used by another challenge.' }
@@ -65,10 +59,11 @@ export async function createChallengeAction(
 }
 
 export async function updateChallengeAction(
+  roomId: string,
   _previous: ChallengeActionState,
   formData: FormData
 ): Promise<ChallengeActionState> {
-  const room = await requireDefaultRoomOwner()
+  await requireRoomOwnerById(roomId)
 
   const parsed = updateChallengeSchema.safeParse(formValues(formData))
   if (!parsed.success) {
@@ -76,7 +71,7 @@ export async function updateChallengeAction(
   }
 
   try {
-    await updateChallenge(room.id, parsed.data)
+    await updateChallenge(roomId, parsed.data)
   } catch (error) {
     if (error instanceof Error && error.message === 'FLAG_IN_USE') {
       return { error: 'That flag is already used by another challenge.' }
@@ -91,8 +86,8 @@ export async function updateChallengeAction(
   redirect('/admin/challenges')
 }
 
-export async function toggleChallengeActiveAction(formData: FormData) {
-  const room = await requireDefaultRoomOwner()
+export async function toggleChallengeActiveAction(roomId: string, formData: FormData) {
+  await requireRoomOwnerById(roomId)
 
   const parsed = toggleChallengeActiveSchema.safeParse({
     id: formData.get('id'),
@@ -100,6 +95,6 @@ export async function toggleChallengeActiveAction(formData: FormData) {
   })
   if (!parsed.success) return
 
-  await setChallengeActive(parsed.data.id, room.id, parsed.data.active)
+  await setChallengeActive(parsed.data.id, roomId, parsed.data.active)
   revalidatePath('/admin/challenges')
 }

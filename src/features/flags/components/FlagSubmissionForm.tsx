@@ -10,8 +10,11 @@ import { cn } from '@/lib/cn'
 
 const initialState: FlagState = {}
 
-export function FlagSubmissionForm() {
-  const [state, action, pending] = useActionState(submitFlagAction, initialState)
+export function FlagSubmissionForm({ roomId }: { roomId: string }) {
+  const [state, action, pending] = useActionState(
+    submitFlagAction.bind(null, roomId),
+    initialState
+  )
 
   return (
     <form action={action} className="mt-1">

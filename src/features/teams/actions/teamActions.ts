@@ -4,7 +4,6 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 import { requireRoomOwnerById } from '@/features/rooms/services/requireRoom'
-import { getDefaultRoom } from '@/features/rooms/repositories/roomRepository'
 import {
   createTeam,
   createTeamSchema,
@@ -16,17 +15,12 @@ export type TeamActionState = {
   error?: string
 }
 
-async function requireDefaultRoomOwner() {
-  const room = await getDefaultRoom()
-  await requireRoomOwnerById(room.id)
-  return room
-}
-
 export async function createTeamAction(
+  roomId: string,
   _previous: TeamActionState,
   formData: FormData
 ): Promise<TeamActionState> {
-  const room = await requireDefaultRoomOwner()
+  await requireRoomOwnerById(roomId)
 
   const parsed = createTeamSchema.safeParse({ name: formData.get('name') })
   if (!parsed.success) {
@@ -34,7 +28,7 @@ export async function createTeamAction(
   }
 
   try {
-    await createTeam(room.id, parsed.data)
+    await createTeam(roomId, parsed.data)
   } catch (error) {
     if (error instanceof Error && error.message === 'TEAM_TAKEN') {
       return { error: 'That team name is already taken.' }
@@ -47,10 +41,11 @@ export async function createTeamAction(
 }
 
 export async function renameTeamAction(
+  roomId: string,
   _previous: TeamActionState,
   formData: FormData
 ): Promise<TeamActionState> {
-  const room = await requireDefaultRoomOwner()
+  await requireRoomOwnerById(roomId)
 
   const parsed = renameTeamSchema.safeParse({
     id: formData.get('id'),
@@ -61,7 +56,7 @@ export async function renameTeamAction(
   }
 
   try {
-    await renameTeam(room.id, parsed.data)
+    await renameTeam(roomId, parsed.data)
   } catch (error) {
     if (error instanceof Error && error.message === 'TEAM_TAKEN') {
       return { error: 'That team name is already taken.' }

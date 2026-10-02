@@ -4,10 +4,6 @@ vi.mock('@/features/rooms/services/requireRoom', () => ({
   requireRoomOwnerById: vi.fn(),
 }))
 
-vi.mock('@/features/rooms/repositories/roomRepository', () => ({
-  getDefaultRoom: vi.fn(),
-}))
-
 vi.mock('@/features/teams/services/teamService', async () => {
   // Schemas are re-declared here (rather than importOriginal) so this test
   // never loads the repository/env chain; it exercises auth gating, not shape.
@@ -31,7 +27,6 @@ vi.mock('next/navigation', () => ({
 }))
 
 import { requireRoomOwnerById } from '@/features/rooms/services/requireRoom'
-import { getDefaultRoom } from '@/features/rooms/repositories/roomRepository'
 import { createTeam, renameTeam } from '@/features/teams/services/teamService'
 import { createTeamAction, renameTeamAction } from '@/features/teams/actions/teamActions'
 
@@ -44,21 +39,18 @@ function formData(entries: Record<string, string>) {
 const ROOM_ID = '22222222-2222-4222-8222-222222222222'
 
 describe('admin team actions authorization', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-    vi.mocked(getDefaultRoom).mockResolvedValue({ id: ROOM_ID } as never)
-  })
+  beforeEach(() => vi.clearAllMocks())
 
   it('denies PLAYER create without touching the mutation', async () => {
     vi.mocked(requireRoomOwnerById).mockRejectedValueOnce(new Error('FORBIDDEN'))
-    await expect(createTeamAction({}, formData({ name: 'Sneaky' }))).rejects.toThrow('FORBIDDEN')
+    await expect(createTeamAction(ROOM_ID, {}, formData({ name: 'Sneaky' }))).rejects.toThrow('FORBIDDEN')
     expect(vi.mocked(createTeam)).not.toHaveBeenCalled()
   })
 
   it('denies PLAYER rename without touching the mutation', async () => {
     vi.mocked(requireRoomOwnerById).mockRejectedValueOnce(new Error('FORBIDDEN'))
     await expect(
-      renameTeamAction({}, formData({ id: '4b2873c8-01b9-4c22-9482-858276b94c43', name: 'Sneaky' }))
+      renameTeamAction(ROOM_ID, {}, formData({ id: '4b2873c8-01b9-4c22-9482-858276b94c43', name: 'Sneaky' }))
     ).rejects.toThrow('FORBIDDEN')
     expect(vi.mocked(renameTeam)).not.toHaveBeenCalled()
   })
@@ -68,7 +60,7 @@ describe('admin team actions authorization', () => {
       membership: { role: 'OWNER' },
     } as never)
     vi.mocked(createTeam).mockResolvedValueOnce('team-id' as never)
-    await expect(createTeamAction({}, formData({ name: 'Ops' }))).rejects.toThrow(
+    await expect(createTeamAction(ROOM_ID, {}, formData({ name: 'Ops' }))).rejects.toThrow(
       'REDIRECT:/admin/teams'
     )
     expect(vi.mocked(requireRoomOwnerById)).toHaveBeenCalledWith(ROOM_ID)

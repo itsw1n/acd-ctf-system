@@ -28,7 +28,7 @@ export default async function ChallengesPage() {
         </div>
 
         <TacticalPanel label="Active challenges" className="p-5 sm:p-7">
-          <ChallengeCards challenges={challenges} />
+          <ChallengeCards challenges={challenges} roomId={room.id} />
           <div className="mt-6 border-t border-border pt-6">
             <div className="flex max-w-2xl gap-4">
               <AlertTriangle className="mt-0.5 shrink-0 text-danger" size={30} aria-hidden />

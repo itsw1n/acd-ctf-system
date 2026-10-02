@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { flagSchema } from '@/features/flags/schemas/flagSchema'
 import { submitFlagForPlayer } from '@/features/flags/services/submitFlag'
 import { requireCurrentPlayer } from '@/features/sessions/services/sessionService'
-import { getDefaultRoom, getMembership } from '@/features/rooms/repositories/roomRepository'
+import { requireRoomMemberById } from '@/features/rooms/services/requireRoom'
 import { checkAuthRateLimit, RATE_LIMITED } from '@/lib/security/rateLimit'
 
 export type FlagState = {
@@ -13,18 +13,18 @@ export type FlagState = {
 }
 
 export async function submitFlagAction(
+  roomId: string,
   _previous: FlagState,
   formData: FormData
 ): Promise<FlagState> {
   const player = await requireCurrentPlayer()
-  const room = await getDefaultRoom()
 
   // Room owners cannot play their own room: their solves would contaminate
   // team scores, totals, and statistics. Enforced here at the only
   // submission entry point; the membership role is DB-derived, never client
-  // input. Non-members cannot submit either.
-  const membership = await getMembership(room.id, player.id)
-  if (!membership || membership.role !== 'PARTICIPANT') {
+  // input. Non-members are bounced to the join page by the guard.
+  const { membership } = await requireRoomMemberById(roomId)
+  if (membership.role !== 'PARTICIPANT') {
     return { status: 'error', message: 'Only room participants can submit competition flags.' }
   }
 
@@ -44,7 +44,7 @@ export async function submitFlagAction(
   }
 
   try {
-    const result = await submitFlagForPlayer(player.id, room.id, parsed.data.flag)
+    const result = await submitFlagForPlayer(player.id, roomId, parsed.data.flag)
 
     if (result.status === 'incorrect') {
       return { status: 'incorrect', message: 'Flag rejected. Check the value and try again.' }

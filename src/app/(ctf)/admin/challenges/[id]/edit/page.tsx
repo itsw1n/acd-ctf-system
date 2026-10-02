@@ -5,9 +5,11 @@ import { Section } from '@/components/layout/Section'
 import { updateChallengeAction } from '@/features/challenges/actions/challengeActions'
 import { ChallengeForm } from '@/features/challenges/components/ChallengeForm'
 import { getChallengeForAdminEdit } from '@/features/challenges/queries/challengeAdminQueries'
+import { getDefaultRoom } from '@/features/rooms/repositories/roomRepository'
 
 export default async function EditChallengePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
+  const room = await getDefaultRoom()
   const challenge = await getChallengeForAdminEdit(id)
   if (!challenge) notFound()
 
@@ -24,7 +26,11 @@ export default async function EditChallengePage({ params }: { params: Promise<{ 
           </p>
         </div>
 
-        <ChallengeForm mode="edit" initial={challenge} action={updateChallengeAction} />
+        <ChallengeForm
+          mode="edit"
+          initial={challenge}
+          action={updateChallengeAction.bind(null, room.id)}
+        />
       </Container>
     </Section>
   )

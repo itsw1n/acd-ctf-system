@@ -4,9 +4,8 @@ vi.mock('@/features/sessions/services/sessionService', () => ({
   requireCurrentPlayer: vi.fn(),
 }))
 
-vi.mock('@/features/rooms/repositories/roomRepository', () => ({
-  getDefaultRoom: vi.fn(),
-  getMembership: vi.fn(),
+vi.mock('@/features/rooms/services/requireRoom', () => ({
+  requireRoomMemberById: vi.fn(),
 }))
 
 vi.mock('next/cache', () => ({
@@ -18,7 +17,7 @@ vi.mock('@/features/flags/services/submitFlag', () => ({
 }))
 
 import { requireCurrentPlayer } from '@/features/sessions/services/sessionService'
-import { getDefaultRoom, getMembership } from '@/features/rooms/repositories/roomRepository'
+import { requireRoomMemberById } from '@/features/rooms/services/requireRoom'
 import { submitFlagForPlayer } from '@/features/flags/services/submitFlag'
 import { submitFlagAction } from '@/features/flags/actions/flagActions'
 
@@ -41,21 +40,18 @@ function playerWith(role: 'PLAYER' | 'ADMIN') {
 const ROOM_ID = '22222222-2222-4222-8222-222222222222'
 
 describe('flag submission role lockout', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-    vi.mocked(getDefaultRoom).mockResolvedValue({ id: ROOM_ID } as never)
-  })
+  beforeEach(() => vi.clearAllMocks())
 
   it('lets PARTICIPANT submit a valid flag in their room', async () => {
     vi.mocked(requireCurrentPlayer).mockResolvedValueOnce(playerWith('PLAYER'))
-    vi.mocked(getMembership).mockResolvedValueOnce({ role: 'PARTICIPANT' } as never)
+    vi.mocked(requireRoomMemberById).mockResolvedValueOnce({ membership: { role: 'PARTICIPANT' } } as never)
     vi.mocked(submitFlagForPlayer).mockResolvedValueOnce({
       status: 'correct',
       challenge: 'Welcome Flag',
       points: 50,
     })
 
-    const state = await submitFlagAction({}, playerForm())
+    const state = await submitFlagAction(ROOM_ID, {}, playerForm())
 
     expect(state.status).toBe('correct')
     expect(vi.mocked(submitFlagForPlayer)).toHaveBeenCalledWith(
@@ -67,21 +63,21 @@ describe('flag submission role lockout', () => {
 
   it('blocks room owners without creating a solve', async () => {
     vi.mocked(requireCurrentPlayer).mockResolvedValueOnce(playerWith('PLAYER'))
-    vi.mocked(getMembership).mockResolvedValueOnce({ role: 'OWNER' } as never)
+    vi.mocked(requireRoomMemberById).mockResolvedValueOnce({ membership: { role: 'OWNER' } } as never)
 
-    const state = await submitFlagAction({}, playerForm())
+    const state = await submitFlagAction(ROOM_ID, {}, playerForm())
 
     expect(state.status).toBe('error')
     expect(vi.mocked(submitFlagForPlayer)).not.toHaveBeenCalled()
   })
 
-  it('blocks non-members without creating a solve', async () => {
+  it('bounces non-members to the join page without creating a solve', async () => {
     vi.mocked(requireCurrentPlayer).mockResolvedValueOnce(playerWith('PLAYER'))
-    vi.mocked(getMembership).mockResolvedValueOnce(null)
+    vi.mocked(requireRoomMemberById).mockRejectedValueOnce(new Error('REDIRECT:/rooms/x/join'))
 
-    const state = await submitFlagAction({}, playerForm())
-
-    expect(state.status).toBe('error')
+    await expect(submitFlagAction(ROOM_ID, {}, playerForm())).rejects.toThrow(
+      'REDIRECT:/rooms/x/join'
+    )
     expect(vi.mocked(submitFlagForPlayer)).not.toHaveBeenCalled()
   })
 })

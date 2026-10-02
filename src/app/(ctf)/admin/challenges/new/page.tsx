@@ -2,8 +2,10 @@ import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
 import { createChallengeAction } from '@/features/challenges/actions/challengeActions'
 import { ChallengeForm } from '@/features/challenges/components/ChallengeForm'
+import { getDefaultRoom } from '@/features/rooms/repositories/roomRepository'
 
-export default function NewChallengePage() {
+export default async function NewChallengePage() {
+  const room = await getDefaultRoom()
   return (
     <Section data-ui="admin-challenge-new">
       <Container>
@@ -17,7 +19,7 @@ export default function NewChallengePage() {
           </p>
         </div>
 
-        <ChallengeForm mode="create" action={createChallengeAction} />
+        <ChallengeForm mode="create" action={createChallengeAction.bind(null, room.id)} />
       </Container>
     </Section>
   )

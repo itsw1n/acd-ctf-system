@@ -14,7 +14,13 @@ const difficultyClass = {
   HARD: 'text-danger-bright',
 } as const
 
-export function ChallengeCards({ challenges }: { challenges: PlayerChallenge[] }) {
+export function ChallengeCards({
+  challenges,
+  roomId,
+}: {
+  challenges: PlayerChallenge[]
+  roomId: string
+}) {
   const [selected, setSelected] = useState<PlayerChallenge | null>(null)
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('')
@@ -147,7 +153,7 @@ export function ChallengeCards({ challenges }: { challenges: PlayerChallenge[] }
               <p className="mb-3 flex items-center gap-2 font-mono text-xs uppercase text-muted">
                 <Trophy size={15} aria-hidden /> Submit solution
               </p>
-              <FlagSubmissionForm />
+              <FlagSubmissionForm roomId={roomId} />
             </div>
           </div>
         </Modal>

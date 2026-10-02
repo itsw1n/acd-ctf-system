@@ -4,10 +4,6 @@ vi.mock('@/features/rooms/services/requireRoom', () => ({
   requireRoomOwnerById: vi.fn(),
 }))
 
-vi.mock('@/features/rooms/repositories/roomRepository', () => ({
-  getDefaultRoom: vi.fn(),
-}))
-
 vi.mock('@/features/challenges/services/challengeService', () => ({
   createChallenge: vi.fn(),
   updateChallenge: vi.fn(),
@@ -28,7 +24,6 @@ vi.mock('next/navigation', () => ({
 }))
 
 import { requireRoomOwnerById } from '@/features/rooms/services/requireRoom'
-import { getDefaultRoom } from '@/features/rooms/repositories/roomRepository'
 import { createChallenge, updateChallenge } from '@/features/challenges/services/challengeService'
 import { setChallengeActive } from '@/features/challenges/repositories/challengeRepository'
 import {
@@ -59,20 +54,17 @@ const validForm = () =>
 const ROOM_ID = '22222222-2222-4222-8222-222222222222'
 
 describe('admin challenge actions authorization', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-    vi.mocked(getDefaultRoom).mockResolvedValue({ id: ROOM_ID } as never)
-  })
+  beforeEach(() => vi.clearAllMocks())
 
   it('denies unauthenticated callers', async () => {
     vi.mocked(requireRoomOwnerById).mockRejectedValueOnce(new Error('REDIRECT:/signin'))
-    await expect(createChallengeAction({}, validForm())).rejects.toThrow('REDIRECT:/signin')
+    await expect(createChallengeAction(ROOM_ID, {}, validForm())).rejects.toThrow('REDIRECT:/signin')
     expect(vi.mocked(createChallenge)).not.toHaveBeenCalled()
   })
 
   it('denies non-owner players', async () => {
     vi.mocked(requireRoomOwnerById).mockRejectedValueOnce(new Error('FORBIDDEN'))
-    await expect(createChallengeAction({}, validForm())).rejects.toThrow('FORBIDDEN')
+    await expect(createChallengeAction(ROOM_ID, {}, validForm())).rejects.toThrow('FORBIDDEN')
     expect(vi.mocked(createChallenge)).not.toHaveBeenCalled()
   })
 
@@ -81,7 +73,7 @@ describe('admin challenge actions authorization', () => {
       membership: { role: 'OWNER' },
     } as never)
     vi.mocked(createChallenge).mockResolvedValueOnce('new-id' as never)
-    await expect(createChallengeAction({}, validForm())).rejects.toThrow(
+    await expect(createChallengeAction(ROOM_ID, {}, validForm())).rejects.toThrow(
       'REDIRECT:/admin/challenges'
     )
     expect(vi.mocked(requireRoomOwnerById)).toHaveBeenCalledWith(ROOM_ID)
@@ -92,14 +84,14 @@ describe('admin challenge actions authorization', () => {
     vi.mocked(requireRoomOwnerById).mockRejectedValueOnce(new Error('FORBIDDEN'))
     const form = validForm()
     form.set('id', '4b2873c8-01b9-4c22-9482-858276b94c43')
-    await expect(updateChallengeAction({}, form)).rejects.toThrow('FORBIDDEN')
+    await expect(updateChallengeAction(ROOM_ID, {}, form)).rejects.toThrow('FORBIDDEN')
     expect(vi.mocked(updateChallenge)).not.toHaveBeenCalled()
   })
 
   it('denies PLAYER toggle without touching the mutation', async () => {
     vi.mocked(requireRoomOwnerById).mockRejectedValueOnce(new Error('FORBIDDEN'))
     const form = formData({ id: '4b2873c8-01b9-4c22-9482-858276b94c43', active: 'false' })
-    await expect(toggleChallengeActiveAction(form)).rejects.toThrow('FORBIDDEN')
+    await expect(toggleChallengeActiveAction(ROOM_ID, form)).rejects.toThrow('FORBIDDEN')
     expect(vi.mocked(setChallengeActive)).not.toHaveBeenCalled()
   })
 })

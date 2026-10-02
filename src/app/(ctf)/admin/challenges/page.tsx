@@ -17,16 +17,20 @@ import {
   getChallengeForAdminEdit,
   listChallengesForAdmin,
 } from '@/features/challenges/queries/challengeAdminQueries'
+import { getDefaultRoom } from '@/features/rooms/repositories/roomRepository'
 import { cn } from '@/lib/cn'
 
-async function ChallengeEditModal({ challengeId }: { challengeId: string }) {
+async function ChallengeEditModal({ challengeId, roomId }: { challengeId: string; roomId: string }) {
   const challenge = await getChallengeForAdminEdit(challengeId)
   if (!challenge) return null
 
-  return <EditChallengeDialog challenge={challenge} action={updateChallengeAction} />
+  return (
+    <EditChallengeDialog challenge={challenge} action={updateChallengeAction.bind(null, roomId)} />
+  )
 }
 
 export default async function AdminChallengesPage() {
+  const room = await getDefaultRoom()
   const challenges = await listChallengesForAdmin()
 
   return (
@@ -42,7 +46,7 @@ export default async function AdminChallengesPage() {
               Manage challenge metadata and flags.
             </p>
           </div>
-          <CreateChallengeDialog action={createChallengeAction} />
+          <CreateChallengeDialog action={createChallengeAction.bind(null, room.id)} />
         </div>
 
         <TacticalPanel label="Challenge list" className="p-5 sm:p-7">
@@ -92,8 +96,8 @@ export default async function AdminChallengesPage() {
                         <Link href={`/admin/challenges/${challenge.id}/edit`} className="hidden">
                           Edit
                         </Link>
-                        <ChallengeEditModal challengeId={challenge.id} />
-                        <form action={toggleChallengeActiveAction}>
+                        <ChallengeEditModal challengeId={challenge.id} roomId={room.id} />
+                        <form action={toggleChallengeActiveAction.bind(null, room.id)}>
                           <input type="hidden" name="id" value={challenge.id} />
                           <input
                             type="hidden"
