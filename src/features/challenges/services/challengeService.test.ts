@@ -36,16 +36,19 @@ const base = {
   active: true,
 }
 
+const ROOM_ID = '22222222-2222-4222-8222-222222222222'
+
 describe('challenge flag handling', () => {
   it('stores the encrypted flag and its submission hash on creation', async () => {
     vi.mocked(insertChallenge).mockResolvedValueOnce('challenge-id')
-    await createChallenge({ ...base, flag: '  ACD{hello}  ' })
+    await createChallenge(ROOM_ID, { ...base, flag: '  ACD{hello}  ' })
 
     expect(hashFlag('  ACD{hello}  ')).toBe(
       'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
     )
     expect(vi.mocked(insertChallenge)).toHaveBeenCalledWith(
       expect.objectContaining({
+        roomId: ROOM_ID,
         flagHash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
         flagEncrypted: 'enc:ACD{hello}',
       })
@@ -58,7 +61,7 @@ describe('challenge flag handling', () => {
     vi.mocked(getChallengeFlagHash).mockResolvedValueOnce('existing-hash')
     vi.mocked(updateChallengeRow).mockResolvedValueOnce(undefined as never)
 
-    await updateChallenge({
+    await updateChallenge(ROOM_ID, {
       ...base,
       id: '4b2873c8-01b9-4c22-9482-858276b94c43',
       flag: undefined,
@@ -66,9 +69,10 @@ describe('challenge flag handling', () => {
 
     expect(vi.mocked(updateChallengeRow)).toHaveBeenCalledWith(
       '4b2873c8-01b9-4c22-9482-858276b94c43',
+      ROOM_ID,
       expect.any(Object)
     )
-    const payload = vi.mocked(updateChallengeRow).mock.calls[0]?.[1] as Record<string, unknown>
+    const payload = vi.mocked(updateChallengeRow).mock.calls[0]?.[2] as Record<string, unknown>
     expect(payload).not.toHaveProperty('flagHash')
     expect(payload).not.toHaveProperty('flagEncrypted')
     expect(payload).not.toHaveProperty('flag')
@@ -78,20 +82,25 @@ describe('challenge flag handling', () => {
     vi.mocked(getChallengeFlagHash).mockResolvedValueOnce('existing-hash')
     vi.mocked(updateChallengeRow).mockResolvedValueOnce(undefined as never)
 
-    await updateChallenge({
+    await updateChallenge(ROOM_ID, {
       ...base,
       id: '4b2873c8-01b9-4c22-9482-858276b94c43',
       flag: 'ACD{new}',
     })
 
+    expect(vi.mocked(getChallengeFlagHash)).toHaveBeenCalledWith(
+      '4b2873c8-01b9-4c22-9482-858276b94c43',
+      ROOM_ID
+    )
     expect(vi.mocked(updateChallengeRow)).toHaveBeenCalledWith(
       '4b2873c8-01b9-4c22-9482-858276b94c43',
+      ROOM_ID,
       expect.objectContaining({
         flagHash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
         flagEncrypted: 'enc:ACD{new}',
       })
     )
-    const updated = vi.mocked(updateChallengeRow).mock.calls[0]?.[1] as Record<string, unknown>
+    const updated = vi.mocked(updateChallengeRow).mock.calls[0]?.[2] as Record<string, unknown>
     expect(updated).not.toHaveProperty('flag')
   })
 })

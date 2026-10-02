@@ -5,10 +5,12 @@ import { Section } from '@/components/layout/Section'
 import { requirePlayer } from '@/features/auth/services/requirePlayer'
 import { ChallengeCards } from '@/features/challenges/components/ChallengeCards'
 import { listChallengesForPlayer } from '@/features/challenges/queries/challengePlayerQueries'
+import { getDefaultRoom } from '@/features/rooms/repositories/roomRepository'
 
 export default async function ChallengesPage() {
   const player = await requirePlayer()
-  const challenges = await listChallengesForPlayer(player.id)
+  const room = await getDefaultRoom()
+  const challenges = await listChallengesForPlayer(player.id, room.id)
 
   return (
     <Section data-ui="challenges">

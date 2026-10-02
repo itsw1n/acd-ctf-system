@@ -1,6 +1,7 @@
 import 'server-only'
 
-import { requireAdmin } from '@/features/auth/services/requireAdmin'
+import { requireRoomOwnerById } from '@/features/rooms/services/requireRoom'
+import { getDefaultRoom } from '@/features/rooms/repositories/roomRepository'
 import {
   getChallengeForEdit,
   listChallengesAdmin,
@@ -8,11 +9,13 @@ import {
 
 /** Server-side reads shaped for admin UI. No flag hashes leave this boundary. */
 export async function listChallengesForAdmin() {
-  await requireAdmin()
-  return listChallengesAdmin()
+  const room = await getDefaultRoom()
+  await requireRoomOwnerById(room.id)
+  return listChallengesAdmin(room.id)
 }
 
 export async function getChallengeForAdminEdit(challengeId: string) {
-  await requireAdmin()
-  return getChallengeForEdit(challengeId)
+  const room = await getDefaultRoom()
+  await requireRoomOwnerById(room.id)
+  return getChallengeForEdit(challengeId, room.id)
 }
