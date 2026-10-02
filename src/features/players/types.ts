@@ -1,13 +1,9 @@
-import type { Team } from '@/features/teams/types'
-
-export type PlayerRole = 'PLAYER' | 'ADMIN'
-
+/**
+ * Account identity. Teams, roles, and locks live on the per-room
+ * membership (see room_memberships), never on the account row.
+ */
 export type Player = {
   id: string
   fullName: string
   alias: string
-  role: PlayerRole
-  accessLocked?: boolean
-  // ADMIN accounts have no competition team (see 004_teamless_admin.sql).
-  team: Team | null
 }

@@ -21,87 +21,29 @@ function mockTables(tables: Record<string, { data: unknown; error: null }>) {
   } as never)
 }
 
-const teamRow = { id: 'team-1', name: 'Cyber Knights', slug: 'cyber-knights' }
-
-describe('getPlayerById with nullable teams', () => {
-  it('resolves ADMIN with null team_id and team: null', async () => {
-    mockTables({
-      players: {
-        data: {
-          id: 'admin-1',
-          full_name: 'Root',
-          alias: 'root',
-          team_id: null,
-          role: 'ADMIN',
-        },
-        error: null,
-      },
-      teams: { data: null, error: null },
-    })
-
-    await expect(getPlayerById('admin-1')).resolves.toMatchObject({
-      role: 'ADMIN',
-      team: null,
-    })
-  })
-
-  it('resolves PLAYER with a team normally', async () => {
+describe('getPlayerById returns bare accounts', () => {
+  it('resolves id, name, and alias without team or role', async () => {
     mockTables({
       players: {
         data: {
           id: 'player-1',
           full_name: 'Test Player',
           alias: 'tester',
-          team_id: 'team-1',
-          role: 'PLAYER',
         },
         error: null,
       },
-      teams: { data: teamRow, error: null },
     })
 
     await expect(getPlayerById('player-1')).resolves.toMatchObject({
-      role: 'PLAYER',
-      team: teamRow,
+      id: 'player-1',
+      fullName: 'Test Player',
+      alias: 'tester',
     })
   })
 
-  it('resolves teamless PLAYER accounts with team: null', async () => {
-    mockTables({
-      players: {
-        data: {
-          id: 'player-2',
-          full_name: 'Newcomer',
-          alias: 'newcomer',
-          team_id: null,
-          role: 'PLAYER',
-        },
-        error: null,
-      },
-      teams: { data: null, error: null },
-    })
+  it('returns null for unknown players', async () => {
+    mockTables({ players: { data: null, error: null } })
 
-    await expect(getPlayerById('player-2')).resolves.toMatchObject({
-      role: 'PLAYER',
-      team: null,
-    })
-  })
-
-  it('rejects dangling team references as corrupt', async () => {
-    mockTables({
-      players: {
-        data: {
-          id: 'player-3',
-          full_name: 'Orphan',
-          alias: 'orphan',
-          team_id: 'missing-team',
-          role: 'PLAYER',
-        },
-        error: null,
-      },
-      teams: { data: null, error: null },
-    })
-
-    await expect(getPlayerById('player-3')).rejects.toThrow('dangling team reference')
+    await expect(getPlayerById('nobody')).resolves.toBeNull()
   })
 })

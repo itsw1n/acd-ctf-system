@@ -1,35 +1,24 @@
 import 'server-only'
 import { createAdminClient } from '@/lib/supabase/admin'
-import type { Player, PlayerRole } from '@/features/players/types'
-
-type TeamRow = {
-  id: string
-  name: string
-  slug: string
-}
+import type { Player } from '@/features/players/types'
 
 type PlayerRow = {
   id: string
   full_name: string
   alias: string
-  team_id: string | null
-  role: PlayerRole
-  access_locked: boolean
 }
 
 type PlayerCredentialsRow = {
   id: string
   alias: string
   password_hash: string | null
-  role: PlayerRole
-  access_locked: boolean
 }
 
 export async function getPlayerByAlias(alias: string): Promise<PlayerRow | null> {
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('players')
-    .select('id,full_name,alias,team_id,role,access_locked')
+    .select('id,full_name,alias')
     .ilike('alias', alias)
     .maybeSingle()
 
@@ -42,55 +31,23 @@ export async function getPlayerById(playerId: string): Promise<Player | null> {
 
   const { data: player, error: playerError } = await supabase
     .from('players')
-    .select('id,full_name,alias,team_id,role,access_locked')
+    .select('id,full_name,alias')
     .eq('id', playerId)
     .maybeSingle()
 
   if (playerError) throw new Error(`Unable to load player: ${playerError.message}`)
   if (!player) return null
 
-  const role = (player as PlayerRow).role
-
-  // Teamless accounts are legitimate: signup creates bare accounts and
-  // teams are chosen per room at join time, so a null team_id resolves with
-  // team: null for any role. Only a dangling FK below is corrupt.
-  if (player.team_id === null) {
-    return {
-      id: player.id,
-      fullName: player.full_name,
-      alias: player.alias,
-      role,
-      accessLocked: player.access_locked,
-      team: null,
-    }
-  }
-
-  const { data: team, error: teamError } = await supabase
-    .from('teams')
-    .select('id,name,slug')
-    .eq('id', player.team_id)
-    .maybeSingle()
-
-  if (teamError) throw new Error(`Unable to load player team: ${teamError.message}`)
-  if (!team) {
-    // Dangling FK: the team row is gone but the reference remains.
-    throw new Error('Unable to load player team: dangling team reference.')
-  }
-
   return {
     id: player.id,
     fullName: player.full_name,
     alias: player.alias,
-    role,
-    accessLocked: player.access_locked,
-    team: team as TeamRow,
   }
 }
 
 export async function createPlayer(input: {
   fullName: string
   alias: string
-  teamId: string | null
   passwordHash: string
   recoveryCodeHash: string
 }) {
@@ -100,9 +57,6 @@ export async function createPlayer(input: {
     .insert({
       full_name: input.fullName,
       alias: input.alias,
-      team_id: input.teamId,
-      // Role is forced server-side. Never accept it from client input.
-      role: 'PLAYER',
       password_hash: input.passwordHash,
       recovery_code_hash: input.recoveryCodeHash,
     })
@@ -126,7 +80,7 @@ export async function getPlayerCredentialsByAlias(
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('players')
-    .select('id,alias,password_hash,role,access_locked')
+    .select('id,alias,password_hash')
     .ilike('alias', alias)
     .maybeSingle()
 

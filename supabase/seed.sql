@@ -126,8 +126,8 @@ cross join (select id from public.rooms where slug = 'acd-ctf') as rooms;
 -- 3. PLAYER ACCOUNTS
 -- ============================================================
 -- Password hash is Argon2id('ctf-demo-1234') from the app's hashPassword;
--- recovery hashes are SHA-256 of the UPPERCASED codes above. Role is always
--- PLAYER here, exactly as public signup forces it.
+-- recovery hashes are SHA-256 of the UPPERCASED codes above. Accounts carry
+-- no team or role; teams and roles live on room_memberships (section 6).
 
 with demo_password(password_hash) as (
   values (
@@ -138,38 +138,32 @@ with demo_password(password_hash) as (
 accounts (
   full_name,
   alias,
-  team_slug,
   recovery_code_hash
 ) as (
   values
     (
       'Sean',
       'sean',
-      'cyber-knights',
       '158ec4157e2ee9edde4f02a3937872ffaad8e36662dac2d8bebb1d824f6a68f8'
     ),
     (
       'Chrmel',
       'chrmel',
-      'cyber-knights',
       'c5e02bc1d9a8ba0a810de60c6438b6f634054d1c7e6c990ff744b4d6732a13dd'
     ),
     (
       'Dan',
       'dan',
-      'it-innovators',
       'dbe421b4037078bb873d7269dc8c6d936894c86db5997d895303e193a2ec4ee3'
     ),
     (
       'Win',
       'win',
-      'data-wizard',
       'cc7a806061861241148d020a3fb7e9b9a8209c82a5d913491b1328b6bcf11906'
     ),
     (
       'Rapz',
       'rapz',
-      'tech-pioneers',
       'caf6e89fbc946d911b19261c75d418f60f83abec158053b39464205383c28275'
     )
 )
@@ -177,29 +171,23 @@ accounts (
 insert into public.players (
   full_name,
   alias,
-  team_id,
   recovery_code_hash,
-  password_hash,
-  role
+  password_hash
 )
 select
   accounts.full_name,
   accounts.alias,
-  teams.id,
   accounts.recovery_code_hash,
-  demo_password.password_hash,
-  'PLAYER'
+  demo_password.password_hash
 from accounts
-join public.teams as teams
-  on teams.slug = accounts.team_slug
 cross join demo_password;
 
 
 -- ============================================================
--- 4. ADMIN ACCOUNT
+-- 4. ROOT ACCOUNT
 -- ============================================================
--- Root / root / ADMIN / team_id NULL / zero solves. ADMIN rows hold no
--- team by database invariant (004_teamless_admin.sql). Uses the shared demo
+-- Root / root / zero solves. Authority comes from the OWNER membership
+-- created in section 6, never from a role column. Uses the shared demo
 -- password `ctf-demo-1234` and a fixed recovery code for reproducible dev.
 
 with demo_password(password_hash) as (
@@ -211,18 +199,14 @@ with demo_password(password_hash) as (
 insert into public.players (
   full_name,
   alias,
-  team_id,
   recovery_code_hash,
-  password_hash,
-  role
+  password_hash
 )
 select
   'Root',
   'root',
-  null,
   '6a61fa8754cfa3368f26cca51476b3664b3c9fb2b1eec79e5d0561a977be19b4',
-  demo_password.password_hash,
-  'ADMIN'
+  demo_password.password_hash
 from demo_password;
 
 
@@ -267,18 +251,28 @@ join public.challenges as challenges
 -- ============================================================
 -- 6. ROOM MEMBERSHIPS
 -- ============================================================
--- Demo accounts join the default room: root (ADMIN) as OWNER, everyone
--- else as PARTICIPANT with their team. Mirrors the 011 backfill for rows
+-- Demo accounts join the default room: root as OWNER, everyone else as
+-- PARTICIPANT with their demo team. Mirrors the 011 backfill for rows
 -- the seed itself creates (migrations run before the seed).
 
 insert into public.room_memberships (room_id, player_id, role, team_id, access_locked)
 select
   rooms.id,
   players.id,
-  case when players.role = 'ADMIN' then 'OWNER' else 'PARTICIPANT' end,
-  players.team_id,
-  players.access_locked
+  case when players.alias = 'root' then 'OWNER' else 'PARTICIPANT' end,
+  teams.id,
+  false
 from public.players
+left join (values
+  ('sean', 'cyber-knights'),
+  ('chrmel', 'cyber-knights'),
+  ('dan', 'it-innovators'),
+  ('win', 'data-wizard'),
+  ('rapz', 'tech-pioneers')
+) as demo_teams(alias, slug)
+  on demo_teams.alias = players.alias
+left join public.teams as teams
+  on teams.slug = demo_teams.slug
 cross join (select id from public.rooms where slug = 'acd-ctf') as rooms;
 
 

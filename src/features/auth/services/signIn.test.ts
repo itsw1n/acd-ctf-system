@@ -22,8 +22,6 @@ function credentials(overrides: Record<string, unknown> = {}) {
     id: 'player-1',
     alias: 'tester',
     password_hash: 'stored-hash',
-    role: 'PLAYER',
-    access_locked: false,
     ...overrides,
   } as never
 }
@@ -31,21 +29,14 @@ function credentials(overrides: Record<string, unknown> = {}) {
 describe('signIn', () => {
   beforeEach(() => vi.clearAllMocks())
 
-  it('issues a session and returns the role on valid credentials', async () => {
+  it('issues a session on valid credentials', async () => {
     vi.mocked(getPlayerCredentialsByAlias).mockResolvedValueOnce(credentials())
     vi.mocked(verifyPassword).mockResolvedValueOnce(true)
 
-    await expect(signIn({ alias: 'tester', password: 'correct-password' })).resolves.toBe('PLAYER')
+    await expect(
+      signIn({ alias: 'tester', password: 'correct-password' })
+    ).resolves.toBeUndefined()
     expect(vi.mocked(issuePlayerSession)).toHaveBeenCalledWith('player-1')
-  })
-
-  it('returns ADMIN for admin credentials so callers can route to /admin', async () => {
-    vi.mocked(getPlayerCredentialsByAlias).mockResolvedValueOnce(
-      credentials({ id: 'admin-1', alias: 'root', role: 'ADMIN' })
-    )
-    vi.mocked(verifyPassword).mockResolvedValueOnce(true)
-
-    await expect(signIn({ alias: 'root', password: 'correct-password' })).resolves.toBe('ADMIN')
   })
 
   it('rejects wrong passwords without issuing a session', async () => {

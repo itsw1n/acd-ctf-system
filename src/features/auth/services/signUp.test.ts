@@ -59,7 +59,7 @@ describe('teamless signup', () => {
     expect(result).toMatchObject({ alias: 'attacker', playerId: 'player-id' })
     expect(result.recoveryCode).toBe('ACD-AAAA-BBBB-CCCC')
     const input = vi.mocked(createPlayer).mock.calls[0]?.[0] as Record<string, unknown>
-    expect(input).toMatchObject({ teamId: null })
+    expect(input).not.toHaveProperty('teamId')
   })
 
   it('ignores a smuggled teamId', async () => {
@@ -69,6 +69,6 @@ describe('teamless signup', () => {
     await signUp(poisoned)
 
     const input = vi.mocked(createPlayer).mock.calls[0]?.[0] as Record<string, unknown>
-    expect(input).toMatchObject({ teamId: null })
+    expect(input).not.toHaveProperty('teamId')
   })
 })

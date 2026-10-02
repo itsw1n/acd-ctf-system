@@ -16,7 +16,6 @@ export async function signUp(input: {
   const playerId = await createPlayer({
     fullName: input.fullName,
     alias: input.alias,
-    teamId: null,
     passwordHash: await hashPassword(input.password),
     recoveryCodeHash: sha256(recoveryCode.toUpperCase()),
   })
