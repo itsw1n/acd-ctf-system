@@ -7,7 +7,7 @@ import { getCurrentPlayer } from '@/features/sessions/services/sessionService'
 
 export default async function SignUpPage() {
   const currentPlayer = await getCurrentPlayer()
-  if (currentPlayer) redirect(currentPlayer.role === 'ADMIN' ? '/admin' : '/dashboard')
+  if (currentPlayer) redirect('/rooms')
 
   return (
     <main className="min-h-screen bg-background px-4 py-6 text-foreground tactical-grid scanlines sm:px-6 lg:px-10">

@@ -7,7 +7,6 @@ import {
   resetPasswordSchema,
 } from '@/features/auth/schemas/authSchemas'
 import { signIn } from '@/features/auth/services/signIn'
-import type { PlayerRole } from '@/features/players/types'
 import { continueAfterSignup, signUp } from '@/features/auth/services/signUp'
 import { resetPassword } from '@/features/auth/services/resetPassword'
 import { clearCurrentSession } from '@/features/sessions/services/sessionService'
@@ -95,7 +94,7 @@ export async function continueSignupAction(_previous: ContinueSignupState, formD
     return { error: 'Verification failed. Please sign in.' }
   }
 
-  redirect('/challenges')
+  redirect('/rooms')
 }
 
 export type SignInState = {
@@ -125,9 +124,8 @@ export async function signInAction(
     throw error
   }
 
-  let role: PlayerRole
   try {
-    role = await signIn(parsed.data, { lockPlayers: accessLocked })
+    await signIn(parsed.data, { lockPlayers: accessLocked })
   } catch (error) {
     if (error instanceof Error && error.message === 'PLAYER_ACCESS_LOCKED') {
       return { error: 'Competition is ongoing.' }
@@ -139,7 +137,7 @@ export async function signInAction(
     return { error: 'Invalid alias or password.' }
   }
 
-  redirect(role === 'ADMIN' ? '/admin' : '/challenges')
+  redirect('/rooms')
 }
 
 export type ResetPasswordState = {

@@ -33,9 +33,9 @@ describe('requirePlayer', () => {
     await expect(requirePlayer()).rejects.toThrow('REDIRECT:/signin')
   })
 
-  it('redirects ADMIN accounts to /admin', async () => {
+  it('allows any authenticated account regardless of legacy role', async () => {
     vi.mocked(getCurrentPlayer).mockResolvedValueOnce(playerWith('ADMIN'))
-    await expect(requirePlayer()).rejects.toThrow('REDIRECT:/admin')
+    await expect(requirePlayer()).resolves.toMatchObject({ role: 'ADMIN' })
   })
 
   it('allows PLAYER accounts', async () => {

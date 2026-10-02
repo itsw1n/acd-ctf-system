@@ -5,16 +5,14 @@ import { redirect } from 'next/navigation'
 import { getCurrentPlayer } from '@/features/sessions/services/sessionService'
 
 /**
- * Server-side player-route guard. Mirrors requireAdmin for the player area.
- *
- * valid session -> load current player -> reject ADMIN -> allow PLAYER.
+ * Server-side account guard for signed-in areas (profile, rooms entry).
+ * Any authenticated account with a usable session passes; room-level
+ * authorization happens in requireRoomMember / requireRoomOwner.
  * Unauthenticated callers are redirected to /signin.
- * ADMIN accounts are redirected to /admin (player routes are PLAYER-only).
  */
 export async function requirePlayer() {
   const player = await getCurrentPlayer()
   if (!player) redirect('/signin')
-  if (player.role !== 'PLAYER') redirect('/admin')
   if (player.accessLocked) redirect('/signin')
   return player
 }
