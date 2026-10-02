@@ -19,10 +19,17 @@ vi.mock('@/features/rooms/repositories/roomRepository', async (importOriginal) =
     isBanned: vi.fn(),
     setJoinLockedRow: vi.fn(),
     updateJoinCodeRow: vi.fn(),
+    banMembership: vi.fn(),
+    unbanMembership: vi.fn(),
+    updateRoomRow: vi.fn(),
+    listMyRooms: vi.fn(),
+    listPublicRooms: vi.fn(),
+    listRoomMembers: vi.fn(),
   }
 })
 
 import {
+  banMembership,
   createMembership,
   createRoomRow,
   deleteMembership,
@@ -31,17 +38,28 @@ import {
   getRoomByJoinCode,
   getRoomTeam,
   isBanned,
+  listMyRooms as listMyRoomsRepo,
+  listPublicRooms as listPublicRoomsRepo,
+  listRoomMembers as listRoomMembersRepo,
   setJoinLockedRow,
+  unbanMembership,
   updateJoinCodeRow,
+  updateRoomRow,
 } from '@/features/rooms/repositories/roomRepository'
 import {
+  banMember,
   createRoom,
   generateJoinCode,
   joinRoom,
   joinRoomByCode,
   leaveRoom,
+  listMyRooms,
+  listPublicRooms,
+  listRoomMembers,
   regenerateJoinCode,
   setJoinLocked,
+  unbanMember,
+  updateRoom,
 } from '@/features/rooms/services/roomService'
 
 function room(overrides: Record<string, unknown> = {}) {
@@ -280,5 +298,77 @@ describe('setJoinLocked and regenerateJoinCode', () => {
       '22222222-2222-4222-8222-222222222222',
       code
     )
+  })
+})
+
+describe('banMember and unbanMember', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('removes the membership and records the ban', async () => {
+    await banMember({
+      playerId: '11111111-1111-4111-8111-111111111111',
+      roomId: '22222222-2222-4222-8222-222222222222',
+    })
+    expect(vi.mocked(banMembership)).toHaveBeenCalledWith(
+      '22222222-2222-4222-8222-222222222222',
+      '11111111-1111-4111-8111-111111111111'
+    )
+  })
+
+  it('lifts bans', async () => {
+    await unbanMember({
+      playerId: '11111111-1111-4111-8111-111111111111',
+      roomId: '22222222-2222-4222-8222-222222222222',
+    })
+    expect(vi.mocked(unbanMembership)).toHaveBeenCalledWith(
+      '22222222-2222-4222-8222-222222222222',
+      '11111111-1111-4111-8111-111111111111'
+    )
+  })
+})
+
+describe('updateRoom', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('patches name and visibility', async () => {
+    await updateRoom({
+      roomId: '22222222-2222-4222-8222-222222222222',
+      name: 'New Name',
+      visibility: 'PRIVATE',
+    })
+    expect(vi.mocked(updateRoomRow)).toHaveBeenCalledWith(
+      '22222222-2222-4222-8222-222222222222',
+      expect.objectContaining({ name: 'New Name', visibility: 'PRIVATE' })
+    )
+  })
+
+  it('rejects blank names without touching the database', async () => {
+    await expect(
+      updateRoom({ roomId: '22222222-2222-4222-8222-222222222222', name: '  ' })
+    ).rejects.toThrow()
+    expect(vi.mocked(updateRoomRow)).not.toHaveBeenCalled()
+  })
+})
+
+describe('room listings', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('lists public rooms', async () => {
+    vi.mocked(listPublicRoomsRepo).mockResolvedValueOnce([{ slug: 'open-room' }] as never)
+    await expect(listPublicRooms()).resolves.toEqual([{ slug: 'open-room' }])
+  })
+
+  it('lists rooms the player belongs to', async () => {
+    vi.mocked(listMyRoomsRepo).mockResolvedValueOnce([{ role: 'OWNER' }] as never)
+    await expect(
+      listMyRooms('11111111-1111-4111-8111-111111111111')
+    ).resolves.toEqual([{ role: 'OWNER' }])
+  })
+
+  it('lists members with display data', async () => {
+    vi.mocked(listRoomMembersRepo).mockResolvedValueOnce([{ alias: 'tester' }] as never)
+    await expect(listRoomMembers('22222222-2222-4222-8222-222222222222')).resolves.toEqual([
+      { alias: 'tester' },
+    ])
   })
 })

@@ -140,6 +140,164 @@ export async function deleteMembership(roomId: string, playerId: string) {
   if (error) throw error
 }
 
+export async function banMembership(roomId: string, playerId: string) {
+  const supabase = createAdminClient()
+  const { error: deleteError } = await supabase
+    .from('room_memberships')
+    .delete()
+    .eq('room_id', roomId)
+    .eq('player_id', playerId)
+
+  if (deleteError) throw deleteError
+
+  const { error: banError } = await supabase
+    .from('room_bans')
+    .insert({ room_id: roomId, player_id: playerId })
+    .select('id')
+    .single()
+
+  if (banError && banError.code !== '23505') throw banError
+}
+
+export async function unbanMembership(roomId: string, playerId: string) {
+  const supabase = createAdminClient()
+  const { error } = await supabase
+    .from('room_bans')
+    .delete()
+    .eq('room_id', roomId)
+    .eq('player_id', playerId)
+
+  if (error) throw error
+}
+
+export async function updateRoomRow(
+  roomId: string,
+  patch: { name?: string; visibility?: 'PUBLIC' | 'PRIVATE'; joinLocked?: boolean }
+) {
+  const supabase = createAdminClient()
+  const { error } = await supabase
+    .from('rooms')
+    .update({
+      ...(patch.name !== undefined ? { name: patch.name } : {}),
+      ...(patch.visibility !== undefined ? { visibility: patch.visibility } : {}),
+      ...(patch.joinLocked !== undefined ? { join_locked: patch.joinLocked } : {}),
+    })
+    .eq('id', roomId)
+
+  if (error) throw error
+}
+
+export async function listPublicRooms(): Promise<Room[]> {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('rooms')
+    .select('id,slug,name,visibility,join_locked')
+    .eq('visibility', 'PUBLIC')
+    .order('created_at', { ascending: false })
+
+  if (error) throw new Error(`Unable to list rooms: ${error.message}`)
+  return (data ?? []).map((row) => ({
+    id: row.id,
+    slug: row.slug,
+    name: row.name,
+    visibility: row.visibility,
+    joinLocked: row.join_locked,
+  }))
+}
+
+export async function listMyRooms(
+  playerId: string
+): Promise<Array<{ room: Room; role: 'OWNER' | 'PARTICIPANT'; teamId: string | null }>> {
+  const supabase = createAdminClient()
+  const { data: memberships, error } = await supabase
+    .from('room_memberships')
+    .select('room_id,role,team_id')
+    .eq('player_id', playerId)
+
+  if (error) throw new Error(`Unable to list rooms: ${error.message}`)
+  if (!memberships?.length) return []
+
+  const roomIds = [...new Set(memberships.map((membership) => membership.room_id))]
+  const { data: rooms, error: roomsError } = await supabase
+    .from('rooms')
+    .select('id,slug,name,visibility,join_locked')
+    .in('id', roomIds)
+
+  if (roomsError) throw new Error(`Unable to list rooms: ${roomsError.message}`)
+
+  const roomById = new Map((rooms ?? []).map((room) => [room.id, room]))
+  return (memberships ?? []).flatMap((membership) => {
+    const room = roomById.get(membership.room_id)
+    if (!room) return []
+    return [
+      {
+        room: {
+          id: room.id,
+          slug: room.slug,
+          name: room.name,
+          visibility: room.visibility,
+          joinLocked: room.join_locked,
+        },
+        role: membership.role,
+        teamId: membership.team_id,
+      },
+    ]
+  })
+}
+
+export type RoomMemberRow = {
+  playerId: string
+  alias: string
+  fullName: string
+  role: 'OWNER' | 'PARTICIPANT'
+  teamId: string | null
+  team: string
+  accessLocked: boolean
+}
+
+export async function listRoomMembers(roomId: string): Promise<RoomMemberRow[]> {
+  const supabase = createAdminClient()
+  const { data: memberships, error } = await supabase
+    .from('room_memberships')
+    .select('player_id,role,team_id,access_locked')
+    .eq('room_id', roomId)
+
+  if (error) throw new Error(`Unable to list members: ${error.message}`)
+  if (!memberships?.length) return []
+
+  const memberIds = [...new Set(memberships.map((membership) => membership.player_id))]
+  const [{ data: players, error: playersError }, { data: teams, error: teamsError }] =
+    await Promise.all([
+      supabase.from('players').select('id,alias,full_name').in('id', memberIds),
+      supabase.from('teams').select('id,name').eq('room_id', roomId),
+    ])
+
+  if (playersError || teamsError) throw new Error('Unable to load member details.')
+
+  const playerById = new Map((players ?? []).map((player) => [player.id, player]))
+  const teamById = new Map((teams ?? []).map((team) => [team.id, team.name]))
+  const membershipByPlayerId = new Map(
+    (memberships ?? []).map((membership) => [membership.player_id, membership])
+  )
+
+  return memberIds.flatMap((playerId) => {
+    const player = playerById.get(playerId)
+    const membership = membershipByPlayerId.get(playerId)
+    if (!player || !membership) return []
+    return [
+      {
+        playerId,
+        alias: player.alias,
+        fullName: player.full_name,
+        role: membership.role,
+        teamId: membership.team_id,
+        team: membership.team_id ? (teamById.get(membership.team_id) ?? 'Unknown') : '—',
+        accessLocked: membership.access_locked,
+      },
+    ]
+  })
+}
+
 export async function isBanned(roomId: string, playerId: string): Promise<boolean> {
   const supabase = createAdminClient()
   const { data, error } = await supabase

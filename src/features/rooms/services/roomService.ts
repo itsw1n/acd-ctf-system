@@ -4,6 +4,7 @@ import { randomBytes } from 'node:crypto'
 import { z } from 'zod'
 
 import {
+  banMembership,
   createMembership,
   createRoomRow,
   deleteMembership,
@@ -12,9 +13,14 @@ import {
   getRoomByJoinCode,
   getRoomTeam,
   isBanned,
+  listMyRooms as fetchMyRooms,
+  listPublicRooms as fetchPublicRooms,
+  listRoomMembers as fetchRoomMembers,
   setJoinLockedRow,
   slugifyRoomName,
+  unbanMembership,
   updateJoinCodeRow,
+  updateRoomRow,
 } from '@/features/rooms/repositories/roomRepository'
 
 const JOIN_CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
@@ -139,4 +145,42 @@ export async function regenerateJoinCode(input: { roomId: string }) {
   const code = generateJoinCode()
   await updateJoinCodeRow(parsed.roomId, code)
   return code
+}
+
+const memberSchema = z.object({
+  playerId: z.string().uuid(),
+  roomId: z.string().uuid(),
+})
+
+export async function banMember(input: z.input<typeof memberSchema>) {
+  const parsed = memberSchema.parse(input)
+  await banMembership(parsed.roomId, parsed.playerId)
+}
+
+export async function unbanMember(input: z.input<typeof memberSchema>) {
+  const parsed = memberSchema.parse(input)
+  await unbanMembership(parsed.roomId, parsed.playerId)
+}
+
+const updateRoomSchema = z.object({
+  roomId: z.string().uuid(),
+  name: z.string().trim().min(2, 'Room name is required.').max(80).optional(),
+  visibility: z.enum(['PUBLIC', 'PRIVATE']).optional(),
+})
+
+export async function updateRoom(input: z.input<typeof updateRoomSchema>) {
+  const parsed = updateRoomSchema.parse(input)
+  await updateRoomRow(parsed.roomId, { name: parsed.name, visibility: parsed.visibility })
+}
+
+export async function listPublicRooms() {
+  return fetchPublicRooms()
+}
+
+export async function listMyRooms(playerId: string) {
+  return fetchMyRooms(z.string().uuid().parse(playerId))
+}
+
+export async function listRoomMembers(roomId: string) {
+  return fetchRoomMembers(z.string().uuid().parse(roomId))
 }
