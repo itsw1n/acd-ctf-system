@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { flagSchema } from '@/features/flags/schemas/flagSchema'
 import { submitFlagForPlayer } from '@/features/flags/services/submitFlag'
 import { requireCurrentPlayer } from '@/features/sessions/services/sessionService'
+import { getDefaultRoom, getMembership } from '@/features/rooms/repositories/roomRepository'
 import { checkAuthRateLimit, RATE_LIMITED } from '@/lib/security/rateLimit'
 
 export type FlagState = {
@@ -16,12 +17,15 @@ export async function submitFlagAction(
   formData: FormData
 ): Promise<FlagState> {
   const player = await requireCurrentPlayer()
+  const room = await getDefaultRoom()
 
-  // Organizer accounts have no competition team, so their solves would
-  // contaminate team scores, totals, and statistics. Enforced here at the
-  // only submission entry point; player.role is DB-derived, never client input.
-  if (player.role !== 'PLAYER') {
-    return { status: 'error', message: 'Organizer accounts cannot submit competition flags.' }
+  // Room owners cannot play their own room: their solves would contaminate
+  // team scores, totals, and statistics. Enforced here at the only
+  // submission entry point; the membership role is DB-derived, never client
+  // input. Non-members cannot submit either.
+  const membership = await getMembership(room.id, player.id)
+  if (!membership || membership.role !== 'PARTICIPANT') {
+    return { status: 'error', message: 'Only room participants can submit competition flags.' }
   }
 
   const parsed = flagSchema.safeParse({ flag: formData.get('flag') })
@@ -40,7 +44,7 @@ export async function submitFlagAction(
   }
 
   try {
-    const result = await submitFlagForPlayer(player.id, parsed.data.flag)
+    const result = await submitFlagForPlayer(player.id, room.id, parsed.data.flag)
 
     if (result.status === 'incorrect') {
       return { status: 'incorrect', message: 'Flag rejected. Check the value and try again.' }

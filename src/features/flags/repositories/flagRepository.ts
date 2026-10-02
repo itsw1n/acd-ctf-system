@@ -1,12 +1,13 @@
 import 'server-only'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-export async function findChallengeByFlagHash(flagHash: string) {
+export async function findChallengeByFlagHash(flagHash: string, roomId: string) {
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('challenges')
     .select('id,title,category,points')
     .eq('flag_hash', flagHash)
+    .eq('room_id', roomId)
     .eq('active', true)
     .maybeSingle()
 
@@ -17,12 +18,14 @@ export async function findChallengeByFlagHash(flagHash: string) {
 export async function createSolve(input: {
   playerId: string
   challengeId: string
+  roomId: string
   pointsAwarded: number
 }) {
   const supabase = createAdminClient()
   const { error } = await supabase.from('solves').insert({
     player_id: input.playerId,
     challenge_id: input.challengeId,
+    room_id: input.roomId,
     points_awarded: input.pointsAwarded,
   })
 
