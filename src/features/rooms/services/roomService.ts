@@ -3,6 +3,7 @@ import 'server-only'
 import { randomBytes } from 'node:crypto'
 import { z } from 'zod'
 
+import { listTeamsAdmin } from '@/features/teams/repositories/teamRepository'
 import {
   banMembership,
   createMembership,
@@ -11,6 +12,7 @@ import {
   getMembership,
   getRoomById,
   getRoomByJoinCode,
+  getRoomJoinCodeRow,
   getRoomTeam,
   isBanned,
   listBannedMembers as fetchBannedMembers,
@@ -202,4 +204,15 @@ export async function listRoomMembers(roomId: string) {
 
 export async function listBannedMembers(roomId: string) {
   return fetchBannedMembers(z.string().uuid().parse(roomId))
+}
+
+export async function getRoomJoinCode(roomId: string): Promise<string | null> {
+  return getRoomJoinCodeRow(z.string().uuid().parse(roomId))
+}
+
+export async function getJoinPreview(code: string) {
+  const room = await getRoomByJoinCode(code.trim().toUpperCase())
+  if (!room) return null
+  const teams = await listTeamsAdmin(room.id)
+  return { room, teams }
 }

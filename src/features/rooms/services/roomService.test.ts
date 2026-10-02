@@ -4,11 +4,16 @@ vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: vi.fn(),
 }))
 
+vi.mock('@/features/teams/repositories/teamRepository', () => ({
+  listTeamsAdmin: vi.fn(),
+}))
+
 vi.mock('@/features/rooms/repositories/roomRepository', async (importOriginal) => {
   const actual =
     await importOriginal<typeof import('@/features/rooms/repositories/roomRepository')>()
   return {
     ...actual,
+    getRoomJoinCodeRow: vi.fn(),
     createRoomRow: vi.fn(),
     createMembership: vi.fn(),
     deleteMembership: vi.fn(),
@@ -30,6 +35,7 @@ vi.mock('@/features/rooms/repositories/roomRepository', async (importOriginal) =
   }
 })
 
+import { listTeamsAdmin } from '@/features/teams/repositories/teamRepository'
 import {
   banMembership,
   createMembership,
@@ -38,6 +44,7 @@ import {
   getMembership,
   getRoomById,
   getRoomByJoinCode,
+  getRoomJoinCodeRow,
   getRoomTeam,
   isBanned,
   listBannedMembers as listBannedMembersRepo,
@@ -54,6 +61,8 @@ import {
   banMember,
   createRoom,
   generateJoinCode,
+  getJoinPreview,
+  getRoomJoinCode,
   joinRoom,
   joinRoomByCode,
   leaveRoom,
@@ -307,6 +316,36 @@ describe('setJoinLocked and regenerateJoinCode', () => {
   })
 })
 
+describe('getJoinPreview', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('returns null for unknown codes', async () => {
+    vi.mocked(getRoomByJoinCode).mockResolvedValueOnce(null)
+    await expect(getJoinPreview('RM-NOPE12')).resolves.toBeNull()
+  })
+
+  it('returns the room with its teams for valid codes', async () => {
+    vi.mocked(getRoomByJoinCode).mockResolvedValueOnce({
+      id: '22222222-2222-4222-8222-222222222222',
+      slug: 'test-room',
+    } as never)
+    vi.mocked(listTeamsAdmin).mockResolvedValueOnce([{ id: 't1', name: 'Ops' }] as never)
+    await expect(getJoinPreview('RM-ABCDEF')).resolves.toMatchObject({
+      room: { slug: 'test-room' },
+      teams: [{ id: 't1', name: 'Ops' }],
+    })
+  })
+})
+
+describe('getRoomJoinCode', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('returns the code for owners to share', async () => {
+    vi.mocked(getRoomJoinCodeRow).mockResolvedValueOnce('RM-ABCDEF')
+    await expect(getRoomJoinCode('22222222-2222-4222-8222-222222222222')).resolves.toBe('RM-ABCDEF')
+  })
+})
+
 describe('banMember and unbanMember', () => {
   beforeEach(() => vi.clearAllMocks())
 
@@ -378,9 +417,9 @@ describe('room listings', () => {
 
   it('lists rooms the player belongs to', async () => {
     vi.mocked(listMyRoomsRepo).mockResolvedValueOnce([{ role: 'OWNER' }] as never)
-    await expect(
-      listMyRooms('11111111-1111-4111-8111-111111111111')
-    ).resolves.toEqual([{ role: 'OWNER' }])
+    await expect(listMyRooms('11111111-1111-4111-8111-111111111111')).resolves.toEqual([
+      { role: 'OWNER' },
+    ])
   })
 
   it('lists members with display data', async () => {

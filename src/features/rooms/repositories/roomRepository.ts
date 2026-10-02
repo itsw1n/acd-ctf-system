@@ -83,6 +83,18 @@ export async function getRoomById(id: string): Promise<Room | null> {
   }
 }
 
+export async function getRoomJoinCodeRow(roomId: string): Promise<string | null> {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('rooms')
+    .select('join_code')
+    .eq('id', roomId)
+    .maybeSingle()
+
+  if (error) throw new Error(`Unable to load room: ${error.message}`)
+  return (data?.join_code as string | null) ?? null
+}
+
 export async function getRoomByJoinCode(code: string): Promise<Room | null> {
   const supabase = createAdminClient()
   const { data, error } = await supabase

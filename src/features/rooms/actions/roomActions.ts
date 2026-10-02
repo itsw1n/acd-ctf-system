@@ -4,10 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 import { getRoomById } from '@/features/rooms/repositories/roomRepository'
-import {
-  requireRoomMemberById,
-  requireRoomOwnerById,
-} from '@/features/rooms/services/requireRoom'
+import { requireRoomMemberById, requireRoomOwnerById } from '@/features/rooms/services/requireRoom'
 import {
   banMember,
   createRoom,

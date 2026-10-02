@@ -1,13 +1,12 @@
-import Link from 'next/link'
-
-import { TacticalPanel } from '@/components/common/TacticalPanel'
-import { Button } from '@/components/common/Button'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
-import { updateChallengeAction } from '@/features/challenges/actions/challengeActions'
+import { TacticalPanel } from '@/components/common/TacticalPanel'
+import { Button } from '@/components/common/Button'
+import { requireRoomOwner } from '@/features/rooms/services/requireRoom'
 import {
   createChallengeAction,
   toggleChallengeActiveAction,
+  updateChallengeAction,
 } from '@/features/challenges/actions/challengeActions'
 import {
   CreateChallengeDialog,
@@ -17,11 +16,16 @@ import {
   getChallengeForAdminEdit,
   listChallengesForAdmin,
 } from '@/features/challenges/queries/challengeAdminQueries'
-import { getDefaultRoom } from '@/features/rooms/repositories/roomRepository'
 import { cn } from '@/lib/cn'
 
-async function ChallengeEditModal({ challengeId, roomId }: { challengeId: string; roomId: string }) {
-  const challenge = await getChallengeForAdminEdit(challengeId)
+async function ChallengeEditModal({
+  challengeId,
+  roomId,
+}: {
+  challengeId: string
+  roomId: string
+}) {
+  const challenge = await getChallengeForAdminEdit(challengeId, roomId)
   if (!challenge) return null
 
   return (
@@ -29,22 +33,26 @@ async function ChallengeEditModal({ challengeId, roomId }: { challengeId: string
   )
 }
 
-export default async function AdminChallengesPage() {
-  const room = await getDefaultRoom()
-  const challenges = await listChallengesForAdmin()
+export default async function RoomChallengesPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await params
+  const { room } = await requireRoomOwner(slug)
+  const challenges = await listChallengesForAdmin(room.id)
 
   return (
-    <Section data-ui="admin-challenges">
+    <Section data-ui="room-admin-challenges">
       <Container>
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">{'// Admin'}</p>
+            <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
+              {'// Room admin'} · {room.name}
+            </p>
             <h1 className="mt-2 font-display text-4xl font-extrabold uppercase leading-none sm:text-6xl">
               Chall<span className="text-danger-bright">enges</span>
             </h1>
-            <p className="mt-3 font-mono text-xs uppercase tracking-[0.14em] text-muted sm:text-sm">
-              Manage challenge metadata and flags.
-            </p>
           </div>
           <CreateChallengeDialog action={createChallengeAction.bind(null, room.id)} />
         </div>
@@ -55,12 +63,10 @@ export default async function AdminChallengesPage() {
               <thead>
                 <tr className="border-y border-border bg-background/70 text-[10px] uppercase tracking-[0.12em] text-muted">
                   <th className="px-4 py-3 font-normal">Title</th>
-                  <th className="px-4 py-3 font-normal">Author</th>
                   <th className="px-4 py-3 font-normal">Category</th>
                   <th className="px-4 py-3 font-normal">Type</th>
                   <th className="px-4 py-3 text-right font-normal">Points</th>
                   <th className="px-4 py-3 font-normal">Status</th>
-                  <th className="px-4 py-3 font-normal">Created at</th>
                   <th className="px-4 py-3 text-right font-normal">Actions</th>
                 </tr>
               </thead>
@@ -70,7 +76,6 @@ export default async function AdminChallengesPage() {
                     <td className="max-w-[240px] truncate px-4 py-4 font-semibold">
                       {challenge.title}
                     </td>
-                    <td className="px-4 py-4 text-muted">{challenge.author}</td>
                     <td className="px-4 py-4 text-muted">{challenge.category}</td>
                     <td className="px-4 py-4">{challenge.type}</td>
                     <td className="px-4 py-4 text-right font-bold text-danger-bright">
@@ -88,14 +93,8 @@ export default async function AdminChallengesPage() {
                         {challenge.active ? 'Active' : 'Inactive'}
                       </span>
                     </td>
-                    <td className="px-4 py-4 text-muted">
-                      {new Date(challenge.createdAt).toLocaleString()}
-                    </td>
                     <td className="px-4 py-4">
                       <div className="flex items-center justify-end gap-2">
-                        <Link href={`/admin/challenges/${challenge.id}/edit`} className="hidden">
-                          Edit
-                        </Link>
                         <ChallengeEditModal challengeId={challenge.id} roomId={room.id} />
                         <form action={toggleChallengeActiveAction.bind(null, room.id)}>
                           <input type="hidden" name="id" value={challenge.id} />

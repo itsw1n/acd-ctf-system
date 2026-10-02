@@ -1,26 +1,29 @@
-import { TacticalPanel } from '@/components/common/TacticalPanel'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
+import { TacticalPanel } from '@/components/common/TacticalPanel'
+import { requireRoomOwner } from '@/features/rooms/services/requireRoom'
 import { createTeamAction, renameTeamAction } from '@/features/teams/actions/teamActions'
 import { CreateTeamForm } from '@/features/teams/components/TeamForms'
 import { RenameTeamDialog } from '@/features/teams/components/TeamDialogs'
 import { listTeamsWithStats } from '@/features/teams/queries/teamAdminQueries'
-import { getDefaultRoom } from '@/features/rooms/repositories/roomRepository'
 
-export default async function AdminTeamsPage() {
-  const room = await getDefaultRoom()
-  const teams = await listTeamsWithStats()
+export default async function RoomTeamsPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const { room } = await requireRoomOwner(slug)
+  const teams = await listTeamsWithStats(room.id)
 
   return (
-    <Section data-ui="admin-teams">
+    <Section data-ui="room-admin-teams">
       <Container>
         <div className="mb-8">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">{'// Admin'}</p>
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
+            {'// Room admin'} · {room.name}
+          </p>
           <h1 className="mt-2 font-display text-4xl font-extrabold uppercase leading-none sm:text-6xl">
             Te<span className="text-danger-bright">ams</span>
           </h1>
           <p className="mt-3 font-mono text-xs uppercase tracking-[0.14em] text-muted sm:text-sm">
-            Create teams and edit team names
+            Participants pick one of these teams when joining.
           </p>
         </div>
 
@@ -60,7 +63,9 @@ export default async function AdminTeamsPage() {
                 </tbody>
               </table>
               {!teams.length && (
-                <p className="py-14 text-center font-mono text-sm text-muted">No teams yet.</p>
+                <p className="py-14 text-center font-mono text-sm text-muted">
+                  No teams yet. Create the first one so participants can join it.
+                </p>
               )}
             </div>
           </TacticalPanel>

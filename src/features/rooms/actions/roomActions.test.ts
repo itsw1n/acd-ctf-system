@@ -37,10 +37,7 @@ vi.mock('next/navigation', () => ({
 
 import { getCurrentPlayer } from '@/features/sessions/services/sessionService'
 import { getRoomById } from '@/features/rooms/repositories/roomRepository'
-import {
-  requireRoomMemberById,
-  requireRoomOwnerById,
-} from '@/features/rooms/services/requireRoom'
+import { requireRoomMemberById, requireRoomOwnerById } from '@/features/rooms/services/requireRoom'
 import {
   banMember,
   createRoom,
@@ -80,9 +77,7 @@ describe('room actions authorization', () => {
 
   it('denies room creation for guests', async () => {
     vi.mocked(getCurrentPlayer).mockResolvedValueOnce(null)
-    await expect(createRoomAction({}, formData({ name: 'X' }))).rejects.toThrow(
-      'REDIRECT:/signin'
-    )
+    await expect(createRoomAction({}, formData({ name: 'X' }))).rejects.toThrow('REDIRECT:/signin')
     expect(vi.mocked(createRoom)).not.toHaveBeenCalled()
   })
 
@@ -99,9 +94,9 @@ describe('room actions authorization', () => {
 
   it('denies joining for guests', async () => {
     vi.mocked(getCurrentPlayer).mockResolvedValueOnce(null)
-    await expect(
-      joinRoomByCodeAction({}, formData({ code: 'RM-ABCDEF' }))
-    ).rejects.toThrow('REDIRECT:/signin')
+    await expect(joinRoomByCodeAction({}, formData({ code: 'RM-ABCDEF' }))).rejects.toThrow(
+      'REDIRECT:/signin'
+    )
     expect(vi.mocked(joinRoomByCode)).not.toHaveBeenCalled()
   })
 
@@ -184,12 +179,15 @@ describe('member lock authorization', () => {
   it('denies lock changes for non-owners', async () => {
     vi.mocked(requireRoomOwnerById).mockRejectedValueOnce(new Error('FORBIDDEN'))
     await expect(
-      setMemberLockedAction('22222222-2222-4222-8222-222222222222', (() => {
-        const form = new FormData()
-        form.set('playerId', '11111111-1111-4111-8111-111111111111')
-        form.set('locked', 'true')
-        return form
-      })())
+      setMemberLockedAction(
+        '22222222-2222-4222-8222-222222222222',
+        (() => {
+          const form = new FormData()
+          form.set('playerId', '11111111-1111-4111-8111-111111111111')
+          form.set('locked', 'true')
+          return form
+        })()
+      )
     ).rejects.toThrow('FORBIDDEN')
   })
 })

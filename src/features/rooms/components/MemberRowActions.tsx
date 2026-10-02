@@ -55,12 +55,7 @@ export function MemberRowActions({
         </Button>
       </ActionForm>
       <ActionForm action={banAction} roomId={roomId} playerId={playerId}>
-        <Button
-          type="submit"
-          variant="warning"
-          size="sm"
-          aria-label="Ban member"
-        >
+        <Button type="submit" variant="warning" size="sm" aria-label="Ban member">
           <Ban size={15} aria-hidden />
         </Button>
       </ActionForm>
@@ -80,12 +75,7 @@ export function BannedRowActions({
   return (
     <div className="flex items-center justify-end gap-2">
       <ActionForm action={unbanAction} roomId={roomId} playerId={playerId}>
-        <Button
-          type="submit"
-          variant="secondary"
-          size="sm"
-          aria-label="Unban member"
-        >
+        <Button type="submit" variant="secondary" size="sm" aria-label="Unban member">
           <Undo2 size={15} aria-hidden />
           Unban
         </Button>

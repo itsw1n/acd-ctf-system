@@ -1,7 +1,6 @@
 import 'server-only'
 
 import { requireRoomOwnerById } from '@/features/rooms/services/requireRoom'
-import { getDefaultRoom } from '@/features/rooms/repositories/roomRepository'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getLeaderboards } from '@/features/leaderboard/queries/leaderboardQueries'
 
@@ -17,10 +16,10 @@ export type AdminOverview = {
  * Cross-feature admin overview composition only. Owned reads stay in
  * players/teams/challenges/solves features.
  */
-export async function getAdminOverview(): Promise<AdminOverview> {
-  const room = await getDefaultRoom()
-  await requireRoomOwnerById(room.id)
+export async function getAdminOverview(roomId: string): Promise<AdminOverview> {
+  await requireRoomOwnerById(roomId)
   const supabase = createAdminClient()
+  const room = { id: roomId }
 
   const [
     { count: playerCount, error: playersError },

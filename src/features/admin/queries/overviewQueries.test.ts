@@ -8,10 +8,6 @@ vi.mock('@/features/rooms/services/requireRoom', () => ({
   requireRoomOwnerById: vi.fn(async () => ({ membership: { role: 'OWNER' } })),
 }))
 
-vi.mock('@/features/rooms/repositories/roomRepository', () => ({
-  getDefaultRoom: vi.fn(async () => ({ id: '22222222-2222-4222-8222-222222222222' })),
-}))
-
 vi.mock('@/features/leaderboard/queries/leaderboardQueries', () => ({
   getLeaderboards: vi.fn(async () => ({ playerRanks: [], teamRanks: [] })),
 }))
@@ -44,7 +40,7 @@ describe('getAdminOverview room scoping', () => {
       from: ((table: keyof typeof tables) => tables[table].chain) as never,
     } as never)
 
-    const overview = await getAdminOverview()
+    const overview = await getAdminOverview('22222222-2222-4222-8222-222222222222')
 
     expect(overview).toMatchObject({
       totalPlayers: 3,

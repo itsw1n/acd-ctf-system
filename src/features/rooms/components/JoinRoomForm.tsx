@@ -14,7 +14,7 @@ export function JoinRoomForm({
   teams,
   action,
 }: {
-  code: string
+  code?: string
   roomName: string
   teams: Array<{ id: string; name: string }>
   action: (previous: RoomActionState, formData: FormData) => Promise<RoomActionState>
@@ -27,7 +27,7 @@ export function JoinRoomForm({
         Room: <span className="font-bold text-foreground">{roomName}</span>
       </p>
       <form action={formAction} className="space-y-5">
-        <input type="hidden" name="code" value={code} />
+        {code !== undefined && <input type="hidden" name="code" value={code} />}
         <Select
           id="teamId"
           name="teamId"
