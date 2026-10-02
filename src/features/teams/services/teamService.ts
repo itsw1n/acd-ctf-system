@@ -20,12 +20,12 @@ export const renameTeamSchema = z.object({
 export type CreateTeamInput = z.infer<typeof createTeamSchema>
 export type RenameTeamInput = z.infer<typeof renameTeamSchema>
 
-export async function createTeam(input: CreateTeamInput) {
+export async function createTeam(roomId: string, input: CreateTeamInput) {
   const name = input.name.trim()
-  return createTeamRow({ name, slug: slugifyTeamName(name) })
+  return createTeamRow({ roomId, name, slug: slugifyTeamName(name) })
 }
 
-export async function renameTeam(input: RenameTeamInput) {
+export async function renameTeam(roomId: string, input: RenameTeamInput) {
   const name = input.name.trim()
-  await renameTeamRow(input.id, { name, slug: slugifyTeamName(name) })
+  await renameTeamRow(input.id, roomId, { name, slug: slugifyTeamName(name) })
 }

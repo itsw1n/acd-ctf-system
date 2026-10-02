@@ -3,6 +3,7 @@ import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
 import { listPlayersForAdmin } from '@/features/players/queries/playerAdminQueries'
 import { listTeamsAdmin } from '@/features/teams/repositories/teamRepository'
+import { getDefaultRoom } from '@/features/rooms/repositories/roomRepository'
 import { PlayerFilters } from '@/features/players/components/PlayerFilters'
 import { PlayerAccessAction } from '@/features/players/components/PlayerAccessAction'
 
@@ -14,9 +15,10 @@ export default async function AdminPlayersPage({
   const params = await searchParams
   const search = params.search ?? ''
   const teamId = params.teamId ?? ''
+  const room = await getDefaultRoom()
   const [players, teams] = await Promise.all([
     listPlayersForAdmin({ search, teamId }),
-    listTeamsAdmin(),
+    listTeamsAdmin(room.id),
   ])
 
   return (

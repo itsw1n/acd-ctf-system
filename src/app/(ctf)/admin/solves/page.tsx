@@ -7,6 +7,7 @@ import {
   listSolvesForAdmin,
 } from '@/features/admin/queries/solveQueries'
 import { listTeamsAdmin } from '@/features/teams/repositories/teamRepository'
+import { getDefaultRoom } from '@/features/rooms/repositories/roomRepository'
 
 export default async function AdminSolvesPage({
   searchParams,
@@ -17,9 +18,10 @@ export default async function AdminSolvesPage({
   const search = params.search ?? ''
   const teamId = params.teamId ?? ''
   const category = params.category ?? ''
+  const room = await getDefaultRoom()
   const [solves, teams, categories] = await Promise.all([
     listSolvesForAdmin({ search, teamId, category }),
-    listTeamsAdmin(),
+    listTeamsAdmin(room.id),
     listSolveCategoriesForAdmin(),
   ])
 
