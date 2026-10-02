@@ -10,14 +10,14 @@ export function AppShell({
   children,
 }: {
   player: Player
-  score: number
+  score: number | null
   children: ReactNode
 }) {
   return (
     <div className="min-h-screen bg-background text-foreground tactical-grid scanlines">
       <Topbar player={player} score={score} />
       <div className="lg:grid lg:grid-cols-[240px_minmax(0,1fr)]">
-        <Navigation isAdmin={player.role === 'ADMIN'} logoutAction={logoutAction} />
+        <Navigation logoutAction={logoutAction} />
         <main className="min-w-0 pb-24 lg:pb-10">{children}</main>
       </div>
       <footer className="border-t border-border px-5 py-4 text-center font-mono text-[9px] uppercase tracking-[0.16em] text-muted/70 lg:ml-60">

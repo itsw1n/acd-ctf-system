@@ -2,34 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import {
-  Activity,
-  Crosshair,
-  ListChecks,
-  LayoutDashboard,
-  LogOut,
-  ScrollText,
-  Trophy,
-  UserRound,
-  Users,
-  UsersRound,
-} from 'lucide-react'
+import { Compass, LayoutDashboard, LogOut, UserRound } from 'lucide-react'
 import { LogoutButton } from '@/features/auth/components/LogoutButton'
 import { cn } from '@/lib/cn'
 
 const items = [
-  { href: '/challenges', label: 'Challenges', icon: ListChecks },
-  { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
-  { href: '/activity', label: 'Activity', icon: Activity },
+  { href: '/rooms', label: 'My rooms', icon: LayoutDashboard },
+  { href: '/rooms/browse', label: 'Browse', icon: Compass },
   { href: '/profile', label: 'Profile', icon: UserRound },
-]
-
-const adminItems = [
-  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/admin/players', label: 'Players', icon: Users },
-  { href: '/admin/teams', label: 'Teams', icon: UsersRound },
-  { href: '/admin/challenges', label: 'Challenges', icon: Crosshair },
-  { href: '/admin/solves', label: 'Solves', icon: ScrollText },
 ]
 
 function linkClass(active: boolean) {
@@ -40,13 +20,7 @@ function linkClass(active: boolean) {
   )
 }
 
-export function Navigation({
-  isAdmin = false,
-  logoutAction,
-}: {
-  isAdmin?: boolean
-  logoutAction: () => Promise<void>
-}) {
+export function Navigation({ logoutAction }: { logoutAction: () => Promise<void> }) {
   const pathname = usePathname()
 
   return (
@@ -56,42 +30,22 @@ export function Navigation({
           aria-label="CTF navigation"
           className="sticky top-[85px] flex h-[calc(100vh-85px)] w-60 flex-col"
         >
-          {!isAdmin && (
-            <div className="py-2">
-              {items.map(({ href, label, icon: Icon }) => {
-                const active = pathname === href
-                return (
-                  <Link
-                    key={href}
-                    href={href}
-                    aria-current={active ? 'page' : undefined}
-                    className={linkClass(active)}
-                  >
-                    <Icon size={20} strokeWidth={1.7} aria-hidden />
-                    {label}
-                  </Link>
-                )
-              })}
-            </div>
-          )}
-          {isAdmin && (
-            <div className="py-2">
-              {adminItems.map(({ href, label, icon: Icon }) => {
-                const active = pathname === href
-                return (
-                  <Link
-                    key={href}
-                    href={href}
-                    aria-current={active ? 'page' : undefined}
-                    className={linkClass(active)}
-                  >
-                    <Icon size={18} strokeWidth={1.7} aria-hidden />
-                    {label}
-                  </Link>
-                )
-              })}
-            </div>
-          )}
+          <div className="py-2">
+            {items.map(({ href, label, icon: Icon }) => {
+              const active = pathname === href
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  aria-current={active ? 'page' : undefined}
+                  className={linkClass(active)}
+                >
+                  <Icon size={20} strokeWidth={1.7} aria-hidden />
+                  {label}
+                </Link>
+              )
+            })}
+          </div>
           <div className="mt-auto border-t border-border p-5">
             <LogoutButton
               action={logoutAction}
@@ -109,12 +63,11 @@ export function Navigation({
       <nav
         aria-label="CTF mobile navigation"
         className={cn(
-          'fixed inset-x-0 bottom-0 z-50 grid border-t border-border bg-background/95 backdrop-blur lg:hidden',
-          isAdmin ? 'grid-cols-5' : 'grid-cols-4'
+          'fixed inset-x-0 bottom-0 z-50 grid grid-cols-3 border-t border-border bg-background/95 backdrop-blur lg:hidden'
         )}
         data-ui="mobile-navigation"
       >
-        {(isAdmin ? adminItems : items).map(({ href, label, icon: Icon }) => {
+        {items.map(({ href, label, icon: Icon }) => {
           const active = pathname === href
           return (
             <Link
