@@ -5,7 +5,7 @@ import { SolveFilters } from '@/features/solves/components/SolveFilters'
 import {
   listSolveCategoriesForAdmin,
   listSolvesForAdmin,
-} from '@/features/solves/queries/solveAdminQueries'
+} from '@/features/admin/queries/solveQueries'
 import { listTeamsAdmin } from '@/features/teams/repositories/teamRepository'
 
 export default async function AdminSolvesPage({
