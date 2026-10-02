@@ -134,19 +134,6 @@ export async function getPlayerCredentialsByAlias(
   return (data as PlayerCredentialsRow | null) ?? null
 }
 
-export async function setPlayerAccessLocked(playerId: string, locked: boolean) {
-  const supabase = createAdminClient()
-  const { data, error } = await supabase
-    .from('players')
-    .update({ access_locked: locked })
-    .eq('id', playerId)
-    .eq('role', 'PLAYER')
-    .select('id')
-    .maybeSingle()
-
-  if (error) throw new Error(`Unable to update player access: ${error.message}`)
-  if (!data) throw new Error('PLAYER_NOT_FOUND')
-}
 
 export async function updatePlayerPassword(playerId: string, passwordHash: string) {
   const supabase = createAdminClient()

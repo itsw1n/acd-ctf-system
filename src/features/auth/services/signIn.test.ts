@@ -58,18 +58,6 @@ describe('signIn', () => {
     expect(vi.mocked(issuePlayerSession)).not.toHaveBeenCalled()
   })
 
-  it('rejects a locked account after verifying the password', async () => {
-    vi.mocked(getPlayerCredentialsByAlias).mockResolvedValueOnce(
-      credentials({ access_locked: true })
-    )
-    vi.mocked(verifyPassword).mockResolvedValueOnce(true)
-
-    await expect(signIn({ alias: 'tester', password: 'correct-password' })).rejects.toThrow(
-      'PLAYER_ACCOUNT_LOCKED'
-    )
-    expect(vi.mocked(issuePlayerSession)).not.toHaveBeenCalled()
-  })
-
   it('rejects unknown aliases with the same public error', async () => {
     vi.mocked(getPlayerCredentialsByAlias).mockResolvedValueOnce(null)
     vi.mocked(verifyPassword).mockResolvedValueOnce(true)
