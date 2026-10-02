@@ -88,12 +88,17 @@ alter table public.challenges
 
 -- Backfill: everything that exists today belongs to one default room.
 insert into public.rooms (slug, name, visibility, join_code)
-values (
+select
   'acd-ctf',
   'ACD CTF',
   'PUBLIC',
-  'ACD-' || upper(substr(translate(gen_random_uuid()::text, '-', ''), 1, 8))
-)
+  -- Same RM-XXXXXX shape the app generates (see generateJoinCode): 6 chars
+  -- from the unambiguous alphabet.
+  'RM-' || string_agg(
+    substr('ABCDEFGHJKLMNPQRSTUVWXYZ23456789', (floor(random() * 32) + 1)::int, 1),
+    '' order by ord
+  )
+from generate_series(1, 6) as ord
 on conflict (slug) do nothing;
 
 update public.teams

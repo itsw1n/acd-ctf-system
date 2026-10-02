@@ -29,7 +29,10 @@ async function createRoom(page: Page, name: string): Promise<string> {
   await page.goto('/rooms/new')
   await page.getByPlaceholder('Friday Night CTF').fill(name)
   await page.getByRole('button', { name: /create room/i }).click()
-  await page.waitForURL(/\/rooms\/(?!new|join|browse)[a-z0-9-]+$/, { timeout: 15000 })
+  await page.waitForURL(
+    (url) => !/\/(new|join|browse)(\?|$)/.test(url.pathname.replace('/rooms', '')),
+    { timeout: 15000 }
+  )
   return page.url().split('/rooms/')[1]
 }
 
