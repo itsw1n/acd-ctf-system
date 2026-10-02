@@ -16,6 +16,9 @@
 --     plaintext flag column removed). Seed stores flag_hash only, so demo
 --     submissions work; flag_encrypted stays NULL until an admin re-saves
 --     the flag via the edit form (display falls back to 'Not available').
+--   011_rooms.sql — rooms(room_id on teams/challenges/solves),
+--     room_memberships (OWNER/PARTICIPANT per room), room_bans. Everything
+--     below belongs to the default 'acd-ctf' room.
 --
 -- Scoreboard this seed produces:
 --
@@ -47,12 +50,15 @@ begin;
 -- 1. TEAMS
 -- ============================================================
 
-insert into public.teams (name, slug)
-values
+insert into public.teams (name, slug, room_id)
+select v.name, v.slug, rooms.id
+from (values
   ('IT Innovators', 'it-innovators'),
   ('Data Wizard', 'data-wizard'),
   ('Tech Pioneers', 'tech-pioneers'),
-  ('Cyber Knights', 'cyber-knights');
+  ('Cyber Knights', 'cyber-knights')
+) as v(name, slug)
+cross join (select id from public.rooms where slug = 'acd-ctf') as rooms;
 
 
 -- ============================================================
@@ -75,9 +81,21 @@ insert into public.challenges (
   difficulty,
   points,
   flag_hash,
-  active
+  active,
+  room_id
 )
-values
+select
+  v.title,
+  v.author,
+  v.category,
+  v.description,
+  v.type,
+  v.difficulty,
+  v.points,
+  v.flag_hash,
+  v.active,
+  rooms.id
+from (values
   (
     'Welcome Flag',
     'ACD Team',
@@ -99,7 +117,9 @@ values
     100,
     '4ad75f150616cff694b38fedaec24b547fa9d7b44af2f8aa7d3975647a43c3d5',
     true
-  );
+  )
+) as v(title, author, category, description, type, difficulty, points, flag_hash, active)
+cross join (select id from public.rooms where slug = 'acd-ctf') as rooms;
 
 
 -- ============================================================
@@ -229,17 +249,37 @@ with seeded_solves (
 insert into public.solves (
   player_id,
   challenge_id,
-  points_awarded
+  points_awarded,
+  room_id
 )
 select
   players.id,
   challenges.id,
-  challenges.points
+  challenges.points,
+  challenges.room_id
 from seeded_solves
 join public.players as players
   on lower(players.alias) = lower(seeded_solves.alias)
 join public.challenges as challenges
   on challenges.title = seeded_solves.challenge_title;
+
+
+-- ============================================================
+-- 6. ROOM MEMBERSHIPS
+-- ============================================================
+-- Demo accounts join the default room: root (ADMIN) as OWNER, everyone
+-- else as PARTICIPANT with their team. Mirrors the 011 backfill for rows
+-- the seed itself creates (migrations run before the seed).
+
+insert into public.room_memberships (room_id, player_id, role, team_id, access_locked)
+select
+  rooms.id,
+  players.id,
+  case when players.role = 'ADMIN' then 'OWNER' else 'PARTICIPANT' end,
+  players.team_id,
+  players.access_locked
+from public.players
+cross join (select id from public.rooms where slug = 'acd-ctf') as rooms;
 
 
 commit;
