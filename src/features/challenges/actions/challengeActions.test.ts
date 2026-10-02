@@ -1,8 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+vi.mock('@/lib/supabase/admin', () => ({
+  createAdminClient: vi.fn(),
+}))
+
 vi.mock('@/features/rooms/services/requireRoom', () => ({
   requireRoomOwnerById: vi.fn(),
 }))
+
+vi.mock('@/features/rooms/services/roomService', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/rooms/services/roomService')>()
+  return { ...actual, getRoomPath: vi.fn(async () => '/rooms/test-room') }
+})
 
 vi.mock('@/features/challenges/services/challengeService', () => ({
   createChallenge: vi.fn(),
@@ -76,7 +85,7 @@ describe('admin challenge actions authorization', () => {
     } as never)
     vi.mocked(createChallenge).mockResolvedValueOnce('new-id' as never)
     await expect(createChallengeAction(ROOM_ID, {}, validForm())).rejects.toThrow(
-      'REDIRECT:/admin/challenges'
+      'REDIRECT:/rooms/test-room/admin/challenges'
     )
     expect(vi.mocked(requireRoomOwnerById)).toHaveBeenCalledWith(ROOM_ID)
     expect(vi.mocked(createChallenge)).toHaveBeenCalledWith(ROOM_ID, expect.any(Object))

@@ -88,7 +88,6 @@ export async function getPlayerCredentialsByAlias(
   return (data as PlayerCredentialsRow | null) ?? null
 }
 
-
 export async function updatePlayerPassword(playerId: string, passwordHash: string) {
   const supabase = createAdminClient()
   const { error } = await supabase

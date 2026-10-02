@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 import { requireRoomOwnerById } from '@/features/rooms/services/requireRoom'
+import { getRoomPath } from '@/features/rooms/services/roomService'
 import {
   createChallengeSchema,
   toggleChallengeActiveSchema,
@@ -54,8 +55,9 @@ export async function createChallengeAction(
     return { error: 'Unable to create challenge. Please try again.' }
   }
 
-  revalidatePath('/admin/challenges')
-  redirect('/admin/challenges')
+  const path = `${await getRoomPath(roomId)}/admin/challenges`
+  revalidatePath(path)
+  redirect(path)
 }
 
 export async function updateChallengeAction(
@@ -82,8 +84,9 @@ export async function updateChallengeAction(
     return { error: 'Unable to update challenge. Please try again.' }
   }
 
-  revalidatePath('/admin/challenges')
-  redirect('/admin/challenges')
+  const path = `${await getRoomPath(roomId)}/admin/challenges`
+  revalidatePath(path)
+  redirect(path)
 }
 
 export async function toggleChallengeActiveAction(roomId: string, formData: FormData) {
@@ -96,5 +99,5 @@ export async function toggleChallengeActiveAction(roomId: string, formData: Form
   if (!parsed.success) return
 
   await setChallengeActive(parsed.data.id, roomId, parsed.data.active)
-  revalidatePath('/admin/challenges')
+  revalidatePath(await getRoomPath(roomId))
 }

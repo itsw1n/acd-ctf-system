@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { randomBytes } from 'node:crypto'
+import { redirect } from 'next/navigation'
 import { z } from 'zod'
 
 import { listTeamsAdmin } from '@/features/teams/repositories/teamRepository'
@@ -208,6 +209,12 @@ export async function listBannedMembers(roomId: string) {
 
 export async function getRoomJoinCode(roomId: string): Promise<string | null> {
   return getRoomJoinCodeRow(z.string().uuid().parse(roomId))
+}
+
+export async function getRoomPath(roomId: string): Promise<string> {
+  const room = await getRoomById(roomId)
+  if (!room) redirect('/rooms')
+  return `/rooms/${room.slug}`
 }
 
 export async function getJoinPreview(code: string) {

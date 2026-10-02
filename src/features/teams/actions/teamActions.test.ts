@@ -1,8 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+vi.mock('@/lib/supabase/admin', () => ({
+  createAdminClient: vi.fn(),
+}))
+
 vi.mock('@/features/rooms/services/requireRoom', () => ({
   requireRoomOwnerById: vi.fn(),
 }))
+
+vi.mock('@/features/rooms/services/roomService', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/rooms/services/roomService')>()
+  return { ...actual, getRoomPath: vi.fn(async () => '/rooms/test-room') }
+})
 
 vi.mock('@/features/teams/services/teamService', async () => {
   // Schemas are re-declared here (rather than importOriginal) so this test
@@ -67,7 +76,7 @@ describe('admin team actions authorization', () => {
     } as never)
     vi.mocked(createTeam).mockResolvedValueOnce('team-id' as never)
     await expect(createTeamAction(ROOM_ID, {}, formData({ name: 'Ops' }))).rejects.toThrow(
-      'REDIRECT:/admin/teams'
+      'REDIRECT:/rooms/test-room/admin/teams'
     )
     expect(vi.mocked(requireRoomOwnerById)).toHaveBeenCalledWith(ROOM_ID)
     expect(vi.mocked(createTeam)).toHaveBeenCalledWith(ROOM_ID, expect.any(Object))

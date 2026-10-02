@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 import { requireRoomOwnerById } from '@/features/rooms/services/requireRoom'
+import { getRoomPath } from '@/features/rooms/services/roomService'
 import {
   createTeam,
   createTeamSchema,
@@ -36,8 +37,9 @@ export async function createTeamAction(
     return { error: 'Unable to create team. Please try again.' }
   }
 
-  revalidatePath('/admin/teams')
-  redirect('/admin/teams')
+  const path = `${await getRoomPath(roomId)}/admin/teams`
+  revalidatePath(path)
+  redirect(path)
 }
 
 export async function renameTeamAction(
@@ -64,6 +66,7 @@ export async function renameTeamAction(
     return { error: 'Unable to rename team. Please try again.' }
   }
 
-  revalidatePath('/admin/teams')
-  redirect('/admin/teams')
+  const path = `${await getRoomPath(roomId)}/admin/teams`
+  revalidatePath(path)
+  redirect(path)
 }

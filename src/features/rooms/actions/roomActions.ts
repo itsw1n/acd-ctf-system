@@ -7,6 +7,7 @@ import { getRoomById } from '@/features/rooms/repositories/roomRepository'
 import { requireRoomMemberById, requireRoomOwnerById } from '@/features/rooms/services/requireRoom'
 import {
   banMember,
+  getRoomPath,
   createRoom,
   joinRoom,
   joinRoomByCode,
@@ -133,7 +134,7 @@ export async function leaveRoomAction(roomId: string) {
 export async function setJoinLockedAction(roomId: string, formData: FormData) {
   await requireRoomOwnerById(roomId)
   await setJoinLocked({ roomId, locked: formData.get('locked') === 'true' })
-  revalidatePath(`/rooms/${roomId}`)
+  revalidatePath(await getRoomPath(roomId))
 }
 
 export async function setMemberLockedAction(roomId: string, formData: FormData) {
@@ -141,13 +142,13 @@ export async function setMemberLockedAction(roomId: string, formData: FormData) 
   const playerId = formData.get('playerId')
   if (typeof playerId !== 'string' || !playerId) return
   await setMemberLocked({ roomId, playerId, locked: formData.get('locked') === 'true' })
-  revalidatePath(`/rooms/${roomId}`)
+  revalidatePath(await getRoomPath(roomId))
 }
 
 export async function regenerateJoinCodeAction(roomId: string): Promise<RoomActionState> {
   await requireRoomOwnerById(roomId)
   const code = await regenerateJoinCode({ roomId })
-  revalidatePath(`/rooms/${roomId}`)
+  revalidatePath(await getRoomPath(roomId))
   return { code }
 }
 
@@ -156,7 +157,7 @@ export async function banMemberAction(roomId: string, formData: FormData) {
   const playerId = formData.get('playerId')
   if (typeof playerId !== 'string' || !playerId) return
   await banMember({ roomId, playerId })
-  revalidatePath(`/rooms/${roomId}`)
+  revalidatePath(await getRoomPath(roomId))
 }
 
 export async function unbanMemberAction(roomId: string, formData: FormData) {
@@ -164,7 +165,7 @@ export async function unbanMemberAction(roomId: string, formData: FormData) {
   const playerId = formData.get('playerId')
   if (typeof playerId !== 'string' || !playerId) return
   await unbanMember({ roomId, playerId })
-  revalidatePath(`/rooms/${roomId}`)
+  revalidatePath(await getRoomPath(roomId))
 }
 
 export async function updateRoomAction(
@@ -184,6 +185,6 @@ export async function updateRoomAction(
     return { error: 'Unable to update room. Please try again.' }
   }
 
-  revalidatePath(`/rooms/${roomId}`)
+  revalidatePath(await getRoomPath(roomId))
   return {}
 }

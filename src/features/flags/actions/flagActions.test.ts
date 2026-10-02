@@ -8,6 +8,10 @@ vi.mock('@/features/rooms/services/requireRoom', () => ({
   requireRoomMemberById: vi.fn(),
 }))
 
+vi.mock('@/features/rooms/services/roomService', () => ({
+  getRoomPath: vi.fn(async () => '/rooms/test-room'),
+}))
+
 vi.mock('next/cache', () => ({
   revalidatePath: vi.fn(),
 }))

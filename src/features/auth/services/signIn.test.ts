@@ -33,9 +33,7 @@ describe('signIn', () => {
     vi.mocked(getPlayerCredentialsByAlias).mockResolvedValueOnce(credentials())
     vi.mocked(verifyPassword).mockResolvedValueOnce(true)
 
-    await expect(
-      signIn({ alias: 'tester', password: 'correct-password' })
-    ).resolves.toBeUndefined()
+    await expect(signIn({ alias: 'tester', password: 'correct-password' })).resolves.toBeUndefined()
     expect(vi.mocked(issuePlayerSession)).toHaveBeenCalledWith('player-1')
   })
 

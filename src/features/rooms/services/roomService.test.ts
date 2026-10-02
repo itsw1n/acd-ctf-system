@@ -346,6 +346,19 @@ describe('getRoomJoinCode', () => {
   })
 })
 
+describe('getRoomPath', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('resolves the canonical room path', async () => {
+    vi.mocked(getRoomById).mockResolvedValueOnce({ slug: 'my-room' } as never)
+    await expect(
+      (await import('@/features/rooms/services/roomService')).getRoomPath(
+        '22222222-2222-4222-8222-222222222222'
+      )
+    ).resolves.toBe('/rooms/my-room')
+  })
+})
+
 describe('banMember and unbanMember', () => {
   beforeEach(() => vi.clearAllMocks())
 

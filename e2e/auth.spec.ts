@@ -15,19 +15,17 @@ async function signUp(page: Page, alias: string, password: string = PASSWORD) {
   await page.getByRole('button', { name: /create account/i }).click()
 }
 
-test('public root is available and dashboard redirects logged-out visitors to signin', async ({
+test('public root is available and rooms redirects logged-out visitors to signin', async ({
   page,
 }) => {
   await page.goto('/')
   await expect(page).toHaveURL('/')
-  await page.goto('/challenges')
+  await page.goto('/rooms')
   await expect(page).toHaveURL('/signin')
   await expect(page.getByRole('heading', { name: 'Enter the CTF' })).toBeVisible()
 })
 
-test('signup shows the recovery code once, then continues to the challenge board', async ({
-  page,
-}) => {
+test('signup shows the recovery code once, then continues to rooms', async ({ page }) => {
   const alias = uniqueAlias('e2ecode')
   await signUp(page, alias)
 
@@ -35,10 +33,10 @@ test('signup shows the recovery code once, then continues to the challenge board
   await expect(code).toBeVisible()
 
   await page.getByRole('button', { name: /i saved my code/i }).click()
-  await expect(page).toHaveURL('/challenges')
+  await expect(page).toHaveURL('/rooms')
 
   await page.goto('/profile')
-  await expect(page.getByText('PLAYER').first()).toBeVisible()
+  await expect(page.getByText('ACTIVE').first()).toBeVisible()
 })
 
 test('duplicate alias is rejected', async ({ page }) => {
@@ -60,7 +58,7 @@ test('signin rejects wrong passwords with a generic error', async ({ page }) => 
   await signUp(page, alias)
   await expect(page.getByText(/ACD-[A-Z2-9]{4}/)).toBeVisible()
   await page.getByRole('button', { name: /i saved my code/i }).click()
-  await expect(page).toHaveURL('/challenges')
+  await expect(page).toHaveURL('/rooms')
 
   await page.goto('/profile')
   await page.getByRole('button', { name: /end session/i }).click()
@@ -92,16 +90,20 @@ test('signin rejects wrong passwords with a generic error', async ({ page }) => 
   await page.getByPlaceholder('Enter your alias').fill(alias)
   await page.getByPlaceholder('Enter your password').fill(PASSWORD)
   await page.getByRole('button', { name: /^sign in$/i }).click()
-  await expect(page).toHaveURL('/challenges')
+  await expect(page).toHaveURL('/rooms')
 })
 
-test('forgot-password resets the password and revokes old sessions', async ({ page, context }) => {
+test('forgot-password resets the password and revokes old sessions', async ({
+  page,
+  context,
+  baseURL,
+}) => {
   const alias = uniqueAlias('e2ereset')
   await signUp(page, alias)
   const code = await page.getByText(/ACD-[A-Z2-9]{4}-[A-Z2-9]{4}-[A-Z2-9]{4}/).textContent()
 
   await page.getByRole('button', { name: /i saved my code/i }).click()
-  await expect(page).toHaveURL('/challenges')
+  await expect(page).toHaveURL('/rooms')
 
   const oldCookies = await context.cookies()
   const oldSession = oldCookies.find((c) => c.name === 'acd_ctf_session')?.value
@@ -126,7 +128,7 @@ test('forgot-password resets the password and revokes old sessions', async ({ pa
   await expect(page.getByText(/password reset/i)).toBeVisible()
 
   // Old session cookie must no longer grant access.
-  const fresh = await context.browser()?.newContext({ baseURL: 'http://localhost:3200' })
+  const fresh = await context.browser()?.newContext({ baseURL })
   await fresh?.addCookies([
     {
       name: 'acd_ctf_session',
@@ -136,13 +138,13 @@ test('forgot-password resets the password and revokes old sessions', async ({ pa
     },
   ])
   const stranger = await fresh?.newPage()
-  await stranger?.goto('/dashboard')
-  await expect(stranger?.url()).toBe('http://localhost:3200/signin')
+  await stranger?.goto('/rooms')
+  await expect(stranger?.url()).toMatch(/\/signin$/)
   await fresh?.close()
 
   // New password works.
   await page.getByPlaceholder('Enter your alias').fill(alias)
   await page.getByPlaceholder('Enter your password').fill('brand-new-password')
   await page.getByRole('button', { name: /^sign in$/i }).click()
-  await expect(page).toHaveURL('/challenges')
+  await expect(page).toHaveURL('/rooms')
 })

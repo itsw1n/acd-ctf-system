@@ -16,6 +16,7 @@ vi.mock('@/features/rooms/repositories/roomRepository', () => ({
 vi.mock('@/features/rooms/services/roomService', () => ({
   banMember: vi.fn(),
   createRoom: vi.fn(),
+  getRoomPath: vi.fn(async () => '/rooms/test-room'),
   joinRoom: vi.fn(),
   joinRoomByCode: vi.fn(),
   leaveRoom: vi.fn(),

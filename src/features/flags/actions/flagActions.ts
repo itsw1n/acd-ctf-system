@@ -5,6 +5,7 @@ import { flagSchema } from '@/features/flags/schemas/flagSchema'
 import { submitFlagForPlayer } from '@/features/flags/services/submitFlag'
 import { requireCurrentPlayer } from '@/features/sessions/services/sessionService'
 import { requireRoomMemberById } from '@/features/rooms/services/requireRoom'
+import { getRoomPath } from '@/features/rooms/services/roomService'
 import { checkAuthRateLimit, RATE_LIMITED } from '@/lib/security/rateLimit'
 
 export type FlagState = {
@@ -57,10 +58,7 @@ export async function submitFlagAction(
       }
     }
 
-    revalidatePath('/challenges')
-    revalidatePath('/dashboard')
-    revalidatePath('/leaderboard')
-    revalidatePath('/activity')
+    revalidatePath(await getRoomPath(roomId))
 
     return {
       status: 'correct',
