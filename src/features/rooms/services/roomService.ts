@@ -13,6 +13,7 @@ import {
   getRoomByJoinCode,
   getRoomTeam,
   isBanned,
+  listBannedMembers as fetchBannedMembers,
   listMyRooms as fetchMyRooms,
   listPublicRooms as fetchPublicRooms,
   listRoomMembers as fetchRoomMembers,
@@ -166,6 +167,8 @@ const memberSchema = z.object({
 
 export async function banMember(input: z.input<typeof memberSchema>) {
   const parsed = memberSchema.parse(input)
+  const membership = await getMembership(parsed.roomId, parsed.playerId)
+  if (membership?.role === 'OWNER') throw new Error('OWNER_CANNOT_BAN')
   await banMembership(parsed.roomId, parsed.playerId)
 }
 
@@ -195,4 +198,8 @@ export async function listMyRooms(playerId: string) {
 
 export async function listRoomMembers(roomId: string) {
   return fetchRoomMembers(z.string().uuid().parse(roomId))
+}
+
+export async function listBannedMembers(roomId: string) {
+  return fetchBannedMembers(z.string().uuid().parse(roomId))
 }

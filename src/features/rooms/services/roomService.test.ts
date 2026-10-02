@@ -23,6 +23,7 @@ vi.mock('@/features/rooms/repositories/roomRepository', async (importOriginal) =
     banMembership: vi.fn(),
     unbanMembership: vi.fn(),
     updateRoomRow: vi.fn(),
+    listBannedMembers: vi.fn(),
     listMyRooms: vi.fn(),
     listPublicRooms: vi.fn(),
     listRoomMembers: vi.fn(),
@@ -39,6 +40,7 @@ import {
   getRoomByJoinCode,
   getRoomTeam,
   isBanned,
+  listBannedMembers as listBannedMembersRepo,
   listMyRooms as listMyRoomsRepo,
   listPublicRooms as listPublicRoomsRepo,
   listRoomMembers as listRoomMembersRepo,
@@ -55,6 +57,7 @@ import {
   joinRoom,
   joinRoomByCode,
   leaveRoom,
+  listBannedMembers,
   listMyRooms,
   listPublicRooms,
   listRoomMembers,
@@ -307,7 +310,19 @@ describe('setJoinLocked and regenerateJoinCode', () => {
 describe('banMember and unbanMember', () => {
   beforeEach(() => vi.clearAllMocks())
 
+  it('refuses to ban the room owner', async () => {
+    vi.mocked(getMembership).mockResolvedValueOnce({ role: 'OWNER' } as never)
+    await expect(
+      banMember({
+        playerId: '11111111-1111-4111-8111-111111111111',
+        roomId: '22222222-2222-4222-8222-222222222222',
+      })
+    ).rejects.toThrow('OWNER_CANNOT_BAN')
+    expect(vi.mocked(banMembership)).not.toHaveBeenCalled()
+  })
+
   it('removes the membership and records the ban', async () => {
+    vi.mocked(getMembership).mockResolvedValueOnce({ role: 'PARTICIPANT' } as never)
     await banMember({
       playerId: '11111111-1111-4111-8111-111111111111',
       roomId: '22222222-2222-4222-8222-222222222222',
@@ -372,6 +387,13 @@ describe('room listings', () => {
     vi.mocked(listRoomMembersRepo).mockResolvedValueOnce([{ alias: 'tester' }] as never)
     await expect(listRoomMembers('22222222-2222-4222-8222-222222222222')).resolves.toEqual([
       { alias: 'tester' },
+    ])
+  })
+
+  it('lists banned players with display data', async () => {
+    vi.mocked(listBannedMembersRepo).mockResolvedValueOnce([{ alias: 'griefer' }] as never)
+    await expect(listBannedMembers('22222222-2222-4222-8222-222222222222')).resolves.toEqual([
+      { alias: 'griefer' },
     ])
   })
 })
