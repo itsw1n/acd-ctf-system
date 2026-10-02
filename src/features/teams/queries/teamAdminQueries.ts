@@ -1,7 +1,6 @@
 import 'server-only'
 
 import { requireRoomOwnerById } from '@/features/rooms/services/requireRoom'
-import { getDefaultRoom } from '@/features/rooms/repositories/roomRepository'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export type AdminTeamStats = {
@@ -12,17 +11,16 @@ export type AdminTeamStats = {
   score: number
 }
 
-export async function listTeamsWithStats(): Promise<AdminTeamStats[]> {
-  const room = await getDefaultRoom()
-  await requireRoomOwnerById(room.id)
+export async function listTeamsWithStats(roomId: string): Promise<AdminTeamStats[]> {
+  await requireRoomOwnerById(roomId)
   const supabase = createAdminClient()
 
   const [{ data: teams, error: teamsError }, { data: memberships, error: membershipsError }] =
     await Promise.all([
-      supabase.from('teams').select('id,name,slug').eq('room_id', room.id).order('name'),
+      supabase.from('teams').select('id,name,slug').eq('room_id', roomId).order('name'),
       // role is selected so member counts explicitly cover PARTICIPANT
       // accounts; teamless OWNERs are never members of any team.
-      supabase.from('room_memberships').select('player_id,team_id,role').eq('room_id', room.id),
+      supabase.from('room_memberships').select('player_id,team_id,role').eq('room_id', roomId),
     ])
 
   if (teamsError || membershipsError) throw new Error('Unable to load teams.')
@@ -39,7 +37,7 @@ export async function listTeamsWithStats(): Promise<AdminTeamStats[]> {
   const { data: solves, error: solvesError } = await supabase
     .from('solves')
     .select('player_id,points_awarded')
-    .eq('room_id', room.id)
+    .eq('room_id', roomId)
   if (solvesError) throw new Error('Unable to load team scores.')
 
   const scoreByTeam = new Map<string, number>()

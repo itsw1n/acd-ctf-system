@@ -51,7 +51,7 @@ describe('team member counts exclude teamless owners', () => {
       }) as never,
     } as never)
 
-    const teams = await listTeamsWithStats()
+    const teams = await listTeamsWithStats('22222222-2222-4222-8222-222222222222')
 
     expect(teams).toHaveLength(1)
     expect(teams[0]).toMatchObject({ memberCount: 1, score: 50 })
