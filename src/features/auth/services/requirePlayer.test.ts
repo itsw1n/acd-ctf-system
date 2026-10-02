@@ -14,7 +14,7 @@ vi.mock('next/navigation', () => ({
 }))
 
 import { getCurrentPlayer } from '@/features/sessions/services/sessionService'
-import { requirePlayer } from '@/features/admin/services/requirePlayer'
+import { requirePlayer } from '@/features/auth/services/requirePlayer'
 import type { Player } from '@/features/players/types'
 
 function playerWith(role: 'PLAYER' | 'ADMIN'): Player {
