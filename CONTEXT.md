@@ -129,6 +129,14 @@ from README direction (user-approved onboarding).
   `supabase/migrations/006_encrypted_challenge_flags.sql` +
   `src/lib/security/flagCrypto.ts` (AES-256-GCM at rest, server-side decrypt
   for the admin edit form only).
+- 2026-10-02 (approver: user): multi-room redesign replaces the single global
+  competition and global ADMIN role with per-room ownership and membership.
+  Rationale: any user can host a room and join others. Authority becomes
+  `room_memberships.role` (OWNER/PARTICIPANT) instead of `players.role`;
+  teams, challenges, solves, locks, and bans are scoped per room. Files:
+  `supabase/migrations/011_rooms.sql`, `src/features/rooms/**`,
+  `src/app/rooms/**`. Rollback: restore pre-011 database backup. Spec:
+  `docs/superpowers/specs/2026-10-02-rooms-design.md`.
 
 ## Notes
 
