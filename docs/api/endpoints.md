@@ -6,23 +6,34 @@ result. Protected actions re-resolve the current player server-side.
 
 ## Auth — `src/features/auth/actions/authActions.ts`
 
-| Action                 | Input                                           | Success                                                        | Failure                                                                      |
-| ---------------------- | ----------------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| `signUpAction`         | teamId, fullName, alias, password == confirm    | `{ recoveryCode, alias, playerId }` (no session yet)           | Field error, `That alias is already taken.`, `Selected team does not exist.` |
-| `continueSignupAction` | playerId + recoveryCode (proves code knowledge) | Issues first session, redirect `/challenges`                   | `Verification failed. Please sign in.`                                       |
-| `signInAction`         | alias, password                                 | Session issued, redirect `/challenges` (admins → `/admin`)     | Generic invalid credentials, competition lock, or account lock message       |
-| `resetPasswordAction`  | alias, recoveryCode, newPassword == confirm     | Hash updated, all sessions revoked, redirect `/signin?reset=1` | `Alias or recovery code is incorrect.` or field error                        |
-| `logoutAction`         | — (current cookie)                              | Session deleted, redirect `/signin`                            | —                                                                            |
+| Action                 | Input                                           | Success                                                        | Failure                                               |
+| ---------------------- | ----------------------------------------------- | -------------------------------------------------------------- | ----------------------------------------------------- |
+| `signUpAction`         | fullName, alias, password == confirm            | `{ recoveryCode, alias, playerId }` (no session yet)           | Field error, `That alias is already taken.`           |
+| `continueSignupAction` | playerId + recoveryCode (proves code knowledge) | Issues first session, redirect `/rooms`                        | `Verification failed. Please sign in.`                |
+| `signInAction`         | alias, password                                 | Session issued, redirect `/rooms`                              | Generic invalid credentials                           |
+| `resetPasswordAction`  | alias, recoveryCode, newPassword == confirm     | Hash updated, all sessions revoked, redirect `/signin?reset=1` | `Alias or recovery code is incorrect.` or field error |
+| `logoutAction`         | — (current cookie)                              | Session deleted, redirect `/signin`                            | —                                                     |
+
+Signup creates a bare account: no team, no role. Teams are picked per room
+at join time; roles live on the membership row.
 
 ## Flags — `src/features/flags/actions/flagActions.ts`
 
-| Action             | Input       | Success                                            | Failure                                                                                                                 |
-| ------------------ | ----------- | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `submitFlagAction` | flag string | `{ status: 'correct', message }` + points recorded | `incorrect` / `duplicate` / `error` messages; unauthenticated callers are redirected to `/signin` before any logic runs |
+| Action             | Input                        | Success                                                        | Failure                                                                                                     |
+| ------------------ | ---------------------------- | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `submitFlagAction` | roomId (bound) + flag string | `{ status: 'correct', message }` + room-scoped points recorded | `incorrect` / `duplicate` / `error` messages; non-members are bounced to the join page, owners get an error |
 
-## Access control actions
+## Rooms — `src/features/rooms/actions/roomActions.ts`
 
-| Action                  | Input                       | Behavior                                                    |
-| ----------------------- | --------------------------- | ----------------------------------------------------------- |
-| `setSignupLockAction`   | locked boolean              | Admin-only competition-wide player signup/signin lock       |
-| `setPlayerAccessAction` | player UUID, locked boolean | Admin-only player lock/unlock; locking revokes all sessions |
+| Action                     | Input                             | Behavior                                                         |
+| -------------------------- | --------------------------------- | ---------------------------------------------------------------- |
+| `createRoomAction`         | name, visibility                  | Any signed-in user; creator becomes OWNER; redirects to the room |
+| `joinRoomByCodeAction`     | code (+ teamId)                   | Checks code, lock, ban, team-in-room; redirects to the room      |
+| `joinRoomAction`           | roomId (bound) + teamId           | Public rooms only; otherwise use a code                          |
+| `leaveRoomAction`          | roomId (bound)                    | Members only; owners cannot leave (would orphan the room)        |
+| `setJoinLockedAction`      | roomId (bound) + locked           | Owner only                                                       |
+| `regenerateJoinCodeAction` | roomId (bound)                    | Owner only; returns the new code                                 |
+| `banMemberAction`          | roomId (bound) + playerId         | Owner only; removes membership, records ban (never the owner)    |
+| `unbanMemberAction`        | roomId (bound) + playerId         | Owner only                                                       |
+| `setMemberLockedAction`    | roomId (bound) + playerId, locked | Owner only                                                       |
+| `updateRoomAction`         | roomId (bound) + name, visibility | Owner only                                                       |
