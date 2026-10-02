@@ -66,13 +66,13 @@ describe('getPlayerById with nullable teams', () => {
     })
   })
 
-  it('rejects PLAYER with null team_id as corrupt', async () => {
+  it('resolves teamless PLAYER accounts with team: null', async () => {
     mockTables({
       players: {
         data: {
           id: 'player-2',
-          full_name: 'Orphan',
-          alias: 'orphan',
+          full_name: 'Newcomer',
+          alias: 'newcomer',
           team_id: null,
           role: 'PLAYER',
         },
@@ -81,6 +81,27 @@ describe('getPlayerById with nullable teams', () => {
       teams: { data: null, error: null },
     })
 
-    await expect(getPlayerById('player-2')).rejects.toThrow()
+    await expect(getPlayerById('player-2')).resolves.toMatchObject({
+      role: 'PLAYER',
+      team: null,
+    })
+  })
+
+  it('rejects dangling team references as corrupt', async () => {
+    mockTables({
+      players: {
+        data: {
+          id: 'player-3',
+          full_name: 'Orphan',
+          alias: 'orphan',
+          team_id: 'missing-team',
+          role: 'PLAYER',
+        },
+        error: null,
+      },
+      teams: { data: null, error: null },
+    })
+
+    await expect(getPlayerById('player-3')).rejects.toThrow('dangling team reference')
   })
 })

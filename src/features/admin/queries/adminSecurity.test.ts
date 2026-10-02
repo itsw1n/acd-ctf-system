@@ -51,14 +51,18 @@ describe('public signup cannot self-assign ADMIN', () => {
     }
   })
 
-  it('still requires a team for public signup', () => {
-    const withoutTeam = {
+  it('ignores a smuggled teamId on public signup', () => {
+    const parsed = signUpSchema.safeParse({
       fullName: 'Test Player',
       alias: 'testplayer',
       password: '0123456789',
       confirmPassword: '0123456789',
+      teamId: '4b2873c8-01b9-4c22-9482-858276b94c43',
+    })
+    expect(parsed.success).toBe(true)
+    if (parsed.success) {
+      expect(parsed.data).not.toHaveProperty('teamId')
     }
-    expect(signUpSchema.safeParse(withoutTeam).success).toBe(false)
   })
 })
 

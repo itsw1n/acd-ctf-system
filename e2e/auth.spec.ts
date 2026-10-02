@@ -6,16 +6,8 @@ function uniqueAlias(prefix: string) {
   return `${prefix}${Date.now().toString(36)}`.slice(0, 24)
 }
 
-async function selectFirstTeam(page: Page) {
-  // Team picker is the shared RAC Select (button trigger + listbox popover),
-  // so drive it the way a user does instead of using a native select driver.
-  await page.getByRole('button', { name: /select a team/i }).click()
-  await page.getByRole('listbox').getByRole('option').first().click()
-}
-
 async function signUp(page: Page, alias: string, password: string = PASSWORD) {
   await page.goto('/signup')
-  await selectFirstTeam(page)
   await page.getByPlaceholder('Enter your full name').fill('E2E Player')
   await page.getByPlaceholder('Choose your hacker tag').fill(alias)
   await page.getByPlaceholder('Minimum 10 characters').fill(password)
@@ -55,7 +47,6 @@ test('duplicate alias is rejected', async ({ page }) => {
   await expect(page.getByText(/ACD-[A-Z2-9]{4}/)).toBeVisible()
 
   await page.goto('/signup')
-  await selectFirstTeam(page)
   await page.getByPlaceholder('Enter your full name').fill('E2E Clone')
   await page.getByPlaceholder('Choose your hacker tag').fill(alias)
   await page.getByPlaceholder('Minimum 10 characters').fill(PASSWORD)
@@ -135,7 +126,7 @@ test('forgot-password resets the password and revokes old sessions', async ({ pa
   await expect(page.getByText(/password reset/i)).toBeVisible()
 
   // Old session cookie must no longer grant access.
-  const fresh = await context.browser()?.newContext({ baseURL: 'http://localhost:3000' })
+  const fresh = await context.browser()?.newContext({ baseURL: 'http://localhost:3200' })
   await fresh?.addCookies([
     {
       name: 'acd_ctf_session',
@@ -146,7 +137,7 @@ test('forgot-password resets the password and revokes old sessions', async ({ pa
   ])
   const stranger = await fresh?.newPage()
   await stranger?.goto('/dashboard')
-  await expect(stranger?.url()).toBe('http://localhost:3000/signin')
+  await expect(stranger?.url()).toBe('http://localhost:3200/signin')
   await fresh?.close()
 
   // New password works.

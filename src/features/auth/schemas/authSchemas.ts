@@ -16,7 +16,6 @@ const aliasSchema = z
 
 export const signUpSchema = z
   .object({
-    teamId: z.string().uuid(),
     fullName: z.string().trim().min(2).max(80),
     alias: aliasSchema,
     password: passwordSchema,

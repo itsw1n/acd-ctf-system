@@ -34,7 +34,6 @@ export async function signUpAction(
   if (await getSignupLock()) return { error: 'Competition is ongoing.' }
 
   const parsed = signUpSchema.safeParse({
-    teamId: formData.get('teamId'),
     fullName: formData.get('fullName'),
     alias: formData.get('alias'),
     password: formData.get('password'),
@@ -57,9 +56,6 @@ export async function signUpAction(
   } catch (error) {
     if (error instanceof Error && error.message === 'ALIAS_TAKEN') {
       return { error: 'That alias is already taken. Choose another hacker tag.' }
-    }
-    if (error instanceof Error && error.message === 'TEAM_NOT_FOUND') {
-      return { error: 'Selected team does not exist.' }
     }
     return { error: 'Registration failed. Please try again.' }
   }

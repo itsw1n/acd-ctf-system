@@ -3,13 +3,11 @@ import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
 import { PublicHeader } from '@/components/layout/PublicHeader'
 import { SignUpForm } from '@/features/auth/components/SignUpForm'
-import { listTeams } from '@/features/players/repositories/playerRepository'
 import { getCurrentPlayer } from '@/features/sessions/services/sessionService'
 
 export default async function SignUpPage() {
   const currentPlayer = await getCurrentPlayer()
-  if (currentPlayer) redirect(currentPlayer.role === 'ADMIN' ? '/admin' : '/challenges')
-  const teams = await listTeams()
+  if (currentPlayer) redirect(currentPlayer.role === 'ADMIN' ? '/admin' : '/dashboard')
 
   return (
     <main className="min-h-screen bg-background px-4 py-6 text-foreground tactical-grid scanlines sm:px-6 lg:px-10">
@@ -29,7 +27,7 @@ export default async function SignUpPage() {
             </p>
           </div>
 
-          <SignUpForm teams={teams} />
+          <SignUpForm />
         </Container>
       </Section>
 

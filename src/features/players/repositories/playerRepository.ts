@@ -1,7 +1,12 @@
 import 'server-only'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { Player, PlayerRole } from '@/features/players/types'
-import type { Team } from '@/features/teams/types'
+
+type TeamRow = {
+  id: string
+  name: string
+  slug: string
+}
 
 type PlayerRow = {
   id: string
@@ -18,32 +23,6 @@ type PlayerCredentialsRow = {
   password_hash: string | null
   role: PlayerRole
   access_locked: boolean
-}
-
-type TeamRow = {
-  id: string
-  name: string
-  slug: string
-}
-
-export async function listTeams(): Promise<Team[]> {
-  const supabase = createAdminClient()
-  const { data, error } = await supabase.from('teams').select('id,name,slug').order('name')
-
-  if (error) throw new Error(`Unable to load teams: ${error.message}`)
-  return (data ?? []) as Team[]
-}
-
-export async function getTeamById(teamId: string): Promise<Team | null> {
-  const supabase = createAdminClient()
-  const { data, error } = await supabase
-    .from('teams')
-    .select('id,name,slug')
-    .eq('id', teamId)
-    .maybeSingle()
-
-  if (error) throw new Error(`Unable to load team: ${error.message}`)
-  return (data as TeamRow | null) ?? null
 }
 
 export async function getPlayerByAlias(alias: string): Promise<PlayerRow | null> {
@@ -72,10 +51,10 @@ export async function getPlayerById(playerId: string): Promise<Player | null> {
 
   const role = (player as PlayerRow).role
 
-  // A null team_id never implies ADMIN on its own: PLAYER rows without a
-  // team are corrupt and must not resolve, even if DB integrity were bypassed.
+  // Teamless accounts are legitimate: signup creates bare accounts and
+  // teams are chosen per room at join time, so a null team_id resolves with
+  // team: null for any role. Only a dangling FK below is corrupt.
   if (player.team_id === null) {
-    if (role !== 'ADMIN') throw new Error('Unable to load player team: missing team for PLAYER.')
     return {
       id: player.id,
       fullName: player.full_name,
@@ -94,16 +73,8 @@ export async function getPlayerById(playerId: string): Promise<Player | null> {
 
   if (teamError) throw new Error(`Unable to load player team: ${teamError.message}`)
   if (!team) {
-    // Dangling FK: corrupt for PLAYER, tolerable for ADMIN (no team anyway).
-    if (role !== 'ADMIN') throw new Error('Unable to load player team: missing team for PLAYER.')
-    return {
-      id: player.id,
-      fullName: player.full_name,
-      alias: player.alias,
-      role,
-      accessLocked: player.access_locked,
-      team: null,
-    }
+    // Dangling FK: the team row is gone but the reference remains.
+    throw new Error('Unable to load player team: dangling team reference.')
   }
 
   return {
@@ -119,7 +90,7 @@ export async function getPlayerById(playerId: string): Promise<Player | null> {
 export async function createPlayer(input: {
   fullName: string
   alias: string
-  teamId: string
+  teamId: string | null
   passwordHash: string
   recoveryCodeHash: string
 }) {
