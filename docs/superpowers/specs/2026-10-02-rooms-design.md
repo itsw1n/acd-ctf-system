@@ -92,7 +92,10 @@ No JWT, no refresh tokens, no Supabase Auth.
 
 ## Phases
 
-1. Schema + migration (new tables, scoping columns, backfill, drop globals).
+1. Schema + migration (new tables, scoping columns, backfill). Implemented as
+   additive migration `011_rooms.sql` (old columns stay so the tree stays
+   green); the drops move to a later `012_rooms_cleanup.sql` once the code is
+   re-scoped. Verified with local `db reset` + row-count and constraint checks.
 2. Guards + room CRUD (requireAccount/Member/Owner, create/browse/join/leave,
    visibility + codes + locks, unit tests).
 3. Scope existing features (challenges, teams, solves, leaderboard, activity,
