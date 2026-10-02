@@ -43,14 +43,20 @@ describe('admin team actions authorization', () => {
 
   it('denies PLAYER create without touching the mutation', async () => {
     vi.mocked(requireRoomOwnerById).mockRejectedValueOnce(new Error('FORBIDDEN'))
-    await expect(createTeamAction(ROOM_ID, {}, formData({ name: 'Sneaky' }))).rejects.toThrow('FORBIDDEN')
+    await expect(createTeamAction(ROOM_ID, {}, formData({ name: 'Sneaky' }))).rejects.toThrow(
+      'FORBIDDEN'
+    )
     expect(vi.mocked(createTeam)).not.toHaveBeenCalled()
   })
 
   it('denies PLAYER rename without touching the mutation', async () => {
     vi.mocked(requireRoomOwnerById).mockRejectedValueOnce(new Error('FORBIDDEN'))
     await expect(
-      renameTeamAction(ROOM_ID, {}, formData({ id: '4b2873c8-01b9-4c22-9482-858276b94c43', name: 'Sneaky' }))
+      renameTeamAction(
+        ROOM_ID,
+        {},
+        formData({ id: '4b2873c8-01b9-4c22-9482-858276b94c43', name: 'Sneaky' })
+      )
     ).rejects.toThrow('FORBIDDEN')
     expect(vi.mocked(renameTeam)).not.toHaveBeenCalled()
   })

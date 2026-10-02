@@ -58,7 +58,9 @@ describe('admin challenge actions authorization', () => {
 
   it('denies unauthenticated callers', async () => {
     vi.mocked(requireRoomOwnerById).mockRejectedValueOnce(new Error('REDIRECT:/signin'))
-    await expect(createChallengeAction(ROOM_ID, {}, validForm())).rejects.toThrow('REDIRECT:/signin')
+    await expect(createChallengeAction(ROOM_ID, {}, validForm())).rejects.toThrow(
+      'REDIRECT:/signin'
+    )
     expect(vi.mocked(createChallenge)).not.toHaveBeenCalled()
   })
 

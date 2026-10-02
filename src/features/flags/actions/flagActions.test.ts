@@ -44,7 +44,9 @@ describe('flag submission role lockout', () => {
 
   it('lets PARTICIPANT submit a valid flag in their room', async () => {
     vi.mocked(requireCurrentPlayer).mockResolvedValueOnce(playerWith('PLAYER'))
-    vi.mocked(requireRoomMemberById).mockResolvedValueOnce({ membership: { role: 'PARTICIPANT' } } as never)
+    vi.mocked(requireRoomMemberById).mockResolvedValueOnce({
+      membership: { role: 'PARTICIPANT' },
+    } as never)
     vi.mocked(submitFlagForPlayer).mockResolvedValueOnce({
       status: 'correct',
       challenge: 'Welcome Flag',
@@ -63,7 +65,9 @@ describe('flag submission role lockout', () => {
 
   it('blocks room owners without creating a solve', async () => {
     vi.mocked(requireCurrentPlayer).mockResolvedValueOnce(playerWith('PLAYER'))
-    vi.mocked(requireRoomMemberById).mockResolvedValueOnce({ membership: { role: 'OWNER' } } as never)
+    vi.mocked(requireRoomMemberById).mockResolvedValueOnce({
+      membership: { role: 'OWNER' },
+    } as never)
 
     const state = await submitFlagAction(ROOM_ID, {}, playerForm())
 
