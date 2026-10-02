@@ -4,10 +4,12 @@ import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
 import { getPlayerActivity } from '@/features/activity/queries/activityQueries'
 import { requirePlayer } from '@/features/auth/services/requirePlayer'
+import { getDefaultRoom } from '@/features/rooms/repositories/roomRepository'
 
 export default async function ActivityPage() {
   const player = await requirePlayer()
-  const activity = await getPlayerActivity(player.id)
+  const room = await getDefaultRoom()
+  const activity = await getPlayerActivity(player.id, room.id)
   const totalPoints = activity.reduce((sum, row) => sum + row.points, 0)
 
   return (

@@ -17,7 +17,7 @@ export default async function AdminPlayersPage({
   const teamId = params.teamId ?? ''
   const room = await getDefaultRoom()
   const [players, teams] = await Promise.all([
-    listPlayersForAdmin({ search, teamId }),
+    listPlayersForAdmin(room.id, { search, teamId }),
     listTeamsAdmin(room.id),
   ])
 
@@ -60,14 +60,14 @@ export default async function AdminPlayersPage({
                       {new Date(player.createdAt).toLocaleString()}
                     </td>
                     <td className="px-4 py-4">
-                      {player.role === 'PLAYER' ? (
+                      {player.role === 'PARTICIPANT' ? (
                         <PlayerAccessAction
                           playerId={player.id}
                           alias={player.alias}
                           locked={player.accessLocked}
                         />
                       ) : (
-                        <span className="text-muted">Admin</span>
+                        <span className="text-muted">Owner</span>
                       )}
                     </td>
                   </tr>

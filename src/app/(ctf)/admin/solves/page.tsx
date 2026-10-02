@@ -20,9 +20,9 @@ export default async function AdminSolvesPage({
   const category = params.category ?? ''
   const room = await getDefaultRoom()
   const [solves, teams, categories] = await Promise.all([
-    listSolvesForAdmin({ search, teamId, category }),
+    listSolvesForAdmin(room.id, { search, teamId, category }),
     listTeamsAdmin(room.id),
-    listSolveCategoriesForAdmin(),
+    listSolveCategoriesForAdmin(room.id),
   ])
 
   return (

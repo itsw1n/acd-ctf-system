@@ -4,10 +4,13 @@ import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
 import { getLeaderboards } from '@/features/leaderboard/queries/leaderboardQueries'
 import { requirePlayer } from '@/features/auth/services/requirePlayer'
+import { getDefaultRoom } from '@/features/rooms/repositories/roomRepository'
 import { cn } from '@/lib/cn'
 
 export default async function LeaderboardPage() {
-  const [player, boards] = await Promise.all([requirePlayer(), getLeaderboards()])
+  const player = await requirePlayer()
+  const room = await getDefaultRoom()
+  const boards = await getLeaderboards(room.id)
 
   return (
     <Section data-ui="leaderboard">

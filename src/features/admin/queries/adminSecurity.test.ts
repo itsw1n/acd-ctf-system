@@ -6,13 +6,15 @@ vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: vi.fn(),
 }))
 
-vi.mock('@/features/auth/services/requireAdmin', () => ({
-  requireAdmin: vi.fn(),
+vi.mock('@/features/rooms/services/requireRoom', () => ({
+  requireRoomOwnerById: vi.fn(),
 }))
 
 import { createAdminClient } from '@/lib/supabase/admin'
-import { requireAdmin } from '@/features/auth/services/requireAdmin'
+import { requireRoomOwnerById } from '@/features/rooms/services/requireRoom'
 import { listPlayersForAdmin } from '@/features/players/queries/playerAdminQueries'
+
+const ROOM_ID = '22222222-2222-4222-8222-222222222222'
 
 function tableChain(result: { data: unknown; error: null }) {
   const chain: Record<string, unknown> = {}
@@ -21,7 +23,15 @@ function tableChain(result: { data: unknown; error: null }) {
   chain.limit = vi.fn(() => Promise.resolve(result))
   chain.eq = vi.fn(() => chain)
   chain.or = vi.fn(() => chain)
+  chain.in = vi.fn(() => chain)
+  chain.then = (resolve: (value: unknown) => unknown) => resolve(result)
   return chain
+}
+
+function mockTables(tables: Record<string, unknown>) {
+  vi.mocked(createAdminClient).mockReturnValue({
+    from: ((table: string) => tables[table]) as never,
+  } as never)
 }
 
 describe('public signup cannot self-assign ADMIN', () => {
@@ -54,59 +64,68 @@ describe('public signup cannot self-assign ADMIN', () => {
 
 describe('admin reads do not expose authentication secrets', () => {
   beforeEach(() => {
-    vi.mocked(requireAdmin).mockResolvedValue({ role: 'ADMIN' } as never)
+    vi.mocked(requireRoomOwnerById).mockResolvedValue({ membership: { role: 'OWNER' } } as never)
   })
 
-  it('player admin query enforces the admin guard before reading', async () => {
-    const playersChain = tableChain({ data: [], error: null })
-    const teamsChain = tableChain({ data: [], error: null })
-    vi.mocked(createAdminClient).mockReturnValue({
-      from: ((table: string) => (table === 'players' ? playersChain : teamsChain)) as never,
-    } as never)
+  it('player admin query enforces the owner guard before reading', async () => {
+    mockTables({
+      room_memberships: tableChain({ data: [], error: null }),
+      players: tableChain({ data: [], error: null }),
+      teams: tableChain({ data: [], error: null }),
+    })
 
-    await listPlayersForAdmin({})
+    await listPlayersForAdmin(ROOM_ID, {})
 
-    expect(vi.mocked(requireAdmin)).toHaveBeenCalledTimes(1)
+    expect(vi.mocked(requireRoomOwnerById)).toHaveBeenCalledWith(ROOM_ID)
   })
 
   it('player admin query fails closed when the guard denies', async () => {
-    vi.mocked(requireAdmin).mockRejectedValueOnce(new Error('FORBIDDEN'))
+    vi.mocked(requireRoomOwnerById).mockRejectedValueOnce(new Error('FORBIDDEN'))
 
-    await expect(listPlayersForAdmin({})).rejects.toThrow('FORBIDDEN')
+    await expect(listPlayersForAdmin(ROOM_ID, {})).rejects.toThrow('FORBIDDEN')
   })
 
   it('player admin query selects display fields only', async () => {
     const selects: string[] = []
-    const playersResult = {
+    const membershipsChain = tableChain({
+      data: [
+        {
+          player_id: 'p1',
+          team_id: 't1',
+          role: 'PARTICIPANT',
+          access_locked: false,
+        },
+      ],
+      error: null,
+    })
+
+    const playersChain = tableChain({
       data: [
         {
           id: 'p1',
           full_name: 'Test Player',
           alias: 'tester',
-          team_id: 't1',
-          role: 'PLAYER',
           created_at: new Date().toISOString(),
         },
       ],
       error: null,
-    }
-
-    const playersChain = tableChain(playersResult)
+    })
     const playersSelect = playersChain.select as ReturnType<typeof vi.fn>
     playersSelect.mockImplementation((arg: string) => {
       selects.push(arg)
       return playersChain
     })
 
-    const teamsChain = tableChain({ data: [{ id: 't1', name: 'Ops' }], error: null })
+    mockTables({
+      room_memberships: membershipsChain,
+      players: playersChain,
+      teams: tableChain({ data: [{ id: 't1', name: 'Ops' }], error: null }),
+    })
 
-    vi.mocked(createAdminClient).mockReturnValue({
-      from: ((table: string) => (table === 'players' ? playersChain : teamsChain)) as never,
-    } as never)
-
-    const rows = await listPlayersForAdmin({})
+    const rows = await listPlayersForAdmin(ROOM_ID, {})
 
     expect(rows).toHaveLength(1)
+    expect(rows[0]).toMatchObject({ alias: 'tester', team: 'Ops', role: 'PARTICIPANT' })
     expect(rows[0]).not.toHaveProperty('password_hash')
     expect(rows[0]).not.toHaveProperty('recovery_code_hash')
     expect(rows[0]).not.toHaveProperty('token_hash')
