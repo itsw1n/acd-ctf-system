@@ -1,6 +1,7 @@
 import 'server-only'
 import { createAdminClient } from '@/lib/supabase/admin'
-import type { Player, PlayerRole, Team } from '@/features/players/types'
+import type { Player, PlayerRole } from '@/features/players/types'
+import type { Team } from '@/features/teams/types'
 
 type PlayerRow = {
   id: string

@@ -1,8 +1,4 @@
-export type Team = {
-  id: string
-  name: string
-  slug: string
-}
+import type { Team } from '@/features/teams/types'
 
 export type PlayerRole = 'PLAYER' | 'ADMIN'
 
