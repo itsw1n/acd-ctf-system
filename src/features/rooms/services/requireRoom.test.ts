@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('@/features/sessions/services/sessionService', () => ({
   getCurrentPlayer: vi.fn(),
@@ -6,6 +6,7 @@ vi.mock('@/features/sessions/services/sessionService', () => ({
 
 vi.mock('@/features/rooms/repositories/roomRepository', () => ({
   getRoomBySlug: vi.fn(),
+  getRoomById: vi.fn(),
   getMembership: vi.fn(),
 }))
 
@@ -22,8 +23,14 @@ vi.mock('next/navigation', () => ({
 }))
 
 import { getCurrentPlayer } from '@/features/sessions/services/sessionService'
-import { getMembership, getRoomBySlug } from '@/features/rooms/repositories/roomRepository'
-import { requireAccount, requireRoomMember, requireRoomOwner } from '@/features/rooms/services/requireRoom'
+import { getMembership, getRoomById, getRoomBySlug } from '@/features/rooms/repositories/roomRepository'
+import {
+  requireAccount,
+  requireRoomMember,
+  requireRoomMemberById,
+  requireRoomOwner,
+  requireRoomOwnerById,
+} from '@/features/rooms/services/requireRoom'
 import type { Player } from '@/features/players/types'
 
 function player(): Player {
@@ -92,6 +99,37 @@ describe('requireRoomMember', () => {
       room: { slug: 'test-room' },
       membership: { role: 'PARTICIPANT' },
     })
+  })
+})
+
+describe('requireRoomMemberById / requireRoomOwnerById', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('resolves members without a slug lookup', async () => {
+    vi.mocked(getCurrentPlayer).mockResolvedValueOnce(player())
+    vi.mocked(getRoomById).mockResolvedValueOnce(room())
+    vi.mocked(getMembership).mockResolvedValueOnce(membership('PARTICIPANT'))
+    await expect(
+      requireRoomMemberById('22222222-2222-4222-8222-222222222222')
+    ).resolves.toMatchObject({ membership: { role: 'PARTICIPANT' } })
+    expect(vi.mocked(getRoomBySlug)).not.toHaveBeenCalled()
+  })
+
+  it('returns 404 for an unknown room id', async () => {
+    vi.mocked(getCurrentPlayer).mockResolvedValueOnce(player())
+    vi.mocked(getRoomById).mockResolvedValueOnce(null)
+    await expect(
+      requireRoomOwnerById('22222222-2222-4222-8222-222222222222')
+    ).rejects.toThrow('NOTFOUND')
+  })
+
+  it('denies participating non-owners by id', async () => {
+    vi.mocked(getCurrentPlayer).mockResolvedValueOnce(player())
+    vi.mocked(getRoomById).mockResolvedValueOnce(room())
+    vi.mocked(getMembership).mockResolvedValueOnce(membership('PARTICIPANT'))
+    await expect(
+      requireRoomOwnerById('22222222-2222-4222-8222-222222222222')
+    ).rejects.toThrow('FORBIDDEN')
   })
 })
 

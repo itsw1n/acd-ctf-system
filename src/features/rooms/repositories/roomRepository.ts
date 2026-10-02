@@ -3,6 +3,14 @@ import 'server-only'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { Room, RoomMembership } from '@/features/rooms/types'
 
+export const DEFAULT_ROOM_SLUG = 'acd-ctf'
+
+export async function getDefaultRoom(): Promise<Room> {
+  const room = await getRoomBySlug(DEFAULT_ROOM_SLUG)
+  if (!room) throw new Error('DEFAULT_ROOM_MISSING')
+  return room
+}
+
 export async function getRoomBySlug(slug: string): Promise<Room | null> {
   const supabase = createAdminClient()
   const { data, error } = await supabase
