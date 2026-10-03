@@ -28,6 +28,9 @@ describe('RoomTabs', () => {
     render(<RoomTabs slug="demo" isOwner={false} />)
     expect(screen.getByRole('link', { name: 'Leaderboard' })).toHaveAttribute('href', '/rooms/demo')
     expect(screen.getByRole('link', { name: 'Play' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Activity' })).toHaveAttribute('href', '/rooms/demo/activity')
+    expect(screen.getByRole('link', { name: 'Activity' })).toHaveAttribute(
+      'href',
+      '/rooms/demo/activity'
+    )
   })
 })
