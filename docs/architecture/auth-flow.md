@@ -56,8 +56,9 @@ Validation on every protected route and action (`requireCurrentPlayer`):
 cookie → hash → row lookup → expiry check → player load, else redirect
 `/signin`. Client state is never trusted for authorization.
 
-Per-room locks live on `room_memberships.access_locked` (a locked member is
-bounced to `/signin`) and bans on `room_bans`. There is no global lock.
+Per-room locks live on `room_memberships.access_locked` — the only
+per-member control. A locked member is bounced to `/signin` and cannot
+rejoin until unlocked. There is no global lock.
 
 ## Room authorization
 
