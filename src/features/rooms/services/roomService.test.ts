@@ -17,6 +17,7 @@ vi.mock('@/features/rooms/repositories/roomRepository', async (importOriginal) =
     createRoomRow: vi.fn(),
     createMembership: vi.fn(),
     deleteMembership: vi.fn(),
+    deleteRoomRow: vi.fn(),
     getMembership: vi.fn(),
     getRoomById: vi.fn(),
     getRoomByJoinCode: vi.fn(),
@@ -41,6 +42,7 @@ import {
   createMembership,
   createRoomRow,
   deleteMembership,
+  deleteRoomRow,
   getMembership,
   getRoomById,
   getRoomByJoinCode,
@@ -60,6 +62,7 @@ import {
 import {
   banMember,
   createRoom,
+  deleteRoom,
   generateJoinCode,
   getJoinPreview,
   getRoomJoinCode,
@@ -464,5 +467,58 @@ describe('setMemberLocked', () => {
       '11111111-1111-4111-8111-111111111111',
       true
     )
+  })
+})
+
+describe('deleteRoom', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('rejects when the typed name does not match', async () => {
+    vi.mocked(getRoomById).mockResolvedValue({
+      id: '11111111-1111-4111-8111-111111111111',
+      slug: 'alpha',
+      name: 'Alpha',
+      visibility: 'PUBLIC',
+      joinLocked: false,
+    })
+    await expect(
+      deleteRoom({ roomId: '11111111-1111-4111-8111-111111111111', expectedName: 'Beta' })
+    ).rejects.toThrow('NAME_MISMATCH')
+    expect(deleteRoomRow).not.toHaveBeenCalled()
+  })
+
+  it('rejects the default room', async () => {
+    vi.mocked(getRoomById).mockResolvedValue({
+      id: '22222222-2222-4222-8222-222222222222',
+      slug: 'acd-ctf',
+      name: 'ACD CTF',
+      visibility: 'PUBLIC',
+      joinLocked: false,
+    })
+    await expect(
+      deleteRoom({ roomId: '22222222-2222-4222-8222-222222222222', expectedName: 'ACD CTF' })
+    ).rejects.toThrow('DEFAULT_ROOM_PROTECTED')
+    expect(deleteRoomRow).not.toHaveBeenCalled()
+  })
+
+  it('rejects when the room is missing', async () => {
+    vi.mocked(getRoomById).mockResolvedValue(null)
+    await expect(
+      deleteRoom({ roomId: '33333333-3333-4333-8333-333333333333', expectedName: 'Alpha' })
+    ).rejects.toThrow('ROOM_NOT_FOUND')
+  })
+
+  it('deletes on exact match', async () => {
+    vi.mocked(getRoomById).mockResolvedValue({
+      id: '11111111-1111-4111-8111-111111111111',
+      slug: 'alpha',
+      name: 'Alpha',
+      visibility: 'PUBLIC',
+      joinLocked: false,
+    })
+    await deleteRoom({ roomId: '11111111-1111-4111-8111-111111111111', expectedName: 'Alpha' })
+    expect(deleteRoomRow).toHaveBeenCalledWith('11111111-1111-4111-8111-111111111111')
   })
 })

@@ -152,6 +152,12 @@ export async function deleteMembership(roomId: string, playerId: string) {
   if (error) throw error
 }
 
+export async function deleteRoomRow(roomId: string) {
+  const supabase = createAdminClient()
+  const { error } = await supabase.from('rooms').delete().eq('id', roomId)
+  if (error) throw error
+}
+
 export async function banMembership(roomId: string, playerId: string) {
   const supabase = createAdminClient()
   const { error: deleteError } = await supabase

@@ -9,7 +9,9 @@ import {
   banMembership,
   createMembership,
   createRoomRow,
+  DEFAULT_ROOM_SLUG,
   deleteMembership,
+  deleteRoomRow,
   getMembership,
   getRoomById,
   getRoomByJoinCode,
@@ -189,6 +191,20 @@ const updateRoomSchema = z.object({
 export async function updateRoom(input: z.input<typeof updateRoomSchema>) {
   const parsed = updateRoomSchema.parse(input)
   await updateRoomRow(parsed.roomId, { name: parsed.name, visibility: parsed.visibility })
+}
+
+const deleteRoomSchema = z.object({
+  roomId: z.string().uuid(),
+  expectedName: z.string(),
+})
+
+export async function deleteRoom(input: z.input<typeof deleteRoomSchema>) {
+  const parsed = deleteRoomSchema.parse(input)
+  const room = await getRoomById(parsed.roomId)
+  if (!room) throw new Error('ROOM_NOT_FOUND')
+  if (room.slug === DEFAULT_ROOM_SLUG) throw new Error('DEFAULT_ROOM_PROTECTED')
+  if (parsed.expectedName.trim() !== room.name) throw new Error('NAME_MISMATCH')
+  await deleteRoomRow(parsed.roomId)
 }
 
 export async function listPublicRooms() {
