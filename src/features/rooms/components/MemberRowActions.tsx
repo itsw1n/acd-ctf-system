@@ -1,6 +1,6 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { cloneElement, isValidElement, useTransition, type ReactNode } from 'react'
 import { Ban, Lock, LockOpen, Undo2 } from 'lucide-react'
 
 import { Button } from '@/components/common/Button'
@@ -20,11 +20,14 @@ function ActionForm({
   locked?: boolean
   children: ReactNode
 }) {
+  const [pending, startTransition] = useTransition()
   return (
-    <form action={action.bind(null, roomId)}>
+    <form action={(formData) => startTransition(() => action(roomId, formData))}>
       <input type="hidden" name="playerId" value={playerId} />
       {locked !== undefined && <input type="hidden" name="locked" value={String(!locked)} />}
-      {children}
+      {isValidElement(children)
+        ? cloneElement(children, { isPending: pending } as { isPending: boolean })
+        : children}
     </form>
   )
 }

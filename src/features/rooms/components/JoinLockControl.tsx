@@ -1,7 +1,9 @@
 'use client'
 
+import { useTransition } from 'react'
 import { Lock, LockOpen } from 'lucide-react'
 import { Button } from '@/components/common/Button'
+import { PendingDots } from '@/components/common/PendingDots'
 
 export function JoinLockControl({
   roomId,
@@ -12,6 +14,7 @@ export function JoinLockControl({
   locked: boolean
   action: (roomId: string, formData: FormData) => Promise<void>
 }) {
+  const [pending, startTransition] = useTransition()
   return (
     <div className="flex flex-col gap-4 border border-danger/40 bg-danger/5 p-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
@@ -24,11 +27,24 @@ export function JoinLockControl({
             : 'Anyone with access can join this room.'}
         </p>
       </div>
-      <form action={action.bind(null, roomId)}>
+      <form action={(formData) => startTransition(() => action(roomId, formData))}>
         <input type="hidden" name="locked" value={String(!locked)} />
-        <Button type="submit" variant={locked ? 'secondary' : 'warning'} size="sm">
+        <Button
+          type="submit"
+          variant={locked ? 'secondary' : 'warning'}
+          size="sm"
+          isPending={pending}
+        >
           {locked ? <LockOpen size={16} aria-hidden /> : <Lock size={16} aria-hidden />}
-          {locked ? 'Unlock joining' : 'Lock joining'}
+          {pending ? (
+            <>
+              Working <PendingDots label="Updating join lock" />
+            </>
+          ) : locked ? (
+            'Unlock joining'
+          ) : (
+            'Lock joining'
+          )}
         </Button>
       </form>
     </div>

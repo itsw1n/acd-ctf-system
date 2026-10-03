@@ -1,11 +1,10 @@
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
-import { Input } from '@/components/common/Input'
-import { Button } from '@/components/common/Button'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 import { requireAccount } from '@/features/rooms/services/requireRoom'
 import { joinRoomByCodeAction } from '@/features/rooms/actions/roomActions'
 import { getJoinPreview } from '@/features/rooms/services/roomService'
+import { JoinCodeContinueForm } from '@/features/rooms/components/JoinCodeContinueForm'
 import { JoinRoomForm } from '@/features/rooms/components/JoinRoomForm'
 
 export default async function JoinRoomPage({
@@ -32,12 +31,7 @@ export default async function JoinRoomPage({
           </div>
 
           <TacticalPanel label="Join code" className="mx-auto max-w-2xl p-5 sm:p-7">
-            <form action="/rooms/join" method="get" className="flex flex-col gap-4">
-              <Input name="code" placeholder="RM-XXXXXX" autoComplete="off" spellCheck={false} />
-              <Button type="submit" size="lg" className="w-full sm:w-auto">
-                Continue
-              </Button>
-            </form>
+            <JoinCodeContinueForm />
           </TacticalPanel>
         </Container>
       </Section>
