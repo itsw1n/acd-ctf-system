@@ -7,11 +7,20 @@ import { cn } from '@/lib/cn'
 
 export function RoomTabs({ slug, isOwner }: { slug: string; isOwner: boolean }) {
   const pathname = usePathname()
+  const base = `/rooms/${slug}`
   const links = [
-    { href: `/rooms/${slug}`, label: 'Overview' },
-    { href: `/rooms/${slug}/play`, label: 'Play' },
-    { href: `/rooms/${slug}/activity`, label: 'Activity' },
-    ...(isOwner ? [{ href: `/rooms/${slug}/admin`, label: 'Admin' }] : []),
+    { href: base, label: 'Leaderboard' },
+    // Owners manage instead of playing, so they get the admin sections.
+    ...(isOwner
+      ? [
+          { href: `${base}/admin`, label: 'Admin' },
+          { href: `${base}/admin/challenges`, label: 'Challenges' },
+          { href: `${base}/admin/teams`, label: 'Teams' },
+          { href: `${base}/admin/members`, label: 'Members' },
+          { href: `${base}/admin/solves`, label: 'Solves' },
+        ]
+      : [{ href: `${base}/play`, label: 'Play' }]),
+    { href: `${base}/activity`, label: 'Activity' },
   ]
 
   return (
@@ -22,7 +31,7 @@ export function RoomTabs({ slug, isOwner }: { slug: string; isOwner: boolean }) 
     >
       <div className="flex min-w-max">
         {links.map(({ href, label }) => {
-          const active = pathname === href
+          const active = pathname === href || (href !== base && pathname.startsWith(`${href}/`))
           return (
             <Link
               key={href}
