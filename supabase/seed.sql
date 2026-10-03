@@ -17,7 +17,7 @@
 --     submissions work; flag_encrypted stays NULL until an admin re-saves
 --     the flag via the edit form (display falls back to 'Not available').
 --   011_rooms.sql — rooms(room_id on teams/challenges/solves),
---     room_memberships (OWNER/PARTICIPANT per room), room_bans. Everything
+--     room_memberships (OWNER/PARTICIPANT per room), locks only. Everything
 --     below belongs to the default 'acd-ctf' room.
 --
 -- Scoreboard this seed produces:

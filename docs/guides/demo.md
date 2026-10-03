@@ -47,7 +47,7 @@ re-saved, which stores it encrypted.
 5. Create a room as a fresh alias → you become its owner; join it from a
    second account with the room code.
 6. Forgot-password with a demo recovery code → sessions revoked, fresh login.
-7. Sign in as `root` → room admin shows team/player leaderboards; ban or lock
+7. Sign in as `root` → room admin shows team/player leaderboards; lock
    a member to verify per-room access controls.
 
 ## Before a real event

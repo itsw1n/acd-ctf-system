@@ -115,29 +115,29 @@ test('non-members are bounced to the join page', async ({ page, browser }) => {
   }
 })
 
-test('banned members cannot rejoin', async ({
+test('locked members cannot rejoin', async ({
   page,
   browser,
 }: {
   page: Page
   browser: Browser
 }) => {
-  const hostAlias = uniqueAlias('e2eownb')
+  const hostAlias = uniqueAlias('e2eownl')
   await signUp(page, hostAlias)
-  const slug = await createRoom(page, `Ban Room ${hostAlias}`)
+  const slug = await createRoom(page, `Lock Room ${hostAlias}`)
   const code = await readJoinCode(page, slug)
   await createTeam(page, slug, 'Green Team')
 
   const guest = await browser.newPage()
   try {
-    const guestAlias = uniqueAlias('e2ebanned')
+    const guestAlias = uniqueAlias('e2elocked')
     await signUp(guest, guestAlias)
     await joinRoom(guest, code, 'Green Team')
     await expect(guest).toHaveURL(new RegExp(`/rooms/${slug}$`))
 
     await page.goto(`/rooms/${slug}/admin/members`)
     const row = page.getByRole('row', { name: new RegExp(guestAlias) })
-    await row.getByRole('button', { name: /ban member/i }).click()
+    await row.getByRole('button', { name: /lock member/i }).click()
     await expect(page.getByText(guestAlias).first()).toBeVisible({ timeout: 15000 })
 
     await guest.goto(`/rooms/join?code=${code}`)
@@ -145,7 +145,7 @@ test('banned members cannot rejoin', async ({
     await guest.getByRole('button', { name: /select a team/i }).click()
     await guest.getByRole('listbox').getByRole('option', { name: 'Green Team' }).click()
     await guest.getByRole('button', { name: /^join room/i }).click()
-    await expect(guest.getByText(/cannot join this room/i)).toBeVisible({ timeout: 15000 })
+    await expect(guest.getByText(/Your access is locked. Contact the organizer./)).toBeVisible({ timeout: 15000 })
   } finally {
     await guest.close()
   }
