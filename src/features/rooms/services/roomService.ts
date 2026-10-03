@@ -6,7 +6,6 @@ import { z } from 'zod'
 
 import { listTeamsAdmin } from '@/features/teams/repositories/teamRepository'
 import {
-  banMembership,
   createMembership,
   createRoomRow,
   DEFAULT_ROOM_SLUG,
@@ -17,15 +16,12 @@ import {
   getRoomByJoinCode,
   getRoomJoinCodeRow,
   getRoomTeam,
-  isBanned,
-  listBannedMembers as fetchBannedMembers,
   listMyRooms as fetchMyRooms,
   listPublicRooms as fetchPublicRooms,
   listRoomMembers as fetchRoomMembers,
   setJoinLockedRow,
   setMemberLockedRow,
   slugifyRoomName,
-  unbanMembership,
   updateJoinCodeRow,
   updateRoomRow,
 } from '@/features/rooms/repositories/roomRepository'
@@ -116,10 +112,12 @@ async function joinRoomInner(
   joinLocked: boolean
 ) {
   if (joinLocked) throw new Error('JOIN_LOCKED')
-  if (await isBanned(roomId, playerId)) throw new Error('BANNED')
 
   const existing = await getMembership(roomId, playerId)
-  if (existing) return existing
+  if (existing) {
+    if (existing.accessLocked) throw new Error('LOCKED')
+    return existing
+  }
 
   if (teamId) {
     const team = await getRoomTeam(teamId, roomId)
@@ -165,23 +163,6 @@ export async function regenerateJoinCode(input: { roomId: string }) {
   return code
 }
 
-const memberSchema = z.object({
-  playerId: z.string().uuid(),
-  roomId: z.string().uuid(),
-})
-
-export async function banMember(input: z.input<typeof memberSchema>) {
-  const parsed = memberSchema.parse(input)
-  const membership = await getMembership(parsed.roomId, parsed.playerId)
-  if (membership?.role === 'OWNER') throw new Error('OWNER_CANNOT_BAN')
-  await banMembership(parsed.roomId, parsed.playerId)
-}
-
-export async function unbanMember(input: z.input<typeof memberSchema>) {
-  const parsed = memberSchema.parse(input)
-  await unbanMembership(parsed.roomId, parsed.playerId)
-}
-
 const updateRoomSchema = z.object({
   roomId: z.string().uuid(),
   name: z.string().trim().min(2, 'Room name is required.').max(80).optional(),
@@ -217,10 +198,6 @@ export async function listMyRooms(playerId: string) {
 
 export async function listRoomMembers(roomId: string) {
   return fetchRoomMembers(z.string().uuid().parse(roomId))
-}
-
-export async function listBannedMembers(roomId: string) {
-  return fetchBannedMembers(z.string().uuid().parse(roomId))
 }
 
 export async function getRoomJoinCode(roomId: string): Promise<string | null> {

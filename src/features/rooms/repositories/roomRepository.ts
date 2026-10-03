@@ -158,41 +158,11 @@ export async function deleteRoomRow(roomId: string) {
   if (error) throw error
 }
 
-export async function banMembership(roomId: string, playerId: string) {
-  const supabase = createAdminClient()
-  const { error: deleteError } = await supabase
-    .from('room_memberships')
-    .delete()
-    .eq('room_id', roomId)
-    .eq('player_id', playerId)
-
-  if (deleteError) throw deleteError
-
-  const { error: banError } = await supabase
-    .from('room_bans')
-    .insert({ room_id: roomId, player_id: playerId })
-    .select('id')
-    .single()
-
-  if (banError && banError.code !== '23505') throw banError
-}
-
 export async function setMemberLockedRow(roomId: string, playerId: string, locked: boolean) {
   const supabase = createAdminClient()
   const { error } = await supabase
     .from('room_memberships')
     .update({ access_locked: locked })
-    .eq('room_id', roomId)
-    .eq('player_id', playerId)
-
-  if (error) throw error
-}
-
-export async function unbanMembership(roomId: string, playerId: string) {
-  const supabase = createAdminClient()
-  const { error } = await supabase
-    .from('room_bans')
-    .delete()
     .eq('room_id', roomId)
     .eq('player_id', playerId)
 
@@ -274,35 +244,6 @@ export async function listMyRooms(
   })
 }
 
-export async function listBannedMembers(
-  roomId: string
-): Promise<Array<{ playerId: string; alias: string }>> {
-  const supabase = createAdminClient()
-  const { data: bans, error } = await supabase
-    .from('room_bans')
-    .select('player_id')
-    .eq('room_id', roomId)
-
-  if (error) throw new Error(`Unable to list bans: ${error.message}`)
-  if (!bans?.length) return []
-
-  const { data: players, error: playersError } = await supabase
-    .from('players')
-    .select('id,alias')
-    .in(
-      'id',
-      bans.map((ban) => ban.player_id)
-    )
-
-  if (playersError) throw new Error('Unable to load banned players.')
-
-  const aliasById = new Map((players ?? []).map((player) => [player.id, player.alias]))
-  return (bans ?? []).map((ban) => ({
-    playerId: ban.player_id,
-    alias: aliasById.get(ban.player_id) ?? 'Unknown',
-  }))
-}
-
 export type RoomMemberRow = {
   playerId: string
   alias: string
@@ -354,19 +295,6 @@ export async function listRoomMembers(roomId: string): Promise<RoomMemberRow[]> 
       },
     ]
   })
-}
-
-export async function isBanned(roomId: string, playerId: string): Promise<boolean> {
-  const supabase = createAdminClient()
-  const { data, error } = await supabase
-    .from('room_bans')
-    .select('id')
-    .eq('room_id', roomId)
-    .eq('player_id', playerId)
-    .maybeSingle()
-
-  if (error) throw error
-  return data !== null
 }
 
 export async function getRoomTeam(teamId: string, roomId: string): Promise<{ id: string } | null> {
