@@ -14,7 +14,6 @@ vi.mock('@/features/rooms/repositories/roomRepository', () => ({
 }))
 
 vi.mock('@/features/rooms/services/roomService', () => ({
-  banMember: vi.fn(),
   createRoom: vi.fn(),
   getRoomPath: vi.fn(async () => '/rooms/test-room'),
   joinRoom: vi.fn(),
@@ -22,7 +21,7 @@ vi.mock('@/features/rooms/services/roomService', () => ({
   leaveRoom: vi.fn(),
   regenerateJoinCode: vi.fn(),
   setJoinLocked: vi.fn(),
-  unbanMember: vi.fn(),
+  setMemberLocked: vi.fn(),
   updateRoom: vi.fn(),
 }))
 
@@ -40,18 +39,15 @@ import { getCurrentPlayer } from '@/features/sessions/services/sessionService'
 import { getRoomById } from '@/features/rooms/repositories/roomRepository'
 import { requireRoomMemberById, requireRoomOwnerById } from '@/features/rooms/services/requireRoom'
 import {
-  banMember,
   createRoom,
   joinRoom,
   joinRoomByCode,
   leaveRoom,
   regenerateJoinCode,
   setJoinLocked,
-  unbanMember,
   updateRoom,
 } from '@/features/rooms/services/roomService'
 import {
-  banMemberAction,
   createRoomAction,
   joinRoomAction,
   joinRoomByCodeAction,
@@ -59,7 +55,6 @@ import {
   regenerateJoinCodeAction,
   setJoinLockedAction,
   setMemberLockedAction,
-  unbanMemberAction,
   updateRoomAction,
 } from '@/features/rooms/actions/roomActions'
 
@@ -139,20 +134,12 @@ describe('room actions authorization', () => {
     expect(vi.mocked(setJoinLocked)).not.toHaveBeenCalled()
   })
 
-  it('denies bans for non-owners', async () => {
-    vi.mocked(requireRoomOwnerById).mockRejectedValueOnce(new Error('FORBIDDEN'))
-    await expect(banMemberAction(ROOM_ID, formData({ playerId: PLAYER_ID }))).rejects.toThrow(
-      'FORBIDDEN'
-    )
-    expect(vi.mocked(banMember)).not.toHaveBeenCalled()
-  })
-
-  it('denies unbans for non-owners', async () => {
-    vi.mocked(requireRoomOwnerById).mockRejectedValueOnce(new Error('FORBIDDEN'))
-    await expect(unbanMemberAction(ROOM_ID, formData({ playerId: PLAYER_ID }))).rejects.toThrow(
-      'FORBIDDEN'
-    )
-    expect(vi.mocked(unbanMember)).not.toHaveBeenCalled()
+  it('maps LOCKED to a safe message', async () => {
+    vi.mocked(getCurrentPlayer).mockResolvedValueOnce({ id: PLAYER_ID } as never)
+    vi.mocked(joinRoomByCode).mockRejectedValueOnce(new Error('LOCKED'))
+    await expect(
+      joinRoomByCodeAction({}, formData({ code: 'RM-ABC123', teamId: TEAM_ID }))
+    ).resolves.toEqual({ error: 'Your access is locked. Contact the organizer.' })
   })
 
   it('denies settings changes for non-owners', async () => {
