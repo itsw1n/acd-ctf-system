@@ -21,9 +21,7 @@ export default async function RootPage() {
 
       <Container className="max-w-[1380px] py-10 sm:py-14">
         <div className="mb-8">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
-            {'// Rooms'}
-          </p>
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">{'// Rooms'}</p>
           <h1 className="mt-2 font-display text-4xl font-extrabold uppercase leading-none sm:text-6xl">
             Find a <span className="text-danger-bright">room</span>
           </h1>
