@@ -28,10 +28,10 @@ at join time; roles live on the membership row.
 | Action                     | Input                             | Behavior                                                         |
 | -------------------------- | --------------------------------- | ---------------------------------------------------------------- |
 | `createRoomAction`         | name, visibility                  | Any signed-in user; creator becomes OWNER; redirects to the room |
-| `joinRoomByCodeAction`     | code (+ teamId)                   | Checks code, lock, team-in-room; redirects to the room         |
+| `joinRoomByCodeAction`     | code (+ teamId)                   | Checks code, lock, team-in-room; redirects to the room           |
 | `joinRoomAction`           | roomId (bound) + teamId           | Public rooms only; otherwise use a code                          |
 | `leaveRoomAction`          | roomId (bound)                    | Members only; owners cannot leave (would orphan the room)        |
 | `setJoinLockedAction`      | roomId (bound) + locked           | Owner only                                                       |
 | `regenerateJoinCodeAction` | roomId (bound)                    | Owner only; returns the new code                                 |
-| `setMemberLockedAction`    | roomId (bound) + playerId, locked | Owner only; the member control (locked members cannot rejoin)  |
+| `setMemberLockedAction`    | roomId (bound) + playerId, locked | Owner only; the member control (locked members cannot rejoin)    |
 | `updateRoomAction`         | roomId (bound) + name, visibility | Owner only                                                       |

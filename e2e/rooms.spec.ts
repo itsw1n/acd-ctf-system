@@ -145,7 +145,9 @@ test('locked members cannot rejoin', async ({
     await guest.getByRole('button', { name: /select a team/i }).click()
     await guest.getByRole('listbox').getByRole('option', { name: 'Green Team' }).click()
     await guest.getByRole('button', { name: /^join room/i }).click()
-    await expect(guest.getByText(/Your access is locked. Contact the organizer./)).toBeVisible({ timeout: 15000 })
+    await expect(guest.getByText(/Your access is locked. Contact the organizer./)).toBeVisible({
+      timeout: 15000,
+    })
   } finally {
     await guest.close()
   }

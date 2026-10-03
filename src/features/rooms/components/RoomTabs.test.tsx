@@ -4,14 +4,21 @@ import { RoomTabs } from '@/features/rooms/components/RoomTabs'
 
 vi.mock('next/navigation', () => ({ usePathname: () => '/rooms/demo/admin' }))
 
-afterEach(() => { cleanup() })
+afterEach(() => {
+  cleanup()
+})
 
 describe('RoomTabs', () => {
-  beforeEach(() => { vi.clearAllMocks() })
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
 
   it('owners see Overview and no Leaderboard', () => {
     render(<RoomTabs slug="demo" isOwner />)
-    expect(screen.getByRole('link', { name: 'Overview' })).toHaveAttribute('href', '/rooms/demo/admin')
+    expect(screen.getByRole('link', { name: 'Overview' })).toHaveAttribute(
+      'href',
+      '/rooms/demo/admin'
+    )
     expect(screen.queryByRole('link', { name: 'Leaderboard' })).toBeNull()
     expect(screen.getByRole('link', { name: 'Challenges' })).toBeInTheDocument()
   })

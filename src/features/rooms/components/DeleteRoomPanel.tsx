@@ -28,11 +28,19 @@ export function DeleteRoomPanel({
 
   return (
     <div className="border border-danger/40 bg-danger/5 p-4">
-      <p className="font-mono text-xs uppercase tracking-[0.14em] text-danger-bright">Delete room</p>
+      <p className="font-mono text-xs uppercase tracking-[0.14em] text-danger-bright">
+        Delete room
+      </p>
       <p className="mt-1 font-mono text-xs text-muted">
         Permanently deletes challenges, teams, solves, and members. This cannot be undone.
       </p>
-      <Button type="button" variant="warning" size="sm" className="mt-3" onPress={() => setIsOpen(true)}>
+      <Button
+        type="button"
+        variant="warning"
+        size="sm"
+        className="mt-3"
+        onPress={() => setIsOpen(true)}
+      >
         <Trash2 size={15} aria-hidden />
         Delete room
       </Button>

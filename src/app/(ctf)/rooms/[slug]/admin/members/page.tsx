@@ -70,7 +70,6 @@ export default async function RoomMembersPage({ params }: { params: Promise<{ sl
               )}
             </div>
           </TacticalPanel>
-
         </div>
       </Container>
     </Section>
