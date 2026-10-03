@@ -70,7 +70,7 @@ export default async function RoomsPage() {
           <TacticalPanel label="Participating" className="p-5 sm:p-7">
             {!joined.length && (
               <p className="py-8 text-center font-mono text-sm text-muted">
-                Not in any room yet. Browse public rooms or join with a code.
+                Not in any room yet. Browse public rooms to join.
               </p>
             )}
             <div className="grid gap-4 sm:grid-cols-2">
@@ -86,15 +86,6 @@ export default async function RoomsPage() {
               ))}
             </div>
           </TacticalPanel>
-
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/rooms/join"
-              className="clip-button inline-flex min-h-9 items-center justify-center gap-2 border border-border-strong bg-surface px-4 font-display text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition hover:border-danger hover:text-white"
-            >
-              Join with a code
-            </Link>
-          </div>
         </div>
       </Container>
     </Section>
