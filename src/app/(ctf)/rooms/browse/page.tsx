@@ -8,10 +8,7 @@ import { listMyRooms, listPublicRooms } from '@/features/rooms/services/roomServ
 
 export default async function BrowseRoomsPage() {
   const player = await requireAccount()
-  const [rooms, memberships] = await Promise.all([
-    listPublicRooms(),
-    listMyRooms(player.id),
-  ])
+  const [rooms, memberships] = await Promise.all([listPublicRooms(), listMyRooms(player.id)])
   const memberRoomIds = new Set(memberships.map((membership) => membership.room.id))
 
   return (
