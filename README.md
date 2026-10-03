@@ -7,9 +7,28 @@
 ![Tailwind v4](https://img.shields.io/badge/Tailwind-v4-38BDF8?logo=tailwindcss)
 ![TypeScript strict](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
 
-School Capture The Flag platform — team signups, challenge solving, static flag
-submission, and live leaderboards. Built with Next.js App Router, Tailwind CSS v4, Supabase
-PostgreSQL, React Aria Components, and Lucide React.
+School Capture The Flag platform where **anyone can host a competition room**
+and anyone can join one. Built with Next.js App Router, Tailwind CSS v4,
+Supabase PostgreSQL, React Aria Components, and Lucide React.
+
+## How it works
+
+Every competition lives in a **room**: its own challenges, teams, members,
+solves, and leaderboard. There is no site-wide admin — authority is per room.
+
+| Role            | Can do                                                                                                             |
+| --------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Room **owner**  | Create the room, add challenges and teams, manage members, lock players, regenerate the join code, delete the room |
+| **Participant** | Join via public listing or join code, pick a team, solve challenges, climb the room leaderboard                    |
+
+- Rooms are **public** (listed, anyone can join) or **private** (join code `RM-XXXXXX` only, regenerable, joining can be locked).
+- Challenges are `TEXT` or `EXTERNAL` (one Drive/hosted link), each with an author, category, difficulty, and points.
+- Flags are static per room: SHA-256 hashed for submissions, AES-256-GCM encrypted at rest.
+- Locking a player freezes them in place (team and score kept) until unlocked — nothing is deleted.
+
+How it fits together: [`docs/architecture/overview.md`](docs/architecture/overview.md) ·
+Auth flows: [`docs/architecture/auth-flow.md`](docs/architecture/auth-flow.md) ·
+Schema: [`docs/architecture/database-schema.md`](docs/architecture/database-schema.md)
 
 ## Quickstart
 
@@ -27,7 +46,7 @@ npm run supabase:reset   # migrations + demo seed
 npm run dev
 ```
 
-Open http://localhost:3000 and sign in with the [demo account](#demo-account).
+Open http://localhost:3000 and sign in with the [demo account](#demo-accounts).
 
 Useful shortcuts: `make dev` (database + app), `make stop` (everything down),
 `make help` (all targets). Full guide: [`docs/guides/setup.md`](docs/guides/setup.md).
@@ -35,7 +54,7 @@ Useful shortcuts: `make dev` (database + app), `make stop` (everything down),
 ## Demo accounts
 
 Resetting the database (`npm run supabase:reset`) seeds five ready-made
-players, one per row below. Shared password for all of them: `ctf-demo-1234`.
+players in the default `acd-ctf` room. Shared password for all of them: `ctf-demo-1234`.
 
 | Alias    | Team          | Solved                      | Points | Recovery code        |
 | -------- | ------------- | --------------------------- | -----: | -------------------- |
@@ -62,22 +81,28 @@ against hosted projects. **Remove demo rows before the real event.**
 
 ## Features
 
-- Signup with team, full name, unique alias, and password (10–128 chars)
+**Accounts** (no Supabase Auth — custom password accounts on PostgreSQL only)
+
+- Signup with alias, full name, and password (10–128 chars)
 - Signin with alias + password (generic failures, no account enumeration)
 - One-time recovery code (`ACD-XXXX-XXXX-XXXX`) for forgotten passwords only
-- Forgot-password flow revokes all sessions and requires a fresh login
-- Persistent HttpOnly browser session
-- Global flag submission with duplicate-solve protection
-- Challenge board with search, category/difficulty filters, authors, hints, and
-  one external resource link
-- Team and player leaderboards, public visitor rankings, personal activity,
-  profile with role display, and an authenticated app-shell leaderboard
-- Admin competition lock, per-player account lock/unlock, and leaderboard overview
-- No Supabase Auth — custom password accounts on PostgreSQL only
+- Password reset revokes all sessions and requires a fresh login
+- Persistent opaque HttpOnly browser session
 
-How it fits together: [`docs/architecture/overview.md`](docs/architecture/overview.md) ·
-Auth flows: [`docs/architecture/auth-flow.md`](docs/architecture/auth-flow.md) ·
-Schema: [`docs/architecture/database-schema.md`](docs/architecture/database-schema.md)
+**Rooms**
+
+- Create public or private rooms; join with a code or straight from Browse
+- Per-room teams, challenges, members, solves, and leaderboards
+- Regenerable join codes, room-wide join lock, per-player lock/unlock
+- Typed-confirmation room delete (default room is protected)
+- Owners manage instead of playing — no flag submission in your own room
+
+**Challenges & scoring**
+
+- `TEXT` and `EXTERNAL` challenges with authors, filters, and one resource link
+- Correct flag awards points exactly once per player per challenge
+- Wrong/duplicate submissions rejected with safe errors
+- Team and player leaderboards plus personal solve history, per room
 
 ## Environment
 
@@ -87,6 +112,7 @@ Schema: [`docs/architecture/database-schema.md`](docs/architecture/database-sche
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | client / public | Public key; direct client DB access is disabled (no RLS policies — server-only access) |
 | `SUPABASE_SERVICE_ROLE_KEY`            | server only     | Trusted server access — never `NEXT_PUBLIC_*`                                          |
 | `SESSION_COOKIE_NAME`                  | server only     | Session cookie name (`acd_ctf_session`)                                                |
+| `FLAG_ENCRYPTION_KEY`                  | server only     | 32-byte hex key for challenge flag encryption (`openssl rand -hex 32`)                 |
 
 Details: [`docs/guides/env-variables.md`](docs/guides/env-variables.md).
 
@@ -102,32 +128,29 @@ Insert only the resulting SHA-256 digest into `challenges.flag_hash`.
 
 ## Security notes
 
-- Player identity is represented by an opaque random HttpOnly cookie.
-- Only a SHA-256 session-token hash is stored in PostgreSQL.
-- Passwords are hashed with Argon2id (never SHA-256, never plaintext) and
-  verified server-side only; unknown aliases run a dummy verification so
-  signin timing reveals nothing.
+- Player identity is an opaque random HttpOnly cookie; only a SHA-256
+  token hash is stored in PostgreSQL.
+- Passwords are Argon2id hashes (never SHA-256, never plaintext) verified
+  server-side only; unknown aliases run a dummy verification so signin
+  timing reveals nothing.
 - Recovery codes are shown once; only their SHA-256 hashes are stored.
   Codes reset forgotten passwords only — they never restore sessions directly.
 - Password resets revoke ALL sessions for the player.
-- Roles (`PLAYER`/`ADMIN`) are forced server-side; public signup always creates
-  `PLAYER`. Promote manually: `UPDATE players SET role = 'ADMIN' WHERE
-lower(alias) = lower('myalias');`
-- Flag values are hashed before database lookup.
-- `UNIQUE(player_id, challenge_id)` prevents duplicate scoring at the database layer.
+- Room authority (`OWNER`/`PARTICIPANT`) is enforced server-side per room;
+  public signup creates plain accounts with no privileges.
+- Flag values are hashed before database lookup; recoverable copies are
+  AES-256-GCM encrypted and decrypted server-side for the admin edit form only.
+- `UNIQUE(player_id, challenge_id)` (per room) prevents duplicate scoring
+  at the database layer.
 - Service-role credentials remain server-only.
-- Auth actions call a rate-limit boundary (`checkAuthRateLimit`) that is
-  currently a documented no-op. Before any larger/public event, integrate a
-  production-compatible provider (e.g. Upstash Redis on Vercel) plus CSRF
-  hardening for cookie-authenticated writes.
+- Auth/flag rate limiting is in-memory single-instance: fine for a classroom
+  on one server; a shared provider (e.g. Redis) is required before any
+  multi-instance or public event, plus CSRF hardening for cookie writes.
 
 ## Validation
 
 ```bash
-npm run lint
-npm run typecheck
-npm test
-npm run build
+npm run format:check && npm run lint && npm run typecheck && npm test && npm run build
 ```
 
 Then deploy to Vercel with the same environment variables. Production notes:
@@ -143,3 +166,4 @@ The visual system intentionally follows the approved industrial/classified-termi
 - toxic amber warnings, muted green success only
 - clipped hard corners, thin rust borders
 - restrained glow, scanlines, and grid texture
+- skeleton placeholders for page loads, animated dots for button pending states

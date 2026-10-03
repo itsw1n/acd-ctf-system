@@ -28,7 +28,7 @@ export function PublicHeader({
         href="/"
         className="justify-self-center font-mono text-xs uppercase tracking-[0.14em] text-muted underline-offset-4 transition hover:text-danger-bright hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger"
       >
-        Leaderboards
+        Rooms
       </Link>
 
       <div className="justify-self-end">
