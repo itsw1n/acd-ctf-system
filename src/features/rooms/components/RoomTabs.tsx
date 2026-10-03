@@ -20,8 +20,8 @@ export function RoomTabs({ slug, isOwner }: { slug: string; isOwner: boolean }) 
       : [
           { href: base, label: 'Leaderboard' },
           { href: `${base}/play`, label: 'Play' },
+          { href: `${base}/activity`, label: 'Activity' },
         ]),
-    { href: `${base}/activity`, label: 'Activity' },
   ]
 
   return (

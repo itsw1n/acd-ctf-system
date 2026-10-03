@@ -21,11 +21,13 @@ describe('RoomTabs', () => {
     )
     expect(screen.queryByRole('link', { name: 'Leaderboard' })).toBeNull()
     expect(screen.getByRole('link', { name: 'Challenges' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Activity' })).toBeNull()
   })
 
   it('participants keep Leaderboard and Play', () => {
     render(<RoomTabs slug="demo" isOwner={false} />)
     expect(screen.getByRole('link', { name: 'Leaderboard' })).toHaveAttribute('href', '/rooms/demo')
     expect(screen.getByRole('link', { name: 'Play' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Activity' })).toHaveAttribute('href', '/rooms/demo/activity')
   })
 })

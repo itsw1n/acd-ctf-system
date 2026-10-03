@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
@@ -6,7 +7,8 @@ import { getPlayerActivity } from '@/features/activity/queries/activityQueries'
 
 export default async function RoomActivityPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const { player, room } = await requireRoomMember(slug)
+  const { player, room, membership } = await requireRoomMember(slug)
+  if (membership.role === 'OWNER') redirect(`/rooms/${slug}/admin`)
   const activity = await getPlayerActivity(player.id, room.id)
   const totalPoints = activity.reduce((sum, row) => sum + row.points, 0)
 
