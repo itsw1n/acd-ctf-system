@@ -11,7 +11,7 @@ export default async function SignInPage({
   searchParams: Promise<{ reset?: string }>
 }) {
   const currentPlayer = await getCurrentPlayer()
-  if (currentPlayer) redirect(currentPlayer.role === 'ADMIN' ? '/admin' : '/challenges')
+  if (currentPlayer) redirect('/rooms')
   const params = await searchParams
 
   return (

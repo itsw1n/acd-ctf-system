@@ -9,12 +9,13 @@ export type ActivityItem = {
   points: number
 }
 
-export async function getPlayerActivity(playerId: string): Promise<ActivityItem[]> {
+export async function getPlayerActivity(playerId: string, roomId: string): Promise<ActivityItem[]> {
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('solves')
     .select('id,solved_at,points_awarded,challenge_id')
     .eq('player_id', playerId)
+    .eq('room_id', roomId)
     .order('solved_at', { ascending: false })
 
   if (error) throw new Error(`Unable to load activity: ${error.message}`)
@@ -25,6 +26,7 @@ export async function getPlayerActivity(playerId: string): Promise<ActivityItem[
   const { data: challenges, error: challengeError } = await supabase
     .from('challenges')
     .select('id,title,category')
+    .eq('room_id', roomId)
     .in('id', challengeIds)
 
   if (challengeError) {
@@ -45,12 +47,13 @@ export async function getPlayerActivity(playerId: string): Promise<ActivityItem[
   })
 }
 
-export async function getPlayerScore(playerId: string) {
+export async function getPlayerScore(playerId: string, roomId: string) {
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('solves')
     .select('points_awarded')
     .eq('player_id', playerId)
+    .eq('room_id', roomId)
 
   if (error) throw new Error(`Unable to load score: ${error.message}`)
 

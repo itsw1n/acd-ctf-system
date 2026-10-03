@@ -6,7 +6,6 @@ import {
 } from '@/features/auth/schemas/authSchemas'
 
 const validSignup = {
-  teamId: '4b2873c8-01b9-4c22-9482-858276b94c43',
   fullName: 'Test Player',
   alias: 'testplayer',
   password: '0123456789',
@@ -16,6 +15,17 @@ const validSignup = {
 describe('signup schema', () => {
   it('accepts a valid signup', () => {
     expect(signUpSchema.safeParse(validSignup).success).toBe(true)
+  })
+
+  it('ignores a smuggled teamId', () => {
+    const parsed = signUpSchema.safeParse({
+      ...validSignup,
+      teamId: '4b2873c8-01b9-4c22-9482-858276b94c43',
+    })
+    expect(parsed.success).toBe(true)
+    if (parsed.success) {
+      expect(parsed.data).not.toHaveProperty('teamId')
+    }
   })
 
   it('rejects passwords shorter than 10 characters', () => {

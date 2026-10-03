@@ -1,12 +1,14 @@
 import { describe, expect, it, vi } from 'vitest'
 
-vi.mock('@/features/auth/services/requireAdmin', () => ({
-  requireAdmin: vi.fn(async () => ({ role: 'ADMIN' })),
+vi.mock('@/features/rooms/services/requireRoom', () => ({
+  requireRoomOwnerById: vi.fn(async () => ({ membership: { role: 'OWNER' } })),
 }))
 vi.mock('@/lib/supabase/admin', () => ({ createAdminClient: vi.fn() }))
 
 import { createAdminClient } from '@/lib/supabase/admin'
 import { listSolveCategoriesForAdmin, listSolvesForAdmin } from './solveQueries'
+
+const ROOM_ID = '22222222-2222-4222-8222-222222222222'
 
 function result(data: unknown) {
   const chain = {
@@ -14,12 +16,14 @@ function result(data: unknown) {
     order: vi.fn(),
     limit: vi.fn(),
     in: vi.fn(),
+    eq: vi.fn(),
     then: (resolve: (value: unknown) => unknown) => resolve({ data, error: null }),
   }
   chain.select.mockReturnValue(chain)
   chain.order.mockReturnValue(chain)
   chain.limit.mockReturnValue(chain)
   chain.in.mockReturnValue(chain)
+  chain.eq.mockReturnValue(chain)
   return chain
 }
 
@@ -49,9 +53,13 @@ describe('admin solve filters', () => {
           solved_at: '2026-01-01',
         },
       ]),
+      room_memberships: result([
+        { player_id: 'p1', team_id: 't1', role: 'PARTICIPANT' },
+        { player_id: 'p2', team_id: 't2', role: 'PARTICIPANT' },
+      ]),
       players: result([
-        { id: 'p1', alias: 'one', full_name: 'One', team_id: 't1' },
-        { id: 'p2', alias: 'two', full_name: 'Two', team_id: 't2' },
+        { id: 'p1', alias: 'one', full_name: 'One' },
+        { id: 'p2', alias: 'two', full_name: 'Two' },
       ]),
       challenges: result([
         { id: 'c1', title: 'First', category: 'Web' },
@@ -66,13 +74,13 @@ describe('admin solve filters', () => {
       from: ((table: keyof typeof tables) => tables[table]) as never,
     } as never)
 
-    const rows = await listSolvesForAdmin({ teamId: 't1' })
+    const rows = await listSolvesForAdmin(ROOM_ID, { teamId: 't1' })
     expect(rows.map((row) => row.id)).toEqual(['s1', 's2'])
     expect(
-      (await listSolvesForAdmin({ teamId: 't1', category: 'Crypto', search: 'Second' })).map(
-        (row) => row.id
-      )
+      (
+        await listSolvesForAdmin(ROOM_ID, { teamId: 't1', category: 'Crypto', search: 'Second' })
+      ).map((row) => row.id)
     ).toEqual(['s2'])
-    expect(await listSolveCategoriesForAdmin()).toEqual(['Crypto', 'Web'])
+    expect(await listSolveCategoriesForAdmin(ROOM_ID)).toEqual(['Crypto', 'Web'])
   })
 })

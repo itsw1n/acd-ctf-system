@@ -19,7 +19,7 @@ export async function resetPassword(input: {
   // even for unknown aliases (against a nil UUID that matches nothing).
   const targetId = exact?.id ?? '00000000-0000-0000-0000-000000000000'
   const codeValid = await verifyRecoveryCode(targetId, sha256(input.recoveryCode.toUpperCase()))
-  if (!exact || !codeValid || exact.access_locked) throw new Error('INVALID_RECOVERY')
+  if (!exact || !codeValid) throw new Error('INVALID_RECOVERY')
 
   await updatePlayerPassword(exact.id, await hashPassword(input.newPassword))
 

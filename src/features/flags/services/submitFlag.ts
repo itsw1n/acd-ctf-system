@@ -9,16 +9,18 @@ export type SubmitFlagResult =
 
 export async function submitFlagForPlayer(
   playerId: string,
+  roomId: string,
   submittedFlag: string
 ): Promise<SubmitFlagResult> {
   const normalized = submittedFlag.trim()
-  const challenge = await findChallengeByFlagHash(sha256(normalized))
+  const challenge = await findChallengeByFlagHash(sha256(normalized), roomId)
 
   if (!challenge) return { status: 'incorrect' }
 
   const solve = await createSolve({
     playerId,
     challengeId: challenge.id,
+    roomId,
     pointsAwarded: challenge.points,
   })
 

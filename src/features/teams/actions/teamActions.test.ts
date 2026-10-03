@@ -1,8 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-vi.mock('@/features/auth/services/requireAdmin', () => ({
-  requireAdmin: vi.fn(),
+vi.mock('@/lib/supabase/admin', () => ({
+  createAdminClient: vi.fn(),
 }))
+
+vi.mock('@/features/rooms/services/requireRoom', () => ({
+  requireRoomOwnerById: vi.fn(),
+}))
+
+vi.mock('@/features/rooms/services/roomService', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/rooms/services/roomService')>()
+  return { ...actual, getRoomPath: vi.fn(async () => '/rooms/test-room') }
+})
 
 vi.mock('@/features/teams/services/teamService', async () => {
   // Schemas are re-declared here (rather than importOriginal) so this test
@@ -26,7 +35,7 @@ vi.mock('next/navigation', () => ({
   },
 }))
 
-import { requireAdmin } from '@/features/auth/services/requireAdmin'
+import { requireRoomOwnerById } from '@/features/rooms/services/requireRoom'
 import { createTeam, renameTeam } from '@/features/teams/services/teamService'
 import { createTeamAction, renameTeamAction } from '@/features/teams/actions/teamActions'
 
@@ -36,29 +45,40 @@ function formData(entries: Record<string, string>) {
   return form
 }
 
+const ROOM_ID = '22222222-2222-4222-8222-222222222222'
+
 describe('admin team actions authorization', () => {
   beforeEach(() => vi.clearAllMocks())
 
   it('denies PLAYER create without touching the mutation', async () => {
-    vi.mocked(requireAdmin).mockRejectedValueOnce(new Error('FORBIDDEN'))
-    await expect(createTeamAction({}, formData({ name: 'Sneaky' }))).rejects.toThrow('FORBIDDEN')
+    vi.mocked(requireRoomOwnerById).mockRejectedValueOnce(new Error('FORBIDDEN'))
+    await expect(createTeamAction(ROOM_ID, {}, formData({ name: 'Sneaky' }))).rejects.toThrow(
+      'FORBIDDEN'
+    )
     expect(vi.mocked(createTeam)).not.toHaveBeenCalled()
   })
 
   it('denies PLAYER rename without touching the mutation', async () => {
-    vi.mocked(requireAdmin).mockRejectedValueOnce(new Error('FORBIDDEN'))
+    vi.mocked(requireRoomOwnerById).mockRejectedValueOnce(new Error('FORBIDDEN'))
     await expect(
-      renameTeamAction({}, formData({ id: '4b2873c8-01b9-4c22-9482-858276b94c43', name: 'Sneaky' }))
+      renameTeamAction(
+        ROOM_ID,
+        {},
+        formData({ id: '4b2873c8-01b9-4c22-9482-858276b94c43', name: 'Sneaky' })
+      )
     ).rejects.toThrow('FORBIDDEN')
     expect(vi.mocked(renameTeam)).not.toHaveBeenCalled()
   })
 
-  it('allows admins to create teams', async () => {
-    vi.mocked(requireAdmin).mockResolvedValueOnce({ role: 'ADMIN' } as never)
+  it('allows room owners to create teams in their room', async () => {
+    vi.mocked(requireRoomOwnerById).mockResolvedValueOnce({
+      membership: { role: 'OWNER' },
+    } as never)
     vi.mocked(createTeam).mockResolvedValueOnce('team-id' as never)
-    await expect(createTeamAction({}, formData({ name: 'Ops' }))).rejects.toThrow(
-      'REDIRECT:/admin/teams'
+    await expect(createTeamAction(ROOM_ID, {}, formData({ name: 'Ops' }))).rejects.toThrow(
+      'REDIRECT:/rooms/test-room/admin/teams'
     )
-    expect(vi.mocked(createTeam)).toHaveBeenCalledTimes(1)
+    expect(vi.mocked(requireRoomOwnerById)).toHaveBeenCalledWith(ROOM_ID)
+    expect(vi.mocked(createTeam)).toHaveBeenCalledWith(ROOM_ID, expect.any(Object))
   })
 })

@@ -2,17 +2,15 @@ import { ShieldCheck } from 'lucide-react'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
-import { requirePlayer } from '@/features/auth/services/requirePlayer'
+import { requireCurrentPlayer } from '@/features/sessions/services/sessionService'
 import { logoutAction } from '@/features/auth/actions/authActions'
 import { LogoutButton } from '@/features/auth/components/LogoutButton'
 
 export default async function ProfilePage() {
-  const player = await requirePlayer()
+  const player = await requireCurrentPlayer()
 
   const rows: Array<{ label: string; value: string; tone?: 'default' | 'success' }> = [
     { label: 'Full name', value: player.fullName },
-    { label: 'Team', value: player.team?.name ?? '—' },
-    { label: 'Role', value: player.role },
     // Rendered only with a valid session, so presence here means active.
     { label: 'Session', value: 'ACTIVE', tone: 'success' },
   ]

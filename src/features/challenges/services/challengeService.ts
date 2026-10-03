@@ -21,9 +21,10 @@ export function hashFlag(flag: string) {
   return sha256(normalizeFlag(flag))
 }
 
-export async function createChallenge(input: CreateChallengeInput) {
+export async function createChallenge(roomId: string, input: CreateChallengeInput) {
   const flagHash = hashFlag(input.flag)
   return insertChallenge({
+    roomId,
     title: input.title,
     author: input.author,
     category: input.category,
@@ -39,12 +40,12 @@ export async function createChallenge(input: CreateChallengeInput) {
   })
 }
 
-export async function updateChallenge(input: UpdateChallengeInput) {
-  const existing = await getChallengeFlagHash(input.id)
+export async function updateChallenge(roomId: string, input: UpdateChallengeInput) {
+  const existing = await getChallengeFlagHash(input.id, roomId)
   if (!existing) throw new Error('CHALLENGE_NOT_FOUND')
 
   const trimmedFlag = input.flag?.trim()
-  await updateChallengeRow(input.id, {
+  await updateChallengeRow(input.id, roomId, {
     title: input.title,
     author: input.author,
     category: input.category,

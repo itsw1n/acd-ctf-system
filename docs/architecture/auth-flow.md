@@ -6,14 +6,16 @@ server-side service-role client (`src/lib/supabase/admin.ts`).
 
 ## Signup — `/signup`
 
+Accounts carry no team and no role; teams and roles live on the per-room
+membership created at join time.
+
 ```
-validate input (team, name, alias, password == confirmation)
-  → verify team exists
+validate input (name, alias, password == confirmation)
   → Argon2id-hash password, generate recovery code (ACD-XXXX-XXXX-XXXX)
-  → create player (role forced to PLAYER, never from client data)
+  → create bare player account
   → show recovery code ONCE behind an explicit continue gate
   → gate action re-verifies the code, then issues the first session
-  → redirect /challenges
+  → redirect /rooms
 ```
 
 The session cookie is deliberately NOT issued during signup itself: setting a
@@ -29,8 +31,8 @@ validate input
     because ilike treats `_` as a wildcard)
   → Argon2id-verify (dummy hash when alias unknown or passwordless,
     so timing reveals nothing)
-  → reject locked/competition-blocked players, issue persistent session
-  → redirect /challenges (admins → /admin)
+  → issue persistent session
+  → redirect /rooms
 ```
 
 Failure is always `Invalid alias or password.` — unknown alias and wrong
@@ -54,10 +56,22 @@ Validation on every protected route and action (`requireCurrentPlayer`):
 cookie → hash → row lookup → expiry check → player load, else redirect
 `/signin`. Client state is never trusted for authorization.
 
-If `players.access_locked` is true, session validation deletes the current
-session and cookie. Locked players cannot sign in or use password recovery.
-The competition-wide lock blocks player signups and signins while allowing
-admins to sign in.
+Per-room locks live on `room_memberships.access_locked` (a locked member is
+bounced to `/signin`) and bans on `room_bans`. There is no global lock.
+
+## Room authorization
+
+Roles come from the membership row, never the account:
+
+```
+requireAccount()       any signed-in user, else redirect /signin
+requireRoomMember(s)   membership required, else redirect to the join page;
+                       locked members redirect to /signin
+requireRoomOwner(s)    membership role must be OWNER, else 403
+```
+
+Every room-admin page and mutation re-authorizes independently; the room tab
+layout redirects are navigation only, never the enforcement boundary.
 
 ## Logout
 

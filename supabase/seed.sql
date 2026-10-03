@@ -16,6 +16,9 @@
 --     plaintext flag column removed). Seed stores flag_hash only, so demo
 --     submissions work; flag_encrypted stays NULL until an admin re-saves
 --     the flag via the edit form (display falls back to 'Not available').
+--   011_rooms.sql — rooms(room_id on teams/challenges/solves),
+--     room_memberships (OWNER/PARTICIPANT per room), room_bans. Everything
+--     below belongs to the default 'acd-ctf' room.
 --
 -- Scoreboard this seed produces:
 --
@@ -47,12 +50,15 @@ begin;
 -- 1. TEAMS
 -- ============================================================
 
-insert into public.teams (name, slug)
-values
+insert into public.teams (name, slug, room_id)
+select v.name, v.slug, rooms.id
+from (values
   ('IT Innovators', 'it-innovators'),
   ('Data Wizard', 'data-wizard'),
   ('Tech Pioneers', 'tech-pioneers'),
-  ('Cyber Knights', 'cyber-knights');
+  ('Cyber Knights', 'cyber-knights')
+) as v(name, slug)
+cross join (select id from public.rooms where slug = 'acd-ctf') as rooms;
 
 
 -- ============================================================
@@ -75,9 +81,21 @@ insert into public.challenges (
   difficulty,
   points,
   flag_hash,
-  active
+  active,
+  room_id
 )
-values
+select
+  v.title,
+  v.author,
+  v.category,
+  v.description,
+  v.type,
+  v.difficulty,
+  v.points,
+  v.flag_hash,
+  v.active,
+  rooms.id
+from (values
   (
     'Welcome Flag',
     'ACD Team',
@@ -99,15 +117,17 @@ values
     100,
     '4ad75f150616cff694b38fedaec24b547fa9d7b44af2f8aa7d3975647a43c3d5',
     true
-  );
+  )
+) as v(title, author, category, description, type, difficulty, points, flag_hash, active)
+cross join (select id from public.rooms where slug = 'acd-ctf') as rooms;
 
 
 -- ============================================================
 -- 3. PLAYER ACCOUNTS
 -- ============================================================
 -- Password hash is Argon2id('ctf-demo-1234') from the app's hashPassword;
--- recovery hashes are SHA-256 of the UPPERCASED codes above. Role is always
--- PLAYER here, exactly as public signup forces it.
+-- recovery hashes are SHA-256 of the UPPERCASED codes above. Accounts carry
+-- no team or role; teams and roles live on room_memberships (section 6).
 
 with demo_password(password_hash) as (
   values (
@@ -118,38 +138,32 @@ with demo_password(password_hash) as (
 accounts (
   full_name,
   alias,
-  team_slug,
   recovery_code_hash
 ) as (
   values
     (
       'Sean',
       'sean',
-      'cyber-knights',
       '158ec4157e2ee9edde4f02a3937872ffaad8e36662dac2d8bebb1d824f6a68f8'
     ),
     (
       'Chrmel',
       'chrmel',
-      'cyber-knights',
       'c5e02bc1d9a8ba0a810de60c6438b6f634054d1c7e6c990ff744b4d6732a13dd'
     ),
     (
       'Dan',
       'dan',
-      'it-innovators',
       'dbe421b4037078bb873d7269dc8c6d936894c86db5997d895303e193a2ec4ee3'
     ),
     (
       'Win',
       'win',
-      'data-wizard',
       'cc7a806061861241148d020a3fb7e9b9a8209c82a5d913491b1328b6bcf11906'
     ),
     (
       'Rapz',
       'rapz',
-      'tech-pioneers',
       'caf6e89fbc946d911b19261c75d418f60f83abec158053b39464205383c28275'
     )
 )
@@ -157,29 +171,23 @@ accounts (
 insert into public.players (
   full_name,
   alias,
-  team_id,
   recovery_code_hash,
-  password_hash,
-  role
+  password_hash
 )
 select
   accounts.full_name,
   accounts.alias,
-  teams.id,
   accounts.recovery_code_hash,
-  demo_password.password_hash,
-  'PLAYER'
+  demo_password.password_hash
 from accounts
-join public.teams as teams
-  on teams.slug = accounts.team_slug
 cross join demo_password;
 
 
 -- ============================================================
--- 4. ADMIN ACCOUNT
+-- 4. ROOT ACCOUNT
 -- ============================================================
--- Root / root / ADMIN / team_id NULL / zero solves. ADMIN rows hold no
--- team by database invariant (004_teamless_admin.sql). Uses the shared demo
+-- Root / root / zero solves. Authority comes from the OWNER membership
+-- created in section 6, never from a role column. Uses the shared demo
 -- password `ctf-demo-1234` and a fixed recovery code for reproducible dev.
 
 with demo_password(password_hash) as (
@@ -191,18 +199,14 @@ with demo_password(password_hash) as (
 insert into public.players (
   full_name,
   alias,
-  team_id,
   recovery_code_hash,
-  password_hash,
-  role
+  password_hash
 )
 select
   'Root',
   'root',
-  null,
   '6a61fa8754cfa3368f26cca51476b3664b3c9fb2b1eec79e5d0561a977be19b4',
-  demo_password.password_hash,
-  'ADMIN'
+  demo_password.password_hash
 from demo_password;
 
 
@@ -229,17 +233,47 @@ with seeded_solves (
 insert into public.solves (
   player_id,
   challenge_id,
-  points_awarded
+  points_awarded,
+  room_id
 )
 select
   players.id,
   challenges.id,
-  challenges.points
+  challenges.points,
+  challenges.room_id
 from seeded_solves
 join public.players as players
   on lower(players.alias) = lower(seeded_solves.alias)
 join public.challenges as challenges
   on challenges.title = seeded_solves.challenge_title;
+
+
+-- ============================================================
+-- 6. ROOM MEMBERSHIPS
+-- ============================================================
+-- Demo accounts join the default room: root as OWNER, everyone else as
+-- PARTICIPANT with their demo team. Mirrors the 011 backfill for rows
+-- the seed itself creates (migrations run before the seed).
+
+insert into public.room_memberships (room_id, player_id, role, team_id, access_locked)
+select
+  rooms.id,
+  players.id,
+  case when players.alias = 'root' then 'OWNER' else 'PARTICIPANT' end,
+  teams.id,
+  false
+from public.players
+left join (values
+  ('sean', 'cyber-knights'),
+  ('chrmel', 'cyber-knights'),
+  ('dan', 'it-innovators'),
+  ('win', 'data-wizard'),
+  ('rapz', 'tech-pioneers')
+) as demo_teams(alias, slug)
+  on demo_teams.alias = players.alias
+left join public.teams as teams
+  on teams.slug = demo_teams.slug
+cross join (select id from public.rooms where slug = 'acd-ctf') as rooms;
 
 
 commit;

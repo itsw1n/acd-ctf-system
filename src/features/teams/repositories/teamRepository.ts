@@ -19,11 +19,12 @@ export function slugifyTeamName(name: string) {
   return slug || 'team'
 }
 
-export async function listTeamsAdmin(): Promise<AdminTeamRow[]> {
+export async function listTeamsAdmin(roomId: string): Promise<AdminTeamRow[]> {
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('teams')
     .select('id,name,slug,created_at')
+    .eq('room_id', roomId)
     .order('name')
 
   if (error) throw new Error(`Unable to load teams: ${error.message}`)
@@ -36,11 +37,11 @@ export async function listTeamsAdmin(): Promise<AdminTeamRow[]> {
   }))
 }
 
-export async function createTeamRow(input: { name: string; slug: string }) {
+export async function createTeamRow(input: { roomId: string; name: string; slug: string }) {
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('teams')
-    .insert({ name: input.name, slug: input.slug })
+    .insert({ room_id: input.roomId, name: input.name, slug: input.slug })
     .select('id')
     .single()
 
@@ -52,12 +53,17 @@ export async function createTeamRow(input: { name: string; slug: string }) {
   return data.id as string
 }
 
-export async function renameTeamRow(teamId: string, input: { name: string; slug: string }) {
+export async function renameTeamRow(
+  teamId: string,
+  roomId: string,
+  input: { name: string; slug: string }
+) {
   const supabase = createAdminClient()
   const { error } = await supabase
     .from('teams')
     .update({ name: input.name, slug: input.slug })
     .eq('id', teamId)
+    .eq('room_id', roomId)
 
   if (error) {
     if (error.code === '23505') throw new Error('TEAM_TAKEN')

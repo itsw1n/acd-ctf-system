@@ -23,6 +23,7 @@ export type AdminChallengeRow = {
 export type { ChallengeEditRow } from '@/features/challenges/types'
 
 export type InsertChallengeRow = {
+  roomId: string
   title: string
   category: string
   description: string
@@ -37,11 +38,12 @@ export type InsertChallengeRow = {
   active: boolean
 }
 
-export async function listChallengesAdmin(): Promise<AdminChallengeRow[]> {
+export async function listChallengesAdmin(roomId: string): Promise<AdminChallengeRow[]> {
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('challenges')
     .select('id,title,author,category,type,difficulty,points,active,created_at')
+    .eq('room_id', roomId)
     .order('created_at', { ascending: false })
 
   if (error) throw new Error(`Unable to load challenges: ${error.message}`)
@@ -59,7 +61,10 @@ export async function listChallengesAdmin(): Promise<AdminChallengeRow[]> {
   }))
 }
 
-export async function getChallengeForEdit(challengeId: string): Promise<ChallengeEditRow | null> {
+export async function getChallengeForEdit(
+  challengeId: string,
+  roomId: string
+): Promise<ChallengeEditRow | null> {
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('challenges')
@@ -67,6 +72,7 @@ export async function getChallengeForEdit(challengeId: string): Promise<Challeng
       'id,title,author,category,description,type,difficulty,hint,points,flag_encrypted,external_url,active'
     )
     .eq('id', challengeId)
+    .eq('room_id', roomId)
     .maybeSingle()
 
   if (error) throw new Error(`Unable to load challenge: ${error.message}`)
@@ -97,12 +103,16 @@ export async function getChallengeForEdit(challengeId: string): Promise<Challeng
   }
 }
 
-export async function getChallengeFlagHash(challengeId: string): Promise<string | null> {
+export async function getChallengeFlagHash(
+  challengeId: string,
+  roomId: string
+): Promise<string | null> {
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('challenges')
     .select('flag_hash')
     .eq('id', challengeId)
+    .eq('room_id', roomId)
     .maybeSingle()
 
   if (error) throw new Error(`Unable to load challenge: ${error.message}`)
@@ -114,6 +124,7 @@ export async function insertChallenge(input: InsertChallengeRow) {
   const { data, error } = await supabase
     .from('challenges')
     .insert({
+      room_id: input.roomId,
       title: input.title,
       author: input.author,
       category: input.category,
@@ -140,6 +151,7 @@ export async function insertChallenge(input: InsertChallengeRow) {
 
 export async function updateChallengeRow(
   challengeId: string,
+  roomId: string,
   input: {
     title: string
     author: string
@@ -172,7 +184,11 @@ export async function updateChallengeRow(
   if (input.flagHash) patch.flag_hash = input.flagHash
   if (input.flagEncrypted) patch.flag_encrypted = input.flagEncrypted
 
-  const { error } = await supabase.from('challenges').update(patch).eq('id', challengeId)
+  const { error } = await supabase
+    .from('challenges')
+    .update(patch)
+    .eq('id', challengeId)
+    .eq('room_id', roomId)
 
   if (error) {
     if (error.code === '23505') throw new Error('FLAG_IN_USE')
@@ -180,12 +196,13 @@ export async function updateChallengeRow(
   }
 }
 
-export async function setChallengeActive(challengeId: string, active: boolean) {
+export async function setChallengeActive(challengeId: string, roomId: string, active: boolean) {
   const supabase = createAdminClient()
   const { error } = await supabase
     .from('challenges')
     .update({ active, updated_at: new Date().toISOString() })
     .eq('id', challengeId)
+    .eq('room_id', roomId)
 
   if (error) throw new Error(`Unable to update challenge: ${error.message}`)
 }

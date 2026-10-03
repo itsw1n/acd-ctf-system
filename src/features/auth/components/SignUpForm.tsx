@@ -10,15 +10,13 @@ import {
   type ContinueSignupState,
   type SignUpState,
 } from '@/features/auth/actions/authActions'
-import type { Team } from '@/features/teams/types'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
-import { Select } from '@/components/common/Select'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 
 const initialState: SignUpState = {}
 
-export function SignUpForm({ teams }: { teams: Team[] }) {
+export function SignUpForm() {
   const [state, action, pending] = useActionState(signUpAction, initialState)
   const [copied, setCopied] = useState(false)
   const [continueState, continueAction, continuePending] = useActionState(
@@ -100,16 +98,6 @@ export function SignUpForm({ teams }: { teams: Team[] }) {
   return (
     <TacticalPanel label="Create account" index="01" className="mx-auto max-w-2xl p-5 sm:p-7">
       <form action={action} className="space-y-5">
-        <Select
-          id="teamId"
-          name="teamId"
-          label="Team"
-          required
-          defaultValue=""
-          placeholder="Select a team"
-          options={teams.map((team) => ({ id: team.id, label: team.name }))}
-        />
-
         <TextField name="fullName" isRequired>
           <Label className="mb-2 block font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
             Full name

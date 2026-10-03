@@ -3,10 +3,12 @@ import { Container } from '@/components/layout/Container'
 import { PublicHeader } from '@/components/layout/PublicHeader'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 import { getLeaderboards } from '@/features/leaderboard/queries/leaderboardQueries'
+import { getDefaultRoom } from '@/features/rooms/repositories/roomRepository'
 import { cn } from '@/lib/cn'
 
 export default async function RootPage() {
-  const boards = await getLeaderboards()
+  const room = await getDefaultRoom()
+  const boards = await getLeaderboards(room.id)
 
   return (
     <main className="min-h-screen bg-background px-4 py-6 text-foreground tactical-grid scanlines sm:px-6 lg:px-10">

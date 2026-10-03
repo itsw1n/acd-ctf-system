@@ -1,56 +1,24 @@
 import 'server-only'
 import { createAdminClient } from '@/lib/supabase/admin'
-import type { Player, PlayerRole } from '@/features/players/types'
-import type { Team } from '@/features/teams/types'
+import type { Player } from '@/features/players/types'
 
 type PlayerRow = {
   id: string
   full_name: string
   alias: string
-  team_id: string | null
-  role: PlayerRole
-  access_locked: boolean
 }
 
 type PlayerCredentialsRow = {
   id: string
   alias: string
   password_hash: string | null
-  role: PlayerRole
-  access_locked: boolean
-}
-
-type TeamRow = {
-  id: string
-  name: string
-  slug: string
-}
-
-export async function listTeams(): Promise<Team[]> {
-  const supabase = createAdminClient()
-  const { data, error } = await supabase.from('teams').select('id,name,slug').order('name')
-
-  if (error) throw new Error(`Unable to load teams: ${error.message}`)
-  return (data ?? []) as Team[]
-}
-
-export async function getTeamById(teamId: string): Promise<Team | null> {
-  const supabase = createAdminClient()
-  const { data, error } = await supabase
-    .from('teams')
-    .select('id,name,slug')
-    .eq('id', teamId)
-    .maybeSingle()
-
-  if (error) throw new Error(`Unable to load team: ${error.message}`)
-  return (data as TeamRow | null) ?? null
 }
 
 export async function getPlayerByAlias(alias: string): Promise<PlayerRow | null> {
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('players')
-    .select('id,full_name,alias,team_id,role,access_locked')
+    .select('id,full_name,alias')
     .ilike('alias', alias)
     .maybeSingle()
 
@@ -63,63 +31,23 @@ export async function getPlayerById(playerId: string): Promise<Player | null> {
 
   const { data: player, error: playerError } = await supabase
     .from('players')
-    .select('id,full_name,alias,team_id,role,access_locked')
+    .select('id,full_name,alias')
     .eq('id', playerId)
     .maybeSingle()
 
   if (playerError) throw new Error(`Unable to load player: ${playerError.message}`)
   if (!player) return null
 
-  const role = (player as PlayerRow).role
-
-  // A null team_id never implies ADMIN on its own: PLAYER rows without a
-  // team are corrupt and must not resolve, even if DB integrity were bypassed.
-  if (player.team_id === null) {
-    if (role !== 'ADMIN') throw new Error('Unable to load player team: missing team for PLAYER.')
-    return {
-      id: player.id,
-      fullName: player.full_name,
-      alias: player.alias,
-      role,
-      accessLocked: player.access_locked,
-      team: null,
-    }
-  }
-
-  const { data: team, error: teamError } = await supabase
-    .from('teams')
-    .select('id,name,slug')
-    .eq('id', player.team_id)
-    .maybeSingle()
-
-  if (teamError) throw new Error(`Unable to load player team: ${teamError.message}`)
-  if (!team) {
-    // Dangling FK: corrupt for PLAYER, tolerable for ADMIN (no team anyway).
-    if (role !== 'ADMIN') throw new Error('Unable to load player team: missing team for PLAYER.')
-    return {
-      id: player.id,
-      fullName: player.full_name,
-      alias: player.alias,
-      role,
-      accessLocked: player.access_locked,
-      team: null,
-    }
-  }
-
   return {
     id: player.id,
     fullName: player.full_name,
     alias: player.alias,
-    role,
-    accessLocked: player.access_locked,
-    team: team as TeamRow,
   }
 }
 
 export async function createPlayer(input: {
   fullName: string
   alias: string
-  teamId: string
   passwordHash: string
   recoveryCodeHash: string
 }) {
@@ -129,9 +57,6 @@ export async function createPlayer(input: {
     .insert({
       full_name: input.fullName,
       alias: input.alias,
-      team_id: input.teamId,
-      // Role is forced server-side. Never accept it from client input.
-      role: 'PLAYER',
       password_hash: input.passwordHash,
       recovery_code_hash: input.recoveryCodeHash,
     })
@@ -155,26 +80,12 @@ export async function getPlayerCredentialsByAlias(
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('players')
-    .select('id,alias,password_hash,role,access_locked')
+    .select('id,alias,password_hash')
     .ilike('alias', alias)
     .maybeSingle()
 
   if (error) throw new Error(`Unable to find player: ${error.message}`)
   return (data as PlayerCredentialsRow | null) ?? null
-}
-
-export async function setPlayerAccessLocked(playerId: string, locked: boolean) {
-  const supabase = createAdminClient()
-  const { data, error } = await supabase
-    .from('players')
-    .update({ access_locked: locked })
-    .eq('id', playerId)
-    .eq('role', 'PLAYER')
-    .select('id')
-    .maybeSingle()
-
-  if (error) throw new Error(`Unable to update player access: ${error.message}`)
-  if (!data) throw new Error('PLAYER_NOT_FOUND')
 }
 
 export async function updatePlayerPassword(playerId: string, passwordHash: string) {

@@ -3,7 +3,8 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
-import { requireAdmin } from '@/features/auth/services/requireAdmin'
+import { requireRoomOwnerById } from '@/features/rooms/services/requireRoom'
+import { getRoomPath } from '@/features/rooms/services/roomService'
 import {
   createTeam,
   createTeamSchema,
@@ -16,10 +17,11 @@ export type TeamActionState = {
 }
 
 export async function createTeamAction(
+  roomId: string,
   _previous: TeamActionState,
   formData: FormData
 ): Promise<TeamActionState> {
-  await requireAdmin()
+  await requireRoomOwnerById(roomId)
 
   const parsed = createTeamSchema.safeParse({ name: formData.get('name') })
   if (!parsed.success) {
@@ -27,7 +29,7 @@ export async function createTeamAction(
   }
 
   try {
-    await createTeam(parsed.data)
+    await createTeam(roomId, parsed.data)
   } catch (error) {
     if (error instanceof Error && error.message === 'TEAM_TAKEN') {
       return { error: 'That team name is already taken.' }
@@ -35,15 +37,17 @@ export async function createTeamAction(
     return { error: 'Unable to create team. Please try again.' }
   }
 
-  revalidatePath('/admin/teams')
-  redirect('/admin/teams')
+  const path = `${await getRoomPath(roomId)}/admin/teams`
+  revalidatePath(path)
+  redirect(path)
 }
 
 export async function renameTeamAction(
+  roomId: string,
   _previous: TeamActionState,
   formData: FormData
 ): Promise<TeamActionState> {
-  await requireAdmin()
+  await requireRoomOwnerById(roomId)
 
   const parsed = renameTeamSchema.safeParse({
     id: formData.get('id'),
@@ -54,7 +58,7 @@ export async function renameTeamAction(
   }
 
   try {
-    await renameTeam(parsed.data)
+    await renameTeam(roomId, parsed.data)
   } catch (error) {
     if (error instanceof Error && error.message === 'TEAM_TAKEN') {
       return { error: 'That team name is already taken.' }
@@ -62,6 +66,7 @@ export async function renameTeamAction(
     return { error: 'Unable to rename team. Please try again.' }
   }
 
-  revalidatePath('/admin/teams')
-  redirect('/admin/teams')
+  const path = `${await getRoomPath(roomId)}/admin/teams`
+  revalidatePath(path)
+  redirect(path)
 }

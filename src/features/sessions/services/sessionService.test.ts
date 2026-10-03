@@ -33,61 +33,27 @@ function cookieWith(token: string | undefined) {
   } as never)
 }
 
-function dbPlayer(role: 'PLAYER' | 'ADMIN'): {
-  id: string
-  fullName: string
-  alias: string
-  role: 'PLAYER' | 'ADMIN'
-  accessLocked: boolean
-  team: { id: string; name: string; slug: string }
-} {
+function dbPlayer() {
   return {
     id: 'player-1',
     fullName: 'Test User',
     alias: 'tester',
-    role,
-    accessLocked: false,
-    team: { id: 't1', name: 'Ops', slug: 'ops' },
   }
 }
 
-describe('session role resolution', () => {
+describe('session identity resolution', () => {
   beforeEach(() => vi.clearAllMocks())
 
-  it('takes role from the player database row, not the cookie', async () => {
+  it('takes identity from the player database row, not the cookie', async () => {
     cookieWith('opaque-client-token')
     vi.mocked(getSessionPlayerId).mockResolvedValueOnce('player-1')
-    vi.mocked(getPlayerById).mockResolvedValueOnce(dbPlayer('ADMIN'))
+    vi.mocked(getPlayerById).mockResolvedValueOnce(dbPlayer())
 
     const player = await getCurrentPlayer()
 
-    // The raw cookie value only locates the session; it carries no role.
-    expect(vi.mocked(getSessionPlayerId)).toHaveBeenCalledWith(expect.not.stringContaining('ADMIN'))
-    expect(player).toMatchObject({ id: 'player-1', role: 'ADMIN' })
-  })
-
-  it('resolves PLAYER for the same cookie shape when the row says PLAYER', async () => {
-    cookieWith('opaque-client-token')
-    vi.mocked(getSessionPlayerId).mockResolvedValueOnce('player-1')
-    vi.mocked(getPlayerById).mockResolvedValueOnce(dbPlayer('PLAYER'))
-
-    const player = await getCurrentPlayer()
-
-    expect(player).toMatchObject({ role: 'PLAYER' })
-  })
-
-  it('revokes the cookie when the account is locked', async () => {
-    const storeDelete = vi.fn()
-    vi.mocked(cookies).mockResolvedValueOnce({
-      get: () => ({ value: 'locked-token' }),
-      delete: storeDelete,
-    } as never)
-    vi.mocked(getSessionPlayerId).mockResolvedValueOnce('player-1')
-    vi.mocked(getPlayerById).mockResolvedValueOnce({ ...dbPlayer('PLAYER'), accessLocked: true })
-
-    await expect(getCurrentPlayer()).resolves.toBeNull()
-    expect(vi.mocked(deleteSessionByTokenHash)).toHaveBeenCalled()
-    expect(storeDelete).toHaveBeenCalledWith('test_session_cookie')
+    // The raw cookie value only locates the session; it carries no identity.
+    expect(vi.mocked(getSessionPlayerId)).toHaveBeenCalledWith(expect.any(String))
+    expect(player).toMatchObject({ id: 'player-1', alias: 'tester' })
   })
 
   it('returns null without a cookie', async () => {
@@ -118,7 +84,7 @@ describe('session role resolution', () => {
       get: () => ({ value: 'persistent-token' }),
     } as never)
     vi.mocked(getSessionPlayerId).mockResolvedValue('player-1')
-    vi.mocked(getPlayerById).mockResolvedValue(dbPlayer('PLAYER'))
+    vi.mocked(getPlayerById).mockResolvedValue(dbPlayer())
 
     await expect(getCurrentPlayer()).resolves.toMatchObject({ id: 'player-1' })
     await expect(getCurrentPlayer()).resolves.toMatchObject({ id: 'player-1' })
