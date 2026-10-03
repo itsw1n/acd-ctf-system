@@ -4,6 +4,7 @@ import { TacticalPanel } from '@/components/common/TacticalPanel'
 import { requireRoomOwner } from '@/features/rooms/services/requireRoom'
 import { getAdminOverview } from '@/features/admin/queries/overviewQueries'
 import {
+  deleteRoomAction,
   regenerateJoinCodeAction,
   setJoinLockedAction,
   updateRoomAction,
@@ -11,6 +12,7 @@ import {
 import { RoomSettingsForm } from '@/features/rooms/components/RoomSettingsForm'
 import { JoinCodePanel } from '@/features/rooms/components/JoinCodePanel'
 import { JoinLockControl } from '@/features/rooms/components/JoinLockControl'
+import { DeleteRoomPanel } from '@/features/rooms/components/DeleteRoomPanel'
 import { getRoomJoinCode } from '@/features/rooms/services/roomService'
 
 export default async function RoomAdminPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -81,6 +83,12 @@ export default async function RoomAdminPage({ params }: { params: Promise<{ slug
               )}
             </div>
           </TacticalPanel>
+
+          <DeleteRoomPanel
+            roomId={room.id}
+            roomName={room.name}
+            action={deleteRoomAction.bind(null, room.id)}
+          />
         </div>
       </Container>
     </Section>

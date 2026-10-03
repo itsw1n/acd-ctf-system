@@ -6,6 +6,7 @@ import { KeyRound, RotateCcw, Terminal } from 'lucide-react'
 import { resetPasswordAction, type ResetPasswordState } from '@/features/auth/actions/authActions'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
+import { PendingDots } from '@/components/common/PendingDots'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 
 const initialState: ResetPasswordState = {}
@@ -95,7 +96,13 @@ export function ResetPasswordForm() {
         ) : (
           <Button type="submit" size="lg" isPending={pending} className="w-full sm:w-auto">
             <RotateCcw size={18} aria-hidden />
-            {pending ? 'Resetting...' : 'Reset password'}
+            {pending ? (
+              <>
+                Resetting <PendingDots label="Resetting password" />
+              </>
+            ) : (
+              'Reset password'
+            )}
           </Button>
         )}
 

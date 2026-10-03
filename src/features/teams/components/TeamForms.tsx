@@ -7,6 +7,7 @@ import { Pencil, Plus } from 'lucide-react'
 import type { TeamActionState } from '@/features/teams/actions/teamActions'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
+import { PendingDots } from '@/components/common/PendingDots'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 
 export function CreateTeamForm({
@@ -27,7 +28,13 @@ export function CreateTeamForm({
         </TextField>
         <Button type="submit" size="md" isPending={pending} className="w-full sm:w-auto">
           <Plus size={17} aria-hidden />
-          {pending ? 'Creating...' : 'Create team'}
+          {pending ? (
+            <>
+              Creating <PendingDots label="Creating team" />
+            </>
+          ) : (
+            'Create team'
+          )}
         </Button>
       </form>
       {state.error && (
@@ -64,7 +71,13 @@ export function RenameTeamForm({
       </TextField>
       <Button type="submit" size="lg" isPending={pending} className="w-full">
         <Pencil size={15} aria-hidden />
-        {pending ? 'Saving...' : 'Save'}
+        {pending ? (
+          <>
+            Saving <PendingDots label="Saving team" />
+          </>
+        ) : (
+          'Save'
+        )}
       </Button>
       {state.error && (
         <span role="alert" className="font-mono text-[11px] text-danger-bright">

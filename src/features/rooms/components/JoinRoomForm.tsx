@@ -5,6 +5,7 @@ import { Users } from 'lucide-react'
 
 import type { RoomActionState } from '@/features/rooms/actions/roomActions'
 import { Button } from '@/components/common/Button'
+import { PendingDots } from '@/components/common/PendingDots'
 import { Select } from '@/components/common/Select'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 
@@ -49,7 +50,13 @@ export function JoinRoomForm({
 
         <Button type="submit" size="lg" isPending={pending} className="w-full sm:w-auto">
           <Users size={18} aria-hidden />
-          {pending ? 'Joining...' : 'Join room'}
+          {pending ? (
+            <>
+              Joining <PendingDots label="Joining room" />
+            </>
+          ) : (
+            'Join room'
+          )}
         </Button>
       </form>
     </TacticalPanel>

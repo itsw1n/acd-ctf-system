@@ -6,6 +6,7 @@ import { AlertTriangle, CheckCircle2, ChevronRight, Flag, RotateCcw } from 'luci
 import { submitFlagAction, type FlagState } from '@/features/flags/actions/flagActions'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
+import { PendingDots } from '@/components/common/PendingDots'
 import { cn } from '@/lib/cn'
 
 const initialState: FlagState = {}
@@ -31,7 +32,13 @@ export function FlagSubmissionForm({ roomId }: { roomId: string }) {
 
         <Button type="submit" size="lg" isPending={pending} className="h-16 self-end">
           <ChevronRight size={20} aria-hidden />
-          {pending ? 'Validating...' : 'Submit flag'}
+          {pending ? (
+            <>
+              Validating <PendingDots label="Validating flag" />
+            </>
+          ) : (
+            'Submit flag'
+          )}
         </Button>
       </div>
 

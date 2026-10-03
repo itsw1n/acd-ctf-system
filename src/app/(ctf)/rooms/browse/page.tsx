@@ -23,6 +23,20 @@ export default async function BrowseRoomsPage() {
           </p>
         </div>
 
+        <TacticalPanel label="Have a code?" className="mb-5 p-5 sm:p-7">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="font-mono text-xs uppercase tracking-[0.14em] text-muted">
+              Private rooms need a join code.
+            </p>
+            <Link
+              href="/rooms/join"
+              className="clip-button inline-flex min-h-11 items-center justify-center gap-2 border border-danger-bright/70 bg-[linear-gradient(180deg,#e32636_0%,#b51622_45%,#8f1111_100%)] px-6 font-display text-sm font-semibold uppercase tracking-[0.14em] text-foreground transition hover:brightness-110"
+            >
+              Enter join code
+            </Link>
+          </div>
+        </TacticalPanel>
+
         <TacticalPanel label="Public rooms" className="p-5 sm:p-7">
           {!rooms.length && (
             <p className="py-8 text-center font-mono text-sm text-muted">

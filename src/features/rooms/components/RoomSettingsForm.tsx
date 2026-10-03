@@ -8,6 +8,7 @@ import type { RoomActionState } from '@/features/rooms/actions/roomActions'
 import type { Room } from '@/features/rooms/types'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
+import { PendingDots } from '@/components/common/PendingDots'
 import { Select } from '@/components/common/Select'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 
@@ -53,7 +54,13 @@ export function RoomSettingsForm({
 
         <Button type="submit" size="lg" isPending={pending} className="w-full sm:w-auto">
           <Save size={18} aria-hidden />
-          {pending ? 'Saving...' : 'Save settings'}
+          {pending ? (
+            <>
+              Saving <PendingDots label="Saving settings" />
+            </>
+          ) : (
+            'Save settings'
+          )}
         </Button>
       </form>
     </TacticalPanel>

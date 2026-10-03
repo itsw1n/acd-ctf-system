@@ -45,3 +45,7 @@ postgres-data/
 .supabase/
 supabase/.branches/
 supabase/.temp/
+
+# Agent scratch (specs/plans/briefs are local working files)
+docs/superpowers/
+.superpowers/

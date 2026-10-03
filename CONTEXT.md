@@ -133,7 +133,7 @@ from README direction (user-approved onboarding).
   competition and global ADMIN role with per-room ownership and membership.
   Rationale: any user can host a room and join others. Authority becomes
   `room_memberships.role` (OWNER/PARTICIPANT) instead of `players.role`;
-  teams, challenges, solves, locks, and bans are scoped per room. Files:
+  teams, challenges, solves, locks are scoped per room. Files:
   `supabase/migrations/011_rooms.sql`, `src/features/rooms/**`,
   `src/app/rooms/**`. Rollback: restore pre-011 database backup. Spec:
   `docs/superpowers/specs/2026-10-02-rooms-design.md`.

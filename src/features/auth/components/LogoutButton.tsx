@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, type ReactNode } from 'react'
+import { useState, useTransition, type ReactNode } from 'react'
 
 import { Button } from '@/components/common/Button'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
+import { PendingDots } from '@/components/common/PendingDots'
 
 type LogoutButtonProps = {
   action: (formData: FormData) => Promise<void>
@@ -19,6 +20,7 @@ type LogoutButtonProps = {
  */
 export function LogoutButton({ action, variant, size, className, children }: LogoutButtonProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const [pending, startTransition] = useTransition()
 
   return (
     <>
@@ -38,9 +40,21 @@ export function LogoutButton({ action, variant, size, className, children }: Log
         onOpenChange={setIsOpen}
         description="End your current session? You will need to sign in again."
         confirm={
-          <form action={action}>
-            <Button type="submit" variant="warning" size="sm" className="w-full sm:w-auto">
-              Log out
+          <form action={(formData) => startTransition(() => action(formData))}>
+            <Button
+              type="submit"
+              variant="warning"
+              size="sm"
+              isPending={pending}
+              className="w-full sm:w-auto"
+            >
+              {pending ? (
+                <>
+                  Logging out <PendingDots label="Logging out" />
+                </>
+              ) : (
+                'Log out'
+              )}
             </Button>
           </form>
         }

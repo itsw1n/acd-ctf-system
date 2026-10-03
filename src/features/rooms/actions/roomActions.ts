@@ -6,16 +6,15 @@ import { redirect } from 'next/navigation'
 import { getRoomById } from '@/features/rooms/repositories/roomRepository'
 import { requireRoomMemberById, requireRoomOwnerById } from '@/features/rooms/services/requireRoom'
 import {
-  banMember,
   getRoomPath,
   createRoom,
+  deleteRoom,
   joinRoom,
   joinRoomByCode,
   leaveRoom,
   regenerateJoinCode,
   setJoinLocked,
   setMemberLocked,
-  unbanMember,
   updateRoom,
 } from '@/features/rooms/services/roomService'
 import { getCurrentPlayer } from '@/features/sessions/services/sessionService'
@@ -83,8 +82,8 @@ export async function joinRoomByCodeAction(
     if (error instanceof Error && error.message === 'JOIN_LOCKED') {
       return { error: 'This room is locked and not accepting new members.' }
     }
-    if (error instanceof Error && error.message === 'BANNED') {
-      return { error: 'You cannot join this room.' }
+    if (error instanceof Error && error.message === 'LOCKED') {
+      return { error: 'Your access is locked. Contact the organizer.' }
     }
     if (error instanceof Error && error.message === 'TEAM_NOT_IN_ROOM') {
       return { error: 'Selected team does not belong to this room.' }
@@ -116,8 +115,8 @@ export async function joinRoomAction(
     if (error instanceof Error && error.message === 'JOIN_LOCKED') {
       return { error: 'This room is locked and not accepting new members.' }
     }
-    if (error instanceof Error && error.message === 'BANNED') {
-      return { error: 'You cannot join this room.' }
+    if (error instanceof Error && error.message === 'LOCKED') {
+      return { error: 'Your access is locked. Contact the organizer.' }
     }
     return { error: 'Unable to join room. Please try again.' }
   }
@@ -152,22 +151,6 @@ export async function regenerateJoinCodeAction(roomId: string): Promise<RoomActi
   return { code }
 }
 
-export async function banMemberAction(roomId: string, formData: FormData) {
-  await requireRoomOwnerById(roomId)
-  const playerId = formData.get('playerId')
-  if (typeof playerId !== 'string' || !playerId) return
-  await banMember({ roomId, playerId })
-  revalidatePath(await getRoomPath(roomId))
-}
-
-export async function unbanMemberAction(roomId: string, formData: FormData) {
-  await requireRoomOwnerById(roomId)
-  const playerId = formData.get('playerId')
-  if (typeof playerId !== 'string' || !playerId) return
-  await unbanMember({ roomId, playerId })
-  revalidatePath(await getRoomPath(roomId))
-}
-
 export async function updateRoomAction(
   roomId: string,
   _previous: RoomActionState,
@@ -187,4 +170,26 @@ export async function updateRoomAction(
 
   revalidatePath(await getRoomPath(roomId))
   return {}
+}
+
+export async function deleteRoomAction(
+  roomId: string,
+  _previous: RoomActionState,
+  formData: FormData
+): Promise<RoomActionState> {
+  await requireRoomOwnerById(roomId)
+
+  try {
+    await deleteRoom({ roomId, expectedName: String(formData.get('expectedName') ?? '') })
+  } catch (error) {
+    if (error instanceof Error && error.message === 'DEFAULT_ROOM_PROTECTED') {
+      return { error: 'The default room cannot be deleted.' }
+    }
+    if (error instanceof Error && error.message === 'NAME_MISMATCH') {
+      return { error: 'Type the room name exactly to confirm.' }
+    }
+    return { error: 'Unable to delete room. Please try again.' }
+  }
+
+  redirect('/rooms')
 }

@@ -2,21 +2,14 @@ import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 import { requireRoomOwner } from '@/features/rooms/services/requireRoom'
-import {
-  banMemberAction,
-  setMemberLockedAction,
-  unbanMemberAction,
-} from '@/features/rooms/actions/roomActions'
-import { listBannedMembers, listRoomMembers } from '@/features/rooms/services/roomService'
-import { BannedRowActions, MemberRowActions } from '@/features/rooms/components/MemberRowActions'
+import { setMemberLockedAction } from '@/features/rooms/actions/roomActions'
+import { listRoomMembers } from '@/features/rooms/services/roomService'
+import { MemberRowActions } from '@/features/rooms/components/MemberRowActions'
 
 export default async function RoomMembersPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const { room } = await requireRoomOwner(slug)
-  const [members, banned] = await Promise.all([
-    listRoomMembers(room.id),
-    listBannedMembers(room.id),
-  ])
+  const members = await listRoomMembers(room.id)
 
   return (
     <Section data-ui="room-admin-members">
@@ -62,7 +55,6 @@ export default async function RoomMembersPage({ params }: { params: Promise<{ sl
                             roomId={room.id}
                             playerId={member.playerId}
                             locked={member.accessLocked}
-                            banAction={banMemberAction}
                             lockAction={setMemberLockedAction}
                           />
                         ) : (
@@ -78,29 +70,6 @@ export default async function RoomMembersPage({ params }: { params: Promise<{ sl
               )}
             </div>
           </TacticalPanel>
-
-          {banned.length > 0 && (
-            <TacticalPanel label="Banned" className="p-5 sm:p-7">
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[720px] border-collapse text-left font-mono">
-                  <tbody>
-                    {banned.map((entry) => (
-                      <tr key={entry.playerId} className="border-b border-border/70 text-xs">
-                        <td className="px-4 py-4 font-bold text-muted">{entry.alias}</td>
-                        <td className="px-4 py-4 text-right">
-                          <BannedRowActions
-                            roomId={room.id}
-                            playerId={entry.playerId}
-                            unbanAction={unbanMemberAction}
-                          />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </TacticalPanel>
-          )}
         </div>
       </Container>
     </Section>

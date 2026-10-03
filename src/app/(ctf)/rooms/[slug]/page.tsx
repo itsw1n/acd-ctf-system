@@ -1,7 +1,8 @@
+import { redirect } from 'next/navigation'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
-import { Button } from '@/components/common/Button'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
+import { LeaveRoomForm } from '@/features/rooms/components/LeaveRoomForm'
 import { requireRoomMember } from '@/features/rooms/services/requireRoom'
 import { leaveRoomAction } from '@/features/rooms/actions/roomActions'
 import { getLeaderboards } from '@/features/leaderboard/queries/leaderboardQueries'
@@ -11,6 +12,8 @@ import { cn } from '@/lib/cn'
 export default async function RoomOverviewPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const { player, room, membership } = await requireRoomMember(slug)
+  const role: 'OWNER' | 'PARTICIPANT' = membership.role
+  if (role === 'OWNER') redirect(`/rooms/${slug}/admin`)
   const [boards, score] = await Promise.all([
     getLeaderboards(room.id),
     getPlayerScore(player.id, room.id),
@@ -30,11 +33,7 @@ export default async function RoomOverviewPage({ params }: { params: Promise<{ s
             Your score: <span className="font-bold text-danger-bright">{score} PTS</span>
           </p>
           {membership.role !== 'OWNER' && (
-            <form action={leaveRoomAction.bind(null, room.id)} className="mt-4">
-              <Button type="submit" variant="secondary" size="sm">
-                Leave room
-              </Button>
-            </form>
+            <LeaveRoomForm action={leaveRoomAction.bind(null, room.id)} />
           )}
         </div>
 

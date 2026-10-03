@@ -9,17 +9,18 @@ export function RoomTabs({ slug, isOwner }: { slug: string; isOwner: boolean }) 
   const pathname = usePathname()
   const base = `/rooms/${slug}`
   const links = [
-    { href: base, label: 'Leaderboard' },
-    // Owners manage instead of playing, so they get the admin sections.
     ...(isOwner
       ? [
-          { href: `${base}/admin`, label: 'Admin' },
+          { href: `${base}/admin`, label: 'Overview' },
           { href: `${base}/admin/challenges`, label: 'Challenges' },
           { href: `${base}/admin/teams`, label: 'Teams' },
           { href: `${base}/admin/members`, label: 'Members' },
           { href: `${base}/admin/solves`, label: 'Solves' },
         ]
-      : [{ href: `${base}/play`, label: 'Play' }]),
+      : [
+          { href: base, label: 'Leaderboard' },
+          { href: `${base}/play`, label: 'Play' },
+        ]),
     { href: `${base}/activity`, label: 'Activity' },
   ]
 
