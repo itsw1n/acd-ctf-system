@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Compass, LayoutDashboard, LogOut, UserRound } from 'lucide-react'
 import { LogoutButton } from '@/features/auth/components/LogoutButton'
+import { LinkStatus } from '@/components/common/LinkStatus'
 import { cn } from '@/lib/cn'
 
 const items = [
@@ -42,6 +43,7 @@ export function Navigation({ logoutAction }: { logoutAction: () => Promise<void>
                 >
                   <Icon size={20} strokeWidth={1.7} aria-hidden />
                   {label}
+                  <LinkStatus />
                 </Link>
               )
             })}
@@ -81,6 +83,7 @@ export function Navigation({ logoutAction }: { logoutAction: () => Promise<void>
             >
               <Icon size={18} aria-hidden />
               <span>{label}</span>
+              <LinkStatus />
             </Link>
           )
         })}

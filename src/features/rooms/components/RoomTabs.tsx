@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 import { cn } from '@/lib/cn'
+import { LinkStatus } from '@/components/common/LinkStatus'
 
 export function RoomTabs({ slug, isOwner }: { slug: string; isOwner: boolean }) {
   const pathname = usePathname()
@@ -44,6 +45,7 @@ export function RoomTabs({ slug, isOwner }: { slug: string; isOwner: boolean }) 
               )}
             >
               {label}
+              <LinkStatus />
             </Link>
           )
         })}
