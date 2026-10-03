@@ -10,6 +10,7 @@ export type ConfirmDialogProps = {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
   description: ReactNode
+  body?: ReactNode
   confirm: ReactNode
   cancelLabel?: string
   eyebrow?: string
@@ -25,6 +26,7 @@ export function ConfirmDialog({
   isOpen,
   onOpenChange,
   description,
+  body,
   confirm,
   cancelLabel = 'Cancel',
   eyebrow,
@@ -32,6 +34,7 @@ export function ConfirmDialog({
   return (
     <Modal title={title} eyebrow={eyebrow} isOpen={isOpen} onOpenChange={onOpenChange}>
       <div className="font-mono text-sm leading-6 text-muted">{description}</div>
+      {body}
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
         <Button type="button" variant="secondary" size="sm" onPress={() => onOpenChange(false)}>
           {cancelLabel}

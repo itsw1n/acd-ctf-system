@@ -54,29 +54,36 @@ export function DeleteRoomPanel({
             Type <span className="font-bold text-foreground">{roomName}</span> to confirm deletion.
           </>
         }
-        confirm={
-          <form action={formAction}>
-            <Input
-              name="expectedName"
-              aria-label={`Type ${roomName} to confirm`}
-              value={typed}
-              onChange={(e) => setTyped(e.currentTarget.value)}
-              autoComplete="off"
-              spellCheck={false}
-              placeholder={roomName}
-            />
+        body={
+          <>
+            <div className="mt-4">
+              <Input
+                name="expectedNameVisible"
+                aria-label={`Type ${roomName} to confirm`}
+                value={typed}
+                onChange={(e) => setTyped(e.currentTarget.value)}
+                autoComplete="off"
+                spellCheck={false}
+                placeholder={roomName}
+              />
+            </div>
             {state.error && (
               <p role="alert" className="mt-2 font-mono text-xs text-danger-bright">
                 {state.error}
               </p>
             )}
+          </>
+        }
+        confirm={
+          <form action={formAction}>
+            <input type="hidden" name="expectedName" value={typed} />
             <Button
               type="submit"
               variant="warning"
               size="sm"
               isPending={pending}
               isDisabled={!matched || pending}
-              className="mt-3 w-full sm:w-auto"
+              className="w-full sm:w-auto"
             >
               {pending ? (
                 <>
