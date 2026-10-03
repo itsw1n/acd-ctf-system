@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
 import { Button } from '@/components/common/Button'
@@ -11,6 +12,8 @@ import { cn } from '@/lib/cn'
 export default async function RoomOverviewPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const { player, room, membership } = await requireRoomMember(slug)
+  const role: 'OWNER' | 'PARTICIPANT' = membership.role
+  if (role === 'OWNER') redirect(`/rooms/${slug}/admin`)
   const [boards, score] = await Promise.all([
     getLeaderboards(room.id),
     getPlayerScore(player.id, room.id),
