@@ -44,7 +44,9 @@ jobs:
           cache: npm
           cache-dependency-path: package-lock.json
       - run: npm ci
-      - run: npm audit --audit-level=high
+      # Time-boxed allowlist lives in scripts/audit-allowlist.json (with
+      # rationale + re-check date). Fails on any other high/critical advisory.
+      - run: node scripts/audit-gate.mjs
 
   # NOTE: no workflow codeql job here on purpose. GitHub's default code
   # scanning already analyzes every PR (it caught the recovery-code modulo

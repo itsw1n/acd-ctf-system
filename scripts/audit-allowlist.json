@@ -1,0 +1,12 @@
+{
+  "$comment": "Time-boxed exceptions to the npm audit gate. Each entry MUST name the GHSA, why it cannot be fixed by upgrade, the blast radius, and a re-check date. Anything not listed here fails the gate at high severity or above.",
+  "reviewBy": "2026-11-03",
+  "allow": [
+    {
+      "ghsa": "GHSA-vfj7-8cjw-p6xm",
+      "package": "braces",
+      "reason": "Stack-exhaustion DoS via crafted glob patterns. Reachable only through the build-tooling chain eslint-config-next > fast-glob > micromatch > braces (verified via npm ls); never bundled into production runtime. No fixed version published (braces@3.0.3 and micromatch@4.0.8 are latest and still flagged); the only npm-suggested fix is a breaking eslint downgrade.",
+      "added": "2026-10-03"
+    }
+  ]
+}
