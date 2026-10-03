@@ -9,6 +9,7 @@ import {
   banMember,
   getRoomPath,
   createRoom,
+  deleteRoom,
   joinRoom,
   joinRoomByCode,
   leaveRoom,
@@ -187,4 +188,26 @@ export async function updateRoomAction(
 
   revalidatePath(await getRoomPath(roomId))
   return {}
+}
+
+export async function deleteRoomAction(
+  roomId: string,
+  _previous: RoomActionState,
+  formData: FormData
+): Promise<RoomActionState> {
+  await requireRoomOwnerById(roomId)
+
+  try {
+    await deleteRoom({ roomId, expectedName: String(formData.get('expectedName') ?? '') })
+  } catch (error) {
+    if (error instanceof Error && error.message === 'DEFAULT_ROOM_PROTECTED') {
+      return { error: 'The default room cannot be deleted.' }
+    }
+    if (error instanceof Error && error.message === 'NAME_MISMATCH') {
+      return { error: 'Type the room name exactly to confirm.' }
+    }
+    return { error: 'Unable to delete room. Please try again.' }
+  }
+
+  redirect('/rooms')
 }
