@@ -11,6 +11,8 @@ export function JoinCodeContinueForm() {
   const [pending, setPending] = useState(false)
   return (
     <form
+      action="/rooms/join"
+      method="get"
       className="flex flex-col gap-4"
       onSubmit={(e) => {
         e.preventDefault()
