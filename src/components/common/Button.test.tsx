@@ -9,7 +9,7 @@ describe('Button', () => {
     render(
       <Button isPending pendingLabel="Saving settings">
         Save settings
-      </Button>,
+      </Button>
     )
 
     expect(screen.getByRole('button', { name: /Save settings/ })).toBeInTheDocument()

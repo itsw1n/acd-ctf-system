@@ -88,8 +88,7 @@ export function SignUpForm() {
               pendingLabel="Continuing signup"
               className="w-full sm:w-auto"
             >
-              <LogIn size={18} aria-hidden />
-              I saved my code — continue
+              <LogIn size={18} aria-hidden />I saved my code — continue
             </Button>
           </form>
         </div>
