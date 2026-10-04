@@ -12,7 +12,6 @@ import {
 } from '@/features/auth/actions/authActions'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
-import { PendingDots } from '@/components/common/PendingDots'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 
 const initialState: SignUpState = {}
@@ -86,16 +85,10 @@ export function SignUpForm() {
               type="submit"
               size="lg"
               isPending={continuePending}
+              pendingLabel="Continuing signup"
               className="w-full sm:w-auto"
             >
-              <LogIn size={18} aria-hidden />
-              {continuePending ? (
-                <>
-                  Continuing <PendingDots label="Continuing signup" />
-                </>
-              ) : (
-                'I saved my code — continue'
-              )}
+              <LogIn size={18} aria-hidden />I saved my code — continue
             </Button>
           </form>
         </div>
@@ -167,15 +160,15 @@ export function SignUpForm() {
           </p>
         )}
 
-        <Button type="submit" size="lg" isPending={pending} className="w-full sm:w-auto">
+        <Button
+          type="submit"
+          size="lg"
+          isPending={pending}
+          pendingLabel="Creating account"
+          className="w-full sm:w-auto"
+        >
           <Users size={18} aria-hidden />
-          {pending ? (
-            <>
-              Creating <PendingDots label="Creating account" />
-            </>
-          ) : (
-            'Create account'
-          )}
+          Create account
         </Button>
 
         <p className="flex flex-wrap gap-x-6 gap-y-2 border-t border-border pt-4 font-mono text-xs text-muted">

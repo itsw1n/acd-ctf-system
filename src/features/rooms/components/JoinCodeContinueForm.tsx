@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
-import { PendingDots } from '@/components/common/PendingDots'
 
 export function JoinCodeContinueForm() {
   const router = useRouter()
@@ -26,14 +25,14 @@ export function JoinCodeContinueForm() {
       }}
     >
       <Input name="code" placeholder="RM-XXXXXX" autoComplete="off" spellCheck={false} />
-      <Button type="submit" size="lg" isPending={pending} className="w-full sm:w-auto">
-        {pending ? (
-          <>
-            Checking <PendingDots label="Checking code" />
-          </>
-        ) : (
-          'Continue'
-        )}
+      <Button
+        type="submit"
+        size="lg"
+        isPending={pending}
+        pendingLabel="Checking code"
+        className="w-full sm:w-auto"
+      >
+        Continue
       </Button>
     </form>
   )

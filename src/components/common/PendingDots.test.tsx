@@ -9,5 +9,6 @@ describe('PendingDots', () => {
     const dots = document.querySelector('.pending-dots')
     expect(dots).not.toBeNull()
     expect(dots?.getAttribute('aria-hidden')).toBe('true')
+    expect(dots?.textContent).toBe('')
   })
 })

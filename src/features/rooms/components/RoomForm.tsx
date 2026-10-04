@@ -6,7 +6,6 @@ import { Label, TextField } from 'react-aria-components'
 import type { RoomActionState } from '@/features/rooms/actions/roomActions'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
-import { PendingDots } from '@/components/common/PendingDots'
 import { Select } from '@/components/common/Select'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 
@@ -47,14 +46,14 @@ export function RoomForm({
           </p>
         )}
 
-        <Button type="submit" size="lg" isPending={pending} className="w-full sm:w-auto">
-          {pending ? (
-            <>
-              Creating <PendingDots label="Creating room" />
-            </>
-          ) : (
-            'Create room'
-          )}
+        <Button
+          type="submit"
+          size="lg"
+          isPending={pending}
+          pendingLabel="Creating room"
+          className="w-full sm:w-auto"
+        >
+          Create room
         </Button>
       </form>
     </TacticalPanel>

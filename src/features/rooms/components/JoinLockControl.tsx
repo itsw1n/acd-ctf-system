@@ -3,7 +3,6 @@
 import { useTransition } from 'react'
 import { Lock, LockOpen } from 'lucide-react'
 import { Button } from '@/components/common/Button'
-import { PendingDots } from '@/components/common/PendingDots'
 
 export function JoinLockControl({
   roomId,
@@ -34,17 +33,10 @@ export function JoinLockControl({
           variant={locked ? 'secondary' : 'warning'}
           size="sm"
           isPending={pending}
+          pendingLabel="Updating join lock"
         >
           {locked ? <LockOpen size={16} aria-hidden /> : <Lock size={16} aria-hidden />}
-          {pending ? (
-            <>
-              Working <PendingDots label="Updating join lock" />
-            </>
-          ) : locked ? (
-            'Unlock joining'
-          ) : (
-            'Lock joining'
-          )}
+          {locked ? 'Unlock joining' : 'Lock joining'}
         </Button>
       </form>
     </div>

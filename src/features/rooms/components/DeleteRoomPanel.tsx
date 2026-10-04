@@ -7,7 +7,6 @@ import type { RoomActionState } from '@/features/rooms/actions/roomActions'
 import { Button } from '@/components/common/Button'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { Input } from '@/components/common/Input'
-import { PendingDots } from '@/components/common/PendingDots'
 
 export function DeleteRoomPanel({
   roomId,
@@ -82,16 +81,11 @@ export function DeleteRoomPanel({
               variant="warning"
               size="sm"
               isPending={pending}
+              pendingLabel="Deleting room"
               isDisabled={!matched || pending}
               className="w-full sm:w-auto"
             >
-              {pending ? (
-                <>
-                  Deleting <PendingDots label="Deleting room" />
-                </>
-              ) : (
-                'Delete'
-              )}
+              Delete
             </Button>
           </form>
         }

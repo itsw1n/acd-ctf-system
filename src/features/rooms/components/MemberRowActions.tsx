@@ -26,7 +26,10 @@ function ActionForm({
       <input type="hidden" name="playerId" value={playerId} />
       {locked !== undefined && <input type="hidden" name="locked" value={String(!locked)} />}
       {isValidElement(children)
-        ? cloneElement(children, { isPending: pending } as { isPending: boolean })
+        ? cloneElement(children, {
+            isPending: pending,
+            pendingLabel: locked ? 'Unlocking member' : 'Locking member',
+          } as { isPending: boolean; pendingLabel: string })
         : children}
     </form>
   )
