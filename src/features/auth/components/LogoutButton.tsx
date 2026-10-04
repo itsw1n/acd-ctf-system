@@ -4,7 +4,6 @@ import { useState, useTransition, type ReactNode } from 'react'
 
 import { Button } from '@/components/common/Button'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
-import { PendingDots } from '@/components/common/PendingDots'
 
 type LogoutButtonProps = {
   action: (formData: FormData) => Promise<void>
@@ -46,15 +45,10 @@ export function LogoutButton({ action, variant, size, className, children }: Log
               variant="warning"
               size="sm"
               isPending={pending}
+              pendingLabel="Logging out"
               className="w-full sm:w-auto"
             >
-              {pending ? (
-                <>
-                  Logging out <PendingDots label="Logging out" />
-                </>
-              ) : (
-                'Log out'
-              )}
+              Log out
             </Button>
           </form>
         }

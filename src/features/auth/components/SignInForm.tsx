@@ -7,7 +7,6 @@ import { CheckCircle2, KeyRound, LogIn, Terminal } from 'lucide-react'
 import { signInAction, type SignInState } from '@/features/auth/actions/authActions'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
-import { PendingDots } from '@/components/common/PendingDots'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 
 const initialState: SignInState = {}
@@ -69,15 +68,15 @@ export function SignInForm({ resetSuccess }: { resetSuccess: boolean }) {
           </p>
         )}
 
-        <Button type="submit" size="lg" isPending={pending} className="w-full sm:w-auto">
+        <Button
+          type="submit"
+          size="lg"
+          isPending={pending}
+          pendingLabel="Signing in"
+          className="w-full sm:w-auto"
+        >
           <LogIn size={18} aria-hidden />
-          {pending ? (
-            <>
-              Signing in <PendingDots label="Signing in" />
-            </>
-          ) : (
-            'Sign in'
-          )}
+          Sign in
         </Button>
 
         <p className="flex flex-wrap gap-x-6 gap-y-2 border-t border-border pt-4 font-mono text-xs text-muted">

@@ -1,9 +1,10 @@
 'use client'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import { Button as AriaButton } from 'react-aria-components'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/cn'
+import { PendingDots } from '@/components/common/PendingDots'
 
 const buttonVariants = cva(
   'clip-button relative inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 border px-6 font-display text-sm font-semibold uppercase tracking-[0.14em] outline-none transition duration-150 focus-visible:ring-2 focus-visible:ring-danger/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-45',
@@ -29,13 +30,33 @@ const buttonVariants = cva(
   }
 )
 
-type AriaButtonProps = Omit<ComponentProps<typeof AriaButton>, 'className'>
+type AriaButtonProps = Omit<ComponentProps<typeof AriaButton>, 'children' | 'className'>
 
 type ButtonProps = AriaButtonProps &
   VariantProps<typeof buttonVariants> & {
     className?: string
+    pendingLabel?: string
+    children?: ReactNode
+    isPending?: boolean
   }
 
-export function Button({ className, variant, size, ...props }: ButtonProps) {
-  return <AriaButton className={cn(buttonVariants({ variant, size }), className)} {...props} />
+export function Button({
+  className,
+  variant,
+  size,
+  pendingLabel = 'Loading',
+  isPending,
+  children,
+  ...props
+}: ButtonProps) {
+  return (
+    <AriaButton
+      className={cn(buttonVariants({ variant, size }), className)}
+      isPending={isPending}
+      {...props}
+    >
+      {children}
+      {isPending && <PendingDots label={pendingLabel} />}
+    </AriaButton>
+  )
 }

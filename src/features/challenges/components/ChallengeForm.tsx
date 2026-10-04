@@ -8,7 +8,6 @@ import type { ChallengeActionState } from '@/features/challenges/actions/challen
 import type { ChallengeEditRow } from '@/features/challenges/types'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
-import { PendingDots } from '@/components/common/PendingDots'
 import { Select } from '@/components/common/Select'
 import { TacticalPanel } from '@/components/common/TacticalPanel'
 
@@ -175,17 +174,15 @@ export function ChallengeForm({
           </p>
         )}
 
-        <Button type="submit" size="lg" isPending={pending} className="w-full sm:w-auto">
+        <Button
+          type="submit"
+          size="lg"
+          isPending={pending}
+          pendingLabel="Saving challenge"
+          className="w-full sm:w-auto"
+        >
           <Save size={18} aria-hidden />
-          {pending ? (
-            <>
-              Saving <PendingDots label="Saving challenge" />
-            </>
-          ) : mode === 'create' ? (
-            'Create challenge'
-          ) : (
-            'Save changes'
-          )}
+          {mode === 'create' ? 'Create challenge' : 'Save changes'}
         </Button>
       </form>
     </TacticalPanel>

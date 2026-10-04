@@ -6,7 +6,6 @@ import { useState } from 'react'
 
 import type { RoomActionState } from '@/features/rooms/actions/roomActions'
 import { Button } from '@/components/common/Button'
-import { PendingDots } from '@/components/common/PendingDots'
 
 export function JoinCodePanel({
   roomId,
@@ -46,15 +45,15 @@ export function JoinCodePanel({
           {copied ? 'Copied' : 'Copy'}
         </Button>
         <form action={formAction}>
-          <Button type="submit" variant="secondary" size="sm" isPending={pending}>
+          <Button
+            type="submit"
+            variant="secondary"
+            size="sm"
+            isPending={pending}
+            pendingLabel="Regenerating code"
+          >
             <RotateCcw size={15} aria-hidden />
-            {pending ? (
-              <>
-                Regenerating <PendingDots label="Regenerating code" />
-              </>
-            ) : (
-              'Regenerate'
-            )}
+            Regenerate
           </Button>
         </form>
       </div>
